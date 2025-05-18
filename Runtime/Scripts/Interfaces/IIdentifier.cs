@@ -3,7 +3,7 @@ using System;
 namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
 {
     /// <summary>
-    /// Interface for objects that require unique identification
+    /// Represents an object that can be uniquely identified
     /// </summary>
     public interface IIdentifier
     {
