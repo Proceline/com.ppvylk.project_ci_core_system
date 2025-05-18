@@ -1,4 +1,4 @@
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
+namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces
 {
     /// <summary>
     /// Represents the data configuration for a unit
@@ -6,42 +6,42 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
     public interface IUnitData
     {
         /// <summary>
-        /// Gets the name of the unit
+        /// Name of the unit
         /// </summary>
         string UnitName { get; }
 
         /// <summary>
-        /// Gets whether the unit is flying
+        /// Whether the unit can fly
         /// </summary>
         bool IsFlying { get; }
 
         /// <summary>
-        /// Gets whether the unit should look at targets
+        /// Whether the unit should look at its targets
         /// </summary>
         bool ShouldLookAtTargets { get; }
 
         /// <summary>
-        /// Gets the height offset of the unit
+        /// Height offset for the unit
         /// </summary>
         float HeightOffset { get; }
 
         /// <summary>
-        /// Gets the maximum movement points of the unit
+        /// Maximum movement points the unit can have
         /// </summary>
         int MaxMovementPoints { get; }
 
         /// <summary>
-        /// Gets the maximum ability points of the unit
+        /// Maximum ability points the unit can have
         /// </summary>
         int MaxAbilityPoints { get; }
 
         /// <summary>
-        /// Gets the maximum health of the unit
+        /// Maximum health the unit can have
         /// </summary>
-        int MaxHealth { get; }
+        float MaxHealth { get; }
 
         /// <summary>
-        /// Gets the team the unit belongs to
+        /// Team the unit belongs to
         /// </summary>
         int Team { get; }
     }

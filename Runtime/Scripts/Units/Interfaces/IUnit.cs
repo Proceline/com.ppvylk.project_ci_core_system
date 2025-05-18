@@ -1,6 +1,7 @@
+using ProjectCI_CoreSystem.Runtime.Scripts.Interfaces;
 using ProjectCI_CoreSystem.Runtime.Scripts.Enums;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
+namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces
 {
     /// <summary>
     /// Represents a unit in the game that can perform actions, move, and interact with other units
@@ -8,63 +9,69 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
     public interface IUnit : IIdentifier
     {
         /// <summary>
-        /// Gets the current state of the unit
+        /// Current state of the unit
         /// </summary>
         UnitState CurrentState { get; }
 
         /// <summary>
-        /// Gets whether the unit is currently moving
+        /// Whether the unit is currently moving
         /// </summary>
         bool IsMoving { get; }
 
         /// <summary>
-        /// Gets whether the unit is currently using an ability
+        /// Whether the unit is currently using an ability
         /// </summary>
         bool IsUsingAbility { get; }
 
         /// <summary>
-        /// Gets whether the unit is currently a target
+        /// Whether the unit is currently a target
         /// </summary>
         bool IsTarget { get; }
 
         /// <summary>
-        /// Gets whether the unit is currently activated
+        /// Whether the unit is currently activated
         /// </summary>
         bool IsActivated { get; }
 
         /// <summary>
-        /// Gets whether the unit is dead
+        /// Whether the unit is dead
         /// </summary>
         bool IsDead { get; }
 
         /// <summary>
-        /// Gets the current movement points of the unit
+        /// Current movement points available to the unit
         /// </summary>
         int CurrentMovementPoints { get; }
 
         /// <summary>
-        /// Gets the current ability points of the unit
+        /// Current ability points available to the unit
         /// </summary>
         int CurrentAbilityPoints { get; }
 
         /// <summary>
-        /// Initializes the unit with necessary components and data
+        /// Initialize the unit with its data
         /// </summary>
-        void Initialize();
+        /// <param name="data">The unit's data configuration</param>
+        void Initialize(IUnitData data);
 
         /// <summary>
-        /// Performs post-initialization setup
+        /// Called after initialization is complete
         /// </summary>
         void PostInitialize();
 
         /// <summary>
-        /// Selects the unit for player interaction
+        /// Called when the unit is selected
         /// </summary>
-        void SelectUnit();
+        void OnSelected();
 
         /// <summary>
-        /// Cleans up the unit's state and resources
+        /// Called when the unit is deselected
         /// </summary>
-        void CleanUp();
+        void OnDeselected();
+
+        /// <summary>
+        /// Clean up resources when the unit is destroyed
+        /// </summary>
+        void Cleanup();
     }
 } 
