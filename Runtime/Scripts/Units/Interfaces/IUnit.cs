@@ -1,12 +1,12 @@
-using ProjectCI_CoreSystem.Runtime.Scripts.Interfaces;
-using ProjectCI_CoreSystem.Runtime.Scripts.Enums;
+using ProjectCI.CoreSystem.Runtime.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Enums;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces
+namespace ProjectCI.CoreSystem.Runtime.Units.Interfaces
 {
     /// <summary>
     /// Represents a unit in the game that can perform actions, move, and interact with other units
     /// </summary>
-    public interface IUnit : IIdentifier
+    public interface IUnit : IIdentifier, IObject
     {
         /// <summary>
         /// Current state of the unit
@@ -53,11 +53,6 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces
         /// </summary>
         /// <param name="data">The unit's data configuration</param>
         void Initialize(IUnitData data);
-
-        /// <summary>
-        /// Called after initialization is complete
-        /// </summary>
-        void PostInitialize();
 
         /// <summary>
         /// Called when the unit is selected

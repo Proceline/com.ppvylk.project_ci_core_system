@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
+namespace ProjectCI.CoreSystem.Runtime.Interfaces
 {
     /// <summary>
     /// Represents an object that can be uniquely identified

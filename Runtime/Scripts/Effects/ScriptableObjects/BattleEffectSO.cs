@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Effects.ScriptableObjects
+namespace ProjectCI.CoreSystem.Runtime.Effects.ScriptableObjects
 {
     /// <summary>
     /// ScriptableObject that defines a battle effect

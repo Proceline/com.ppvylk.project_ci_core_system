@@ -1,6 +1,6 @@
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Data
+namespace ProjectCI.CoreSystem.Runtime.Units.Data
 {
     /// <summary>
     /// Represents the runtime data for a unit, including all dynamic resources

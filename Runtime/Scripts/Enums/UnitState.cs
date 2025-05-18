@@ -1,4 +1,4 @@
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Enums
+namespace ProjectCI.CoreSystem.Runtime.Enums
 {
     /// <summary>
     /// Represents the current state of a unit

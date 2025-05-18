@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
+using ProjectCI.CoreSystem.Runtime.Enums;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
+namespace ProjectCI.CoreSystem.Runtime.Interfaces
 {
     /// <summary>
     /// Base interface for all objects that can be placed on the grid
@@ -19,6 +20,7 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Interfaces
         bool IsVisible { get; }
         Vector3 Bounds { get; }
         Vector3 Position { get; }
+        BattleTeam Team { get; }
 
         // Methods
         void Initialize();

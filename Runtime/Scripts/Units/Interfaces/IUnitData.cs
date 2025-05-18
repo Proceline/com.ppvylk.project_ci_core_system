@@ -1,4 +1,4 @@
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces
+namespace ProjectCI.CoreSystem.Runtime.Units.Interfaces
 {
     /// <summary>
     /// Represents the data configuration for a unit

@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
-using ProjectCI_CoreSystem.Runtime.Scripts.Effects.ScriptableObjects;
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Effects.ScriptableObjects;
+using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Effects.Data
+namespace ProjectCI.CoreSystem.Runtime.Effects.Data
 {
     /// <summary>
     /// Data for an effect that is contained by a unit

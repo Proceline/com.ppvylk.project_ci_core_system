@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Data;
+using ProjectCI.CoreSystem.Runtime.Units.Data;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Components
+namespace ProjectCI.CoreSystem.Runtime.Units.Components
 {
     /// <summary>
     /// Represents the health system for a battle unit, including health, armor, and magical armor

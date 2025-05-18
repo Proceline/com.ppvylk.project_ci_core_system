@@ -1,8 +1,8 @@
 using UnityEngine;
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces;
-using ProjectCI_CoreSystem.Runtime.Scripts.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Interfaces;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Abilities.Params
+namespace ProjectCI.CoreSystem.Runtime.Abilities.Params
 {
     [CreateAssetMenu(fileName = "NewBattleHealParam", menuName = "ProjectCI/Ability/Parameters/Create BattleHealParam", order = 1)]
     public class BattleHealParam : BattleAbilityParam

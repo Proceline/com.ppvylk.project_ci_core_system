@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using ProjectCI_CoreSystem.Runtime.Scripts.Effects.Data;
-using ProjectCI_CoreSystem.Runtime.Scripts.Effects.ScriptableObjects;
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Effects.Data;
+using ProjectCI.CoreSystem.Runtime.Effects.ScriptableObjects;
+using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
 using UnityEngine;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Effects.Components
+namespace ProjectCI.CoreSystem.Runtime.Effects.Components
 {
     /// <summary>
-    /// Manages effects on a unit
+    /// Manages effects on a battle entity (unit or cell)
     /// </summary>
-    public class UnitEffectContainer : MonoBehaviour
+    public class BattleEffectContainer : MonoBehaviour
     {
         List<EffectContainedData> m_Effects = new List<EffectContainedData>();
 

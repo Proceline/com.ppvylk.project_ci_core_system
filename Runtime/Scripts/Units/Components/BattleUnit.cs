@@ -1,21 +1,21 @@
 using UnityEngine;
 using System;
-using ProjectCI_CoreSystem.Runtime.Scripts.Enums;
-using ProjectCI_CoreSystem.Runtime.Scripts.Units.Interfaces;
+using ProjectCI.CoreSystem.Runtime.Enums;
+using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
 
-namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Components
+namespace ProjectCI.CoreSystem.Runtime.Units.Components
 {
     /// <summary>
     /// Represents a unit in a battle system that can perform actions, move, and interact with other units
     /// </summary>
-    public class BattleUnit : MonoBehaviour, IUnit
+    public class BattleUnit : BattleObject, IUnit
     {
-        
         // IIdentifier implementation
         private Guid id;
         public Guid ID => id;
 
-        [SerializeField] private IUnitData unitData;
+        [SerializeField] 
+        private IUnitData unitData;
         
         // State variables
         private UnitState currentState;
@@ -48,9 +48,16 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Components
         // TODO: Add ailment system
         // private IUnitAilmentContainer ailmentContainer;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             GenerateNewID();
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            // Base initialization logic
         }
 
         public void Initialize(IUnitData data)
@@ -67,8 +74,9 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Components
             }
         }
 
-        public void PostInitialize()
+        public override void PostInitialize()
         {
+            base.PostInitialize();
             // TODO: Setup any post-initialization logic
             // TODO: Setup visibility system
         }
@@ -115,5 +123,11 @@ namespace ProjectCI_CoreSystem.Runtime.Scripts.Units.Components
 
         // TODO: Add state change system
         // public void ChangeState(UnitState newState) { }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Cleanup();
+        }
     }
 } 
