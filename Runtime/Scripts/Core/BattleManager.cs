@@ -815,7 +815,7 @@ namespace ProjectCI.CoreSystem.Runtime.Core
             if (unit)
             {
                 BattleTeam currentTurnTeam = battleRules.GetCurrentTeam();
-                BattleTeam unitsTeam = unit.GetTeam();
+                BattleTeam unitsTeam = unit.Team;
 
                 if (unitsTeam == currentTurnTeam)
                 {
