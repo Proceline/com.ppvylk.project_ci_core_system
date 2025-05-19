@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 39429a7701f07dd4d8b3c97a84803bf2
+timeCreated: 1573106176
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Unit/AbilityParams/SpawnUnitParam.cs
+  uploadId: 389222

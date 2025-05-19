@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: dbb67b6daa261ee40bd8bdb084783b2c
+timeCreated: 1567289802
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/WinConditions/DefeatAllOpponents_WinCondition.cs
+  uploadId: 389222

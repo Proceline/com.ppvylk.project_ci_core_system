@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 7a2c12a0b5dd2364b9a86af86fda69fa
+timeCreated: 1566010987
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/GameRules/TacticalGameRules.cs
+  uploadId: 389222

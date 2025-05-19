@@ -1,0 +1,16 @@
+{
+    "name": "ProjectCI_CoreSystem_Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e6ce8ade526c0184abaee24743971082"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

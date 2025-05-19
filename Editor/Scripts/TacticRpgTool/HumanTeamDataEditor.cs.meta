@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 51f0fdcb056ce78419c269fc7b41a8be
+timeCreated: 1570346415
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/HumanTeamDataEditor.cs
+  uploadId: 389222

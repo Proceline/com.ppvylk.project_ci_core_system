@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: b33dda57e38729b4ab43a9ceb44d020c
+timeCreated: 1567289901
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/WinConditions/SurviveNumberOfTurns_WinCondition.cs
+  uploadId: 389222

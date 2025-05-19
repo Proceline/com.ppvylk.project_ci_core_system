@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: ca3f49c46f0ae4a4a9d636e3790a9d26
+timeCreated: 1567051467
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/Generator/IGridGenerator.cs
+  uploadId: 389222

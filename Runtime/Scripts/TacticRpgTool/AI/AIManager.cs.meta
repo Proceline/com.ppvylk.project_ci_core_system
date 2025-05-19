@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 7a0759902c8080d41a3918ff302f3560
+timeCreated: 1569222345
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/AI/AIManager.cs
+  uploadId: 389222

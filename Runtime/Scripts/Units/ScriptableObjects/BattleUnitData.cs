@@ -1,6 +1,4 @@
 using UnityEngine;
-using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
-using ProjectCI.CoreSystem.Runtime.Enums;
 
 namespace ProjectCI.CoreSystem.Runtime.Units.ScriptableObjects
 {

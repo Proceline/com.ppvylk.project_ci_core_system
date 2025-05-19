@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: d7579dcc66e22a84fa97ec7e3fa01500
+timeCreated: 1571716543
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/AilmentSystem/AilmentContainer.cs
+  uploadId: 389222

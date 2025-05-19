@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: e968590dbcc10884dae2a366f6b2f588
+timeCreated: 1571280447
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/FogOfWar/FogOfWar.cs
+  uploadId: 389222

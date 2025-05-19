@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: db19f2669bebe6b40b264af96b261a4b
+timeCreated: 1571518126
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/AilmentEditor.cs
+  uploadId: 389222

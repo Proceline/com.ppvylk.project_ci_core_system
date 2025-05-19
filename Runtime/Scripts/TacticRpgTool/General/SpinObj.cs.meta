@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 75973ef1130d8c64992cec560129f54b
+timeCreated: 1573340695
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/_General/SpinObj.cs
+  uploadId: 389222

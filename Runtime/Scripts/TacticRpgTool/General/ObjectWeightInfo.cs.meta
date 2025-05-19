@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 8e16472020ae37042ad433a159d76c99
+timeCreated: 1565232788
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/_General/ObjectWeightInfo.cs
+  uploadId: 389222

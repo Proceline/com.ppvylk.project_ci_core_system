@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 0bf45dcdb0c3d6b47980f11ebc795d9f
+timeCreated: 1572063853
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/CellStyleInfoEditor.cs
+  uploadId: 389222

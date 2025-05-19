@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 75e065a8e91cb1d4ba627ec85d91271a
+timeCreated: 1570337925
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/UnitDataEditor.cs
+  uploadId: 389222

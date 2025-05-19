@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 0868e0e15c50bdd4a945ad5585f97edb
+timeCreated: 1572405214
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 156593
+  packageName: Turn-Based Strategy Toolkit
+  packageVersion: 1.0.2
+  assetPath: Assets/TurnBasedToolsAsset/Scripts/Audio/AudioHandler.cs
+  uploadId: 389222
