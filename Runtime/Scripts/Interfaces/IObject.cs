@@ -25,8 +25,8 @@ namespace ProjectCI.CoreSystem.Runtime.Interfaces
         // Methods
         void Initialize();
         void PostInitialize();
-        void AlignToGrid();
         void SetVisible(bool visible);
+        void SetTeam(BattleTeam team);
 
         // TODO: Implement these methods after CellInteractionState is defined
         // void HandleInteraction(CellInteractionState interactionState);

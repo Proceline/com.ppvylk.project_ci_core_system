@@ -34,6 +34,7 @@ namespace ProjectCI.CoreSystem.Runtime.Units.Components
         public BattleTeam Team => m_Team;
 
         protected BattleCell m_OwnerCell;
+        protected BattleGrid m_Grid;
 
         protected virtual void Awake()
         {
@@ -77,6 +78,30 @@ namespace ProjectCI.CoreSystem.Runtime.Units.Components
             }
         }
 
+        public virtual void SetGrid(BattleGrid grid)
+        {
+            m_Grid = grid;
+        }
+
+        public virtual void SetCurrentCell(BattleCell cell)
+        {
+            if (m_OwnerCell != null)
+            {
+                m_OwnerCell.SetObjectOnCell(null);
+            }
+            m_OwnerCell = cell;
+            if (m_OwnerCell != null)
+            {
+                m_OwnerCell.SetObjectOnCell(this);
+                HandleOwnerCellChanged(m_OwnerCell);
+            }
+        }
+
+        protected virtual void HandleOwnerCellChanged(BattleCell newCell)
+        {
+            // Base implementation - can be overridden by derived classes
+        }
+
         public virtual void HandleLeftClick()
         {
             OnLeftClick?.Invoke();
@@ -114,6 +139,16 @@ namespace ProjectCI.CoreSystem.Runtime.Units.Components
         public virtual BattleCell GetOwnerCell()
         {
             return m_OwnerCell;
+        }
+
+        public virtual BattleCell GetCell()
+        {
+            return m_OwnerCell;
+        }
+
+        public virtual void SetTeam(BattleTeam team)
+        {
+            m_Team = team;
         }
 
         protected virtual void OnDestroy()
