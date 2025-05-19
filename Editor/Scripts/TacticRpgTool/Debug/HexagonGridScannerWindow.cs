@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using UnityEditorInternal;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
@@ -14,7 +16,9 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         private int gridWidth = 5;
         private int gridHeight = 5;
         private float maxDistance = 100f;
-        private LayerMask layerMask = 0; // Default to layer 0 (Default)
+        private LayerMask layerMask = 0;
+        [SerializeField]
+        private CellPalette cellPalette;
 
         [MenuItem("ProjectCI Tools/Debug/Hexagon Grid Scanner")]
         public static void ShowWindow()
@@ -27,14 +31,14 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             EditorGUILayout.LabelField("Hexagon Grid Scanner", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            // Parameters can be edited in both editor and play mode
+            // 扫描参数
+            EditorGUILayout.LabelField("Scan Parameters", EditorStyles.boldLabel);
             centerPosition = EditorGUILayout.Vector3Field("Center Position", centerPosition);
             hexWidth = EditorGUILayout.FloatField("Hexagon Width", hexWidth);
             hexHeight = EditorGUILayout.FloatField("Hexagon Height", hexHeight);
             gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
             gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
             maxDistance = EditorGUILayout.FloatField("Max Distance", maxDistance);
-            // 多选Layer（Flags风格）
             string[] layerNames = InternalEditorUtility.layers;
             int maskValue = layerMask.value;
             maskValue = EditorGUILayout.MaskField("Layer Mask", maskValue, layerNames);
@@ -42,37 +46,47 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
             EditorGUILayout.Space();
 
-            // Only disable the scan button in non-play mode
+            // 网格生成参数
+            EditorGUILayout.LabelField("Grid Generation Parameters", EditorStyles.boldLabel);
+            cellPalette = EditorGUILayout.ObjectField("Cell Palette", cellPalette, typeof(CellPalette), true) as CellPalette;
+
+            EditorGUILayout.Space();
+
+            // 按钮
             GUI.enabled = Application.isPlaying;
-            if (GUILayout.Button("Scan Ground"))
+            if (GUILayout.Button("Scan and Generate Grid"))
             {
-                ScanGround();
+                ScanAndGenerateGrid();
             }
             GUI.enabled = true;
 
-            // Show warning if not in play mode
             if (!Application.isPlaying)
             {
                 EditorGUILayout.HelpBox("Scan button only works in Play Mode", MessageType.Warning);
             }
         }
 
-        private void ScanGround()
+        private void ScanAndGenerateGrid()
         {
-            Dictionary<Vector2, Vector3> hitPoints = GridBattleUtils.ScanHexagonGroundGrid(
+            if (cellPalette == null)
+            {
+                EditorUtility.DisplayDialog("Error", "Please assign a Cell Palette", "OK");
+                return;
+            }
+
+            // 使用 GridBattleUtils 生成网格
+            var levelGrid = GridBattleUtils.GenerateLevelGridFromGround<HexagonGrid>(
                 centerPosition,
                 hexWidth,
                 hexHeight,
-                gridWidth,
-                gridHeight,
-                maxDistance,
-                layerMask
+                new Vector2Int(gridWidth, gridHeight),
+                layerMask,
+                cellPalette
             );
 
-            Debug.Log($"Found {hitPoints.Count} hit points");
-            foreach (var hit in hitPoints)
+            if (levelGrid != null)
             {
-                Debug.Log($"Grid Position: {hit.Key}, World Position: {hit.Value}");
+                Debug.Log($"Successfully generated grid with {gridWidth * gridHeight} cells");
             }
         }
     }

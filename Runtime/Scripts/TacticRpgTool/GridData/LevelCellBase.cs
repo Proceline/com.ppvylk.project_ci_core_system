@@ -64,7 +64,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public UnityEvent OnCellDestroyed = new UnityEvent();
 
-        void Reset()
+        public void Reset()
         {
             m_Info = CellInfo.Default();
         }

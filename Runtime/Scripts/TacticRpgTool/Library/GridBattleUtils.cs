@@ -160,7 +160,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             // 5. 为每个碰撞点创建网格
             foreach (var hit in hitPoints)
             {
-                levelGrid.GenerateCell(hit.Value, hit.Key);
+                var cell =levelGrid.GenerateCell(hit.Value, hit.Key);
+                cell.Reset();
             }
 
             // 6. 设置网格相邻关系
