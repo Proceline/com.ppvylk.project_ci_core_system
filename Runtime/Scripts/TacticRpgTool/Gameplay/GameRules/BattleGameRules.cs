@@ -58,7 +58,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         {
             m_CurrentTeam = m_StartingTeam;
             m_TurnNumber = 0;
-            GameManager.HandleGameStarted();
+            TacticBattleManager.HandleGameStarted();
             BeginTeamTurn(m_CurrentTeam);
         }
 
@@ -76,7 +76,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 m_CurrentTeam = GameTeam.Friendly;
             }
 
-            if (!GameManager.GetTeamList().Contains(m_CurrentTeam))
+            if (!TacticBattleManager.GetTeamList().Contains(m_CurrentTeam))
             {
                 EndTurn();
             }

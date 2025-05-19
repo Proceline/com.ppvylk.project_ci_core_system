@@ -46,7 +46,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 
         protected virtual bool DidTeamLose(GameTeam InTeam)
         {
-            return GameManager.AreAllUnitsOnTeamDead(InTeam);
+            return TacticBattleManager.AreAllUnitsOnTeamDead(InTeam);
         }
 
         bool AllowsTeam(GameTeam InTeam)

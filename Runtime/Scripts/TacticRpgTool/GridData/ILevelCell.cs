@@ -285,7 +285,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             if (CellRenderer)
             {
                 Vector3 CellPosition = transform.position;
-                Vector3 ObjectBounds = GameManager.GetBoundsOfObject(InObject);
+                Vector3 ObjectBounds = TacticBattleManager.GetBoundsOfObject(InObject);
                 Vector3 LevelCellBounds = CellRenderer.bounds.size;
 
                 float heightOffset = (LevelCellBounds.y + (ObjectBounds.y * 0.5f));
@@ -412,7 +412,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         public void SetVisible(bool bInVisible)
         {
             m_Info.m_bIsVisible = bInVisible;
-            GameManager.ResetCellState(this);
+            TacticBattleManager.ResetCellState(this);
             HandleVisibilityChanged();
         }
 

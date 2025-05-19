@@ -95,7 +95,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             {
                 if (cell)
                 {
-                    GameManager.ResetCellState(cell);
+                    TacticBattleManager.ResetCellState(cell);
                 }
             }
 
@@ -326,7 +326,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                             {
                                 GameTeam EffectedTeam = (currCell == InCell) ? ability.GetEffectedTeam() : GameTeam.All;
 
-                                if (GameManager.CanCasterEffectTarget(GetCell(), currCell, EffectedTeam, ability.DoesAllowBlocked()))
+                                if (TacticBattleManager.CanCasterEffectTarget(GetCell(), currCell, EffectedTeam, ability.DoesAllowBlocked()))
                                 {
                                     outCells.Add(currCell);
                                 }
@@ -359,7 +359,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void SetupAbility(UnitAbility InAbility)
         {
-            if (IsMoving() || GameManager.IsActionBeingPerformed())
+            if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
                 return;
             }
@@ -376,7 +376,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     List<ILevelCell> EditedAbilityCells = m_CurrentAbility.Setup(this);
                     m_EditedCells.AddRange(EditedAbilityCells);
 
-                    GameManager.Get().UpdateHoverCells();
+                    TacticBattleManager.Get().UpdateHoverCells();
                 }
             }
         }
@@ -433,7 +433,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void SetupMovement()
         {
-            if (IsMoving() || GameManager.IsActionBeingPerformed())
+            if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
                 return;
             }
@@ -452,13 +452,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             {
                 if (cell && cell.IsVisible())
                 {
-                    GameManager.SetCellState(cell, CellState.eMovement);
+                    TacticBattleManager.SetCellState(cell, CellState.eMovement);
                 }
             }
 
             m_EditedCells.AddRange(abilityCells);
 
-            GameManager.Get().UpdateHoverCells();
+            TacticBattleManager.Get().UpdateHoverCells();
         }
 
         public bool ExecuteMovement(ILevelCell TargetCell, UnityEvent InOnMovementComplete)
@@ -487,7 +487,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             InOnMovementComplete.AddListener(HandleMovementFinished);
             TraverseTo(TargetCell, InOnMovementComplete, abilityCells);
 
-            GameManager.CheckWinConditions();
+            TacticBattleManager.CheckWinConditions();
 
             CleanUp();
             return true;
@@ -517,7 +517,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 PlayAnimation(GetUnitData().m_MovementAnimation);
 
-                GameManager.AddActionBeingPerformed();
+                TacticBattleManager.AddActionBeingPerformed();
 
                 List<ILevelCell> cellPath = GetPathTo(InTargetCell, InAllowedCells);
 
@@ -531,7 +531,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 foreach (ILevelCell cell in cellPath)
                 {
-                    FogOfWar fogOfWar = GameManager.GetFogOfWar();
+                    FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)
                     {
                         if (GetTeam() == GameTeam.Friendly)
@@ -586,7 +586,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     PlayAnimation(GetUnitData().m_IdleAnimation);
                 }
 
-                GameManager.RemoveActionBeingPerformed();
+                TacticBattleManager.RemoveActionBeingPerformed();
 
                 m_bIsMoving = false;
 
@@ -603,7 +603,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             pathInfo.StartCell = GetCell();
             pathInfo.TargetCell = InTargetCell;
             pathInfo.bIgnoreUnits = true;
-            pathInfo.bTakeWeightIntoAccount = GameManager.IsTeamAI(GetTeam());
+            pathInfo.bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam());
             pathInfo.AllowedCells = InAllowedCells;
             pathInfo.bAllowBlocked = m_UnitData.m_bIsFlying;
 
@@ -616,7 +616,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             if (InTargetCell)
             {
-                GameManager.AddActionBeingPerformed();
+                TacticBattleManager.AddActionBeingPerformed();
 
                 AIPathInfo pathInfo = new AIPathInfo();
                 pathInfo.StartCell = GetCell();
@@ -634,7 +634,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 foreach (ILevelCell cell in cellPath)
                 {
-                    FogOfWar fogOfWar = GameManager.GetFogOfWar();
+                    FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)
                     {
                         if (GetTeam() == GameTeam.Friendly)
@@ -666,7 +666,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     }
                 }
 
-                GameManager.RemoveActionBeingPerformed();
+                TacticBattleManager.RemoveActionBeingPerformed();
             }
         }
 
@@ -757,8 +757,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             m_bIsAttacking = false;
 
-            GameTeam team = GameManager.GetUnitTeam(this);
-            if( GameManager.IsTeamHuman(team) && GameManager.IsPlaying() && !IsDead() )
+            GameTeam team = TacticBattleManager.GetUnitTeam(this);
+            if( TacticBattleManager.IsTeamHuman(team) && TacticBattleManager.IsPlaying() && !IsDead() )
             {
                 SetupMovement();
             }
@@ -766,7 +766,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         void HandleMovementFinished()
         {
-            if ( GameManager.IsPlaying() && !IsDead() )
+            if ( TacticBattleManager.IsPlaying() && !IsDead() )
             {
                 SetupMovement();
             }
@@ -799,9 +799,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 AudioHandler.PlayAudio(audioData, gameObject.transform.position);
             }
 
-            if (GameManager.IsActionBeingPerformed())
+            if (TacticBattleManager.IsActionBeingPerformed())
             {
-                GameManager.BindToOnFinishedPerformedActions(DestroyObj);
+                TacticBattleManager.BindToOnFinishedPerformedActions(DestroyObj);
             }
             else
             {
@@ -811,18 +811,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         protected virtual void HandleDeath()
         {
-            GameManager.HandleUnitDeath(this);
+            TacticBattleManager.HandleUnitDeath(this);
         }
 
         void DestroyObj()
         {
-            GameManager.UnBindFromOnFinishedPerformedActions(DestroyObj);
+            TacticBattleManager.UnBindFromOnFinishedPerformedActions(DestroyObj);
             Destroy(gameObject);
         }
 
         void HandleHit()
         {
-            bool bShowHitAnimationOnMove = GameManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
+            bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
             if ( !IsMoving() || bShowHitAnimationOnMove )
             {
                 PlayAnimation( GetUnitData().m_DamagedAnimation, true );
@@ -883,7 +883,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         void HandleActivation()
         {
-            GameManager.HandleUnitActivated(this);
+            TacticBattleManager.HandleUnitActivated(this);
         }
 
         #endregion

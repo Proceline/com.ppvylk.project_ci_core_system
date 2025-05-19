@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
@@ -35,7 +34,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         
         void SetupCellSpawns()
         {
-            SpawnUnits( GameTeam.Hostile, HandleEnemyUnitsSpawned );
+            SpawnUnits(GameTeam.Hostile, HandleEnemyUnitsSpawned);
         }
 
         void SpawnUnits(GameTeam InTeam, UnityAction OnComplete)
@@ -45,10 +44,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             UnityEvent OnSpawnerComplete = new UnityEvent();
             OnSpawnerComplete.AddListener(OnComplete);
 
-            HumanTeamData HumanData = GameManager.GetDataForTeam<HumanTeamData>( InTeam );
-            if( HumanData )
+            HumanTeamData HumanData = TacticBattleManager.GetDataForTeam<HumanTeamData>(InTeam);
+            if(HumanData)
             {
-                List<ILevelCell> SpawnList = GameManager.GetGrid().GetTeamStartPoints( InTeam );
+                List<ILevelCell> SpawnList = TacticBattleManager.GetGrid().GetTeamStartPoints(InTeam);
 
                 if(InTeam == GameTeam.Friendly)
                 {
@@ -61,42 +60,41 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                     }
                 }
 
-                if( m_bManuallyPlaceUnits )
+                if(m_bManuallyPlaceUnits)
                 {
-                    CurrentSpawner = new GameObject( "UnitSpawner" ).AddComponent<TeamUnitSpawner>();
-                    CurrentSpawner.Init( HumanData, SpawnList, OnSpawnerComplete );
+                    CurrentSpawner = new GameObject("UnitSpawner").AddComponent<TeamUnitSpawner>();
+                    CurrentSpawner.Init(HumanData, SpawnList, OnSpawnerComplete);
                     CurrentSpawner.StartSpawning();
                 }
                 else
                 {
-                    AutoPlaceUnits( HumanData, SpawnList );
+                    AutoPlaceUnits(HumanData, SpawnList);
                     OnSpawnerComplete.Invoke();
                 }
             }
             else
             {
-                SpawnAIUnits( InTeam );
+                SpawnAIUnits(InTeam);
                 OnSpawnerComplete.Invoke();
             }
         }
 
         void SpawnAIUnits(GameTeam InTeam)
         {
-            AITeamData AIData = GameManager.GetDataForTeam<AITeamData>( InTeam );
-            if ( AIData )
+            AITeamData AIData = TacticBattleManager.GetDataForTeam<AITeamData>(InTeam);
+            if (AIData)
             {
-                foreach ( AIObjectSpawnInfo ObjInfo in AIData.m_AISpawnUnits )
+                foreach (AIObjectSpawnInfo ObjInfo in AIData.m_AISpawnUnits)
                 {
-                    List<ILevelCell> CellsToSpawnAt = GameManager.GetGrid().GetCellsById(ObjInfo.m_SpawnAtCellId);
+                    List<ILevelCell> CellsToSpawnAt = TacticBattleManager.GetGrid().GetCellsById(ObjInfo.m_SpawnAtCellId);
 
                     if(CellsToSpawnAt.Count > 0)
                     {
-
                         int selectedIndex = Random.Range(0, CellsToSpawnAt.Count - 1);
-                        ILevelCell selectedCell = CellsToSpawnAt[ selectedIndex ];
-                        if( selectedCell )
+                        ILevelCell selectedCell = CellsToSpawnAt[selectedIndex];
+                        if(selectedCell)
                         {
-                            GridUnit SpawnedUnit = GameManager.SpawnUnit(ObjInfo.m_UnitData, InTeam, selectedCell.GetIndex(), ObjInfo.m_StartDirection);
+                            GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(ObjInfo.m_UnitData, InTeam, selectedCell.GetIndex(), ObjInfo.m_StartDirection);
                             SpawnedUnit.SetAsTarget(ObjInfo.m_bIsATarget);
                             SpawnedUnit.AddAI(ObjInfo.m_AssociatedAI);
                         }
@@ -105,8 +103,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                     {
                         Debug.Log("([TurnBasedTools]::TacticalGameRules::SpawnAIUnits) Couldn't find a cell for the AI unit: \"" + ObjInfo.m_UnitData.m_UnitName + "\" to spawn at. Either the m_SpawnAtCellId(" + ObjInfo.m_SpawnAtCellId + ") isn't set, or no cells are tagged.");
                     }
-
-
                 }
             }
         }
@@ -119,9 +115,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             for (int i = 0; i < NumInRoster; i++)
             {
                 HumanUnitSpawnInfo HumanSpawnInfo = InHumanData.m_UnitRoster[i];
-                if ( HumanSpawnInfo.m_UnitData )
+                if (HumanSpawnInfo.m_UnitData)
                 {
-                    List<ILevelCell> spawnCells = GameManager.GetGrid().GetCellsById(HumanSpawnInfo.m_SpawnAtCellId);
+                    List<ILevelCell> spawnCells = TacticBattleManager.GetGrid().GetCellsById(HumanSpawnInfo.m_SpawnAtCellId);
 
                     List<ILevelCell> cellsToRemove = new List<ILevelCell>();
                     foreach (ILevelCell cell in spawnCells)
@@ -150,7 +146,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                             InSpawnList.Remove(selectedCell);
                         }
                     
-                        GridUnit SpawnedUnit = GameManager.SpawnUnit(HumanSpawnInfo.m_UnitData, InHumanData.GetTeam(), selectedCell.GetIndex(), HumanSpawnInfo.m_StartDirection);
+                        GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(HumanSpawnInfo.m_UnitData, InHumanData.GetTeam(), selectedCell.GetIndex(), HumanSpawnInfo.m_StartDirection);
                         if (SpawnedUnit)
                         {
                             SpawnedUnit.SetAsTarget(HumanSpawnInfo.m_bIsATarget);
@@ -158,14 +154,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                     }
                     else if(i < NumStartPoints)
                     {
-                            int selectedCellIndex = Random.Range(0, InSpawnList.Count);
-                            ILevelCell selectedCell = InSpawnList[selectedCellIndex];
-                            InSpawnList.RemoveAt(selectedCellIndex);
-                            GridUnit SpawnedUnit = GameManager.SpawnUnit(HumanSpawnInfo.m_UnitData, InHumanData.GetTeam(), selectedCell.GetIndex(), HumanSpawnInfo.m_StartDirection);
-                            if (SpawnedUnit)
-                            {
-                                SpawnedUnit.SetAsTarget(HumanSpawnInfo.m_bIsATarget);
-                            }
+                        int selectedCellIndex = Random.Range(0, InSpawnList.Count);
+                        ILevelCell selectedCell = InSpawnList[selectedCellIndex];
+                        InSpawnList.RemoveAt(selectedCellIndex);
+                        GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(HumanSpawnInfo.m_UnitData, InHumanData.GetTeam(), selectedCell.GetIndex(), HumanSpawnInfo.m_StartDirection);
+                        if (SpawnedUnit)
+                        {
+                            SpawnedUnit.SetAsTarget(HumanSpawnInfo.m_bIsATarget);
+                        }
                     }
                     else
                     {
@@ -178,7 +174,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         void HandleEnemyUnitsSpawned()
         {
             CurrentSpawner = null;
-            SpawnUnits( GameTeam.Friendly, HandleAllUnitsSpawned );
+            SpawnUnits(GameTeam.Friendly, HandleAllUnitsSpawned);
         }
 
         void HandleAllUnitsSpawned()
@@ -199,7 +195,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
         void SetupTeam(GameTeam InTeam)
         {
-            List<GridUnit> Units = GameManager.GetUnitsOnTeam(InTeam);
+            List<GridUnit> Units = TacticBattleManager.GetUnitsOnTeam(InTeam);
             foreach (GridUnit unit in Units)
             {
                 unit.HandleTurnStarted();
@@ -218,9 +214,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 Destroy(m_CurrentHoverObject);
             }
 
-            if ( SelectedUnit && !SelectedUnit.IsDead() )
+            if (SelectedUnit && !SelectedUnit.IsDead())
             {
-                GameObject hoverObj = GameManager.GetSelectedHoverPrefab();
+                GameObject hoverObj = TacticBattleManager.GetSelectedHoverPrefab();
                 if (hoverObj)
                 {
                     m_CurrentHoverObject = Instantiate(hoverObj, SelectedUnit.GetCell().GetAllignPos(SelectedUnit), hoverObj.transform.rotation);
@@ -245,12 +241,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 SelectedUnit.CleanUp();
                 SelectedUnit = null;
 
-                GameManager.Get().OnUnitSelected.Invoke(SelectedUnit);
+                TacticBattleManager.Get().OnUnitSelected.Invoke(SelectedUnit);
 
                 UpdateSelectedHoverObject();
             }
 
-            GameManager.Get().UpdateHoverCells();
+            TacticBattleManager.Get().UpdateHoverCells();
         }
 
         public override GridUnit GetSelectedUnit()
@@ -280,11 +276,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
             if(InTeam == GameTeam.Hostile)
             {
-                bool bIsHostileTeamAI = GameManager.IsTeamAI(GameTeam.Hostile);
-                if( bIsHostileTeamAI )
+                bool bIsHostileTeamAI = TacticBattleManager.IsTeamAI(GameTeam.Hostile);
+                if(bIsHostileTeamAI)
                 {
-                    List<GridUnit> AIUnits = GameManager.GetUnitsOnTeam(GameTeam.Hostile);
-                    AIManager.RunAI( AIUnits, EndTurn );
+                    List<GridUnit> AIUnits = TacticBattleManager.GetUnitsOnTeam(GameTeam.Hostile);
+                    AIManager.RunAI(AIUnits, EndTurn);
                 }
             }
         }
@@ -306,7 +302,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 return;
             }
 
-            if (GameManager.IsActionBeingPerformed())
+            if (TacticBattleManager.IsActionBeingPerformed())
             {
                 return;
             }
@@ -314,7 +310,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             GameTeam currTeam = GetCurrentTeam();
             if(currTeam == InPlayerUnit.GetTeam())
             {
-
                 if(SelectedUnit)
                 {
                     if(SelectedUnit.GetCurrentState() == UnitState.UsingAbility)
@@ -331,7 +326,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 {
                     SelectedUnit.SelectUnit();
                     SelectedUnit.BindToOnMovementComplete(UpdateSelectedHoverObject);
-                    GameManager.Get().OnUnitSelected.Invoke(SelectedUnit);
+                    TacticBattleManager.Get().OnUnitSelected.Invoke(SelectedUnit);
                 }
 
                 UpdateSelectedHoverObject();
@@ -340,8 +335,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
         public override void HandleCellSelected(ILevelCell InCell)
         {
-
-            if (GameManager.IsActionBeingPerformed())
+            if (TacticBattleManager.IsActionBeingPerformed())
             {
                 return;
             }
@@ -378,8 +372,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
         private void CancelActionPerformed(InputAction.CallbackContext context)
         {
-            
-            if (GameManager.IsActionBeingPerformed())
+            if (TacticBattleManager.IsActionBeingPerformed())
             {
                 return;
             }
@@ -389,7 +382,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 return;
             }
 
-            if (GameManager.IsPlaying() && SelectedUnit)
+            if (TacticBattleManager.IsPlaying() && SelectedUnit)
             {
                 UnitState currentState = SelectedUnit.GetCurrentState();
                 if (currentState == UnitState.UsingAbility)

@@ -36,7 +36,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
                     GridUnit unitOnCell = currCell.GetUnitOnCell();
                     if ( unitOnCell )
                     {
-                        GameTeam AffinityToCaster = GameManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
+                        GameTeam AffinityToCaster = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
                         if ( AffinityToCaster == GameTeam.Hostile )
                         {
                             enemyCells.Add( currCell );

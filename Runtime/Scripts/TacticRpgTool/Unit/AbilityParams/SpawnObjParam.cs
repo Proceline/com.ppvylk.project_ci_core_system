@@ -14,7 +14,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         {
             if(!InCell.IsObjectOnCell())
             {
-                GameManager.SpawnObjectOnCell(m_Object, InCell, m_Offset);
+                TacticBattleManager.SpawnObjectOnCell(m_Object, InCell, m_Offset);
             }
         }
 

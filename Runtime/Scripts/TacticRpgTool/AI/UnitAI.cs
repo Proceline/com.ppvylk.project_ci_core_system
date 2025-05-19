@@ -40,7 +40,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             {
                                 UnityEvent OnMovementComplete = new UnityEvent();
                                 List<ILevelCell> AllowedCells = InAIUnit.GetAllowedMovementCells();
-                                yield return GameManager.Get().StartCoroutine(InAIUnit.EnumeratorTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells));
+                                yield return TacticBattleManager.Get().StartCoroutine(InAIUnit.EnumeratorTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells));
                             }
                         }
 
@@ -55,7 +55,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                                     List<ILevelCell> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
                                     if (abilityCells.Contains(target.GetCell()))
                                     {
-                                        yield return GameManager.Get().StartCoroutine(AIManager.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
+                                        yield return TacticBattleManager.Get().StartCoroutine(AIManager.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
                                     }
                                 }
                             }
@@ -89,7 +89,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         GridObject objOnCell = cell.GetObjectOnCell();
                         if (objOnCell)
                         {
-                            if (GameManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == GameTeam.Hostile)
+                            if (TacticBattleManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == GameTeam.Hostile)
                             {
                                 InUnit.SetActivated(true);
                             }
@@ -108,7 +108,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 SelectedTeam = GameTeam.Friendly;
             }
 
-            List<GridUnit> AIUnits = GameManager.GetUnitsOnTeam(SelectedTeam);
+            List<GridUnit> AIUnits = TacticBattleManager.GetUnitsOnTeam(SelectedTeam);
 
             int closestIndex = int.MaxValue;
             GridUnit selectedTarget = null;

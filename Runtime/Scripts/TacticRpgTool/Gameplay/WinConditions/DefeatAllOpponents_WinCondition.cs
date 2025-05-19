@@ -10,11 +10,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
         {
             if (InTeam == GameTeam.Friendly)
             {
-                return GameManager.AreAllUnitsOnTeamDead(GameTeam.Hostile);
+                return TacticBattleManager.AreAllUnitsOnTeamDead(GameTeam.Hostile);
             }
             else if (InTeam == GameTeam.Hostile)
             {
-                return GameManager.AreAllUnitsOnTeamDead(GameTeam.Friendly);
+                return TacticBattleManager.AreAllUnitsOnTeamDead(GameTeam.Friendly);
             }
 
             return false;
@@ -24,15 +24,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
         {
             GameTeam TargetTeam = GameTeam.Friendly;
 
-            GameTeam CurrentTeam = GameManager.GetRules().GetCurrentTeam();
+            GameTeam CurrentTeam = TacticBattleManager.GetRules().GetCurrentTeam();
 
-            if (GameManager.IsTeamHuman(CurrentTeam))
+            if (TacticBattleManager.IsTeamHuman(CurrentTeam))
             {
                 TargetTeam = (CurrentTeam == GameTeam.Friendly ? GameTeam.Hostile : GameTeam.Friendly);
             }
 
-            int numTargets = GameManager.GetUnitsOnTeam(TargetTeam).Count;
-            int numTargetsKilled = GameManager.NumUnitsKilled(TargetTeam);
+            int numTargets = TacticBattleManager.GetUnitsOnTeam(TargetTeam).Count;
+            int numTargetsKilled = TacticBattleManager.NumUnitsKilled(TargetTeam);
 
             return "(" + numTargetsKilled + "/" + numTargets + ")";
         }

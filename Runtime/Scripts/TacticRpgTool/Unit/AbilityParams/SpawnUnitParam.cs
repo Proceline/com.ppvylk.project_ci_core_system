@@ -11,7 +11,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 
         public override void ApplyTo(GridUnit InCaster, ILevelCell InCell)
         {
-            GridUnit SpawnedUnit = GameManager.SpawnUnit(m_UnitToSpawn, InCaster.GetTeam(), InCell.GetIndex());
+            GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(m_UnitToSpawn, InCaster.GetTeam(), InCell.GetIndex());
             SpawnedUnit.HandleTurnStarted();
         }
 

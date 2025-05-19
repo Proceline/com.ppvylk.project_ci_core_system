@@ -9,7 +9,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
         
         public void StartPanning()
         {
-            CameraController cameraController = GameManager.GetCameraController();
+            CameraController cameraController = TacticBattleManager.GetCameraController();
             if(cameraController)
             {
                 cameraController.SetPanDirection(PanDir);
@@ -18,7 +18,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 
         public void StopPanning()
         {
-            CameraController cameraController = GameManager.GetCameraController();
+            CameraController cameraController = TacticBattleManager.GetCameraController();
             if (cameraController)
             {
                 cameraController.StopPanning();

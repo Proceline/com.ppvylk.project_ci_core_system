@@ -48,7 +48,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
                 }
             }
 
-            GameManager.CheckWinConditions();
+            TacticBattleManager.CheckWinConditions();
         }
 
         public void SpawnFogObjects()
@@ -58,7 +58,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
                 return;
             }
 
-            List<ILevelCell> AllCells = GameManager.GetGrid().GetAllCells();
+            List<ILevelCell> AllCells = TacticBattleManager.GetGrid().GetAllCells();
 
             foreach (ILevelCell levelCell in AllCells)
             {
@@ -68,7 +68,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
                     {
                         List<GameObject> SpawnedObjs = new List<GameObject>();
 
-                        Vector3 SpawnBounds = GameManager.GetBoundsOfObject(m_FogObject);
+                        Vector3 SpawnBounds = TacticBattleManager.GetBoundsOfObject(m_FogObject);
 
                         for (int i = 0; i < m_FogHeight; i++)
                         {

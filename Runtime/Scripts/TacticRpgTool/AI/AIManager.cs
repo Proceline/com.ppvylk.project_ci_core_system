@@ -287,7 +287,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
                 if(InRadiusInfo.Caster != null)
                 {
-                    GameTeam ObjAffinity = GameManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
+                    GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
                     if (ObjAffinity == GameTeam.Friendly && InRadiusInfo.EffectedTeam == GameTeam.Hostile)
                     {
                         return false;
@@ -310,7 +310,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             UnityEvent OnAIComplete = new UnityEvent();
             OnAIComplete.AddListener(OnComplete);
 
-            GameManager.Get().StartCoroutine(InternalRunAI(InAIUnits, OnAIComplete));
+            TacticBattleManager.Get().StartCoroutine(InternalRunAI(InAIUnits, OnAIComplete));
         }
 
         static IEnumerator InternalRunAI(List<GridUnit> InAIUnits, UnityEvent OnComplete)
@@ -323,7 +323,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     if(AIComponent)
                     {
                         IEnumerator RunOnUnitEnum = AIComponent.GetAIData().RunOnUnit(AIUnit);
-                        yield return GameManager.Get().StartCoroutine(RunOnUnitEnum);
+                        yield return TacticBattleManager.Get().StartCoroutine(RunOnUnitEnum);
                     }
                 }
             }

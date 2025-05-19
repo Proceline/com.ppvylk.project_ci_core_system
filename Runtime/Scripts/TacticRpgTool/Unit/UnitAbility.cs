@@ -158,7 +158,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             {
                 if (cell)
                 {
-                    GameManager.SetCellState(cell, AbilityState);
+                    TacticBattleManager.SetCellState(cell, AbilityState);
                 }
             }
 
@@ -176,7 +176,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
             else
             {
-                bool bEffectsTarget = GameManager.CanCasterEffectTarget(InCasterUnit.GetCell(), InTarget, GetEffectedTeam(), DoesAllowBlocked());
+                bool bEffectsTarget = TacticBattleManager.CanCasterEffectTarget(InCasterUnit.GetCell(), InTarget, GetEffectedTeam(), DoesAllowBlocked());
                 if(bEffectsTarget)
                 {
                     EffectCellList.Add(InTarget);
@@ -255,7 +255,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         EffectCellList.Add( InTarget );
                     }
 
-                    GameManager.AddActionBeingPerformed();
+                    TacticBattleManager.AddActionBeingPerformed();
 
                     InCasterUnit.RemoveAbilityPoints(m_ActionPointCost);
 
@@ -296,7 +296,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         yield return new WaitForSeconds( timeRemaining );
                     }
 
-                    GameManager.RemoveActionBeingPerformed();
+                    TacticBattleManager.RemoveActionBeingPerformed();
                 }
             }
 

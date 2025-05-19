@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(GameManager))]
+    [CustomEditor(typeof(TacticBattleManager))]
     [CanEditMultipleObjects]
     public class GameManagerEditor : Editor
     {

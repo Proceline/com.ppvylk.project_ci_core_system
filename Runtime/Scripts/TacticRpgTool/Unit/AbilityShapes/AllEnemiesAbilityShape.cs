@@ -11,9 +11,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
     {
         public override List<ILevelCell> GetCellList(GridUnit InCaster, ILevelCell InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
         {
-            GameTeam OtherTeam = GameManager.GetTeamAffinity( InCaster.GetTeam(), GameTeam.Hostile );
+            GameTeam OtherTeam = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), GameTeam.Hostile );
 
-            List<GridUnit> EnemyUnits = GameManager.GetUnitsOnTeam( OtherTeam );
+            List<GridUnit> EnemyUnits = TacticBattleManager.GetUnitsOnTeam( OtherTeam );
 
             List<ILevelCell> cells = new List<ILevelCell>();
             foreach ( var unit in EnemyUnits )

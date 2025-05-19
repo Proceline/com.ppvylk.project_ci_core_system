@@ -1,7 +1,7 @@
 using ProjectCI.CoreSystem.Runtime.Units.Interfaces;
 using UnityEngine;
 
-namespace ProjectCI.CoreSystem.Runtime.Units.Data
+namespace ProjectCI.CoreSystem.Runtime.Data
 {
     /// <summary>
     /// Represents a resource that uses float values for precise calculations

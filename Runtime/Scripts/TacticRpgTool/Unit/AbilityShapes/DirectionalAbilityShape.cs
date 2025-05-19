@@ -37,7 +37,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
                     GridUnit unitOnCell = currCell.GetUnitOnCell();
                     if ( unitOnCell )
                     {
-                        GameTeam AffinityToCaster = GameManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
+                        GameTeam AffinityToCaster = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
                         if ( AffinityToCaster == GameTeam.Hostile )
                         {
                             enemyCells.Add( currCell );
@@ -77,7 +77,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
                             break;
                         }
 
-                        GameTeam ObjAffinity = GameManager.GetTeamAffinity(gridObj.GetTeam(), StartCell.GetCellTeam());
+                        GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), StartCell.GetCellTeam());
                         if (ObjAffinity == GameTeam.Friendly && m_EffectedTeam == GameTeam.Hostile)
                         {
                             break;

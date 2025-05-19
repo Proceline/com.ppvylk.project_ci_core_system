@@ -15,7 +15,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
                 m_AssocaitedUnit = GetComponentInParent<GridUnit>();
                 if( m_AssocaitedUnit )
                 {
-                    bool bIsTarget = GameManager.GetTeamTargets(m_AssocaitedUnit.GetTeam()).Contains(m_AssocaitedUnit);
+                    bool bIsTarget = TacticBattleManager.GetTeamTargets(m_AssocaitedUnit.GetTeam()).Contains(m_AssocaitedUnit);
                     if(bIsTarget)
                     {
                         transform.localPosition = new Vector3(0, m_AssocaitedUnit.GetBounds().y, 0);

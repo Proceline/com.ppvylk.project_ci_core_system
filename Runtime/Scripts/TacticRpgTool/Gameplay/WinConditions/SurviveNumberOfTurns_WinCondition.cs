@@ -10,18 +10,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 
         protected override bool DidTeamWin(GameTeam InTeam)
         {
-            return GameManager.GetRules().GetTurnNumber() >= m_NumberRequired;
+            return TacticBattleManager.GetRules().GetTurnNumber() >= m_NumberRequired;
         }
 
         protected override bool DidTeamLose(GameTeam InTeam)
         {
-            bool bAllUnitsDead = GameManager.AreAllUnitsOnTeamDead(InTeam);
+            bool bAllUnitsDead = TacticBattleManager.AreAllUnitsOnTeamDead(InTeam);
             return bAllUnitsDead;
         }
 
         public override string GetConditionStateString()
         {
-            int turnNumber = GameManager.GetRules().GetTurnNumber();
+            int turnNumber = TacticBattleManager.GetRules().GetTurnNumber();
             return turnNumber + "/" + m_NumberRequired;
         }
     }

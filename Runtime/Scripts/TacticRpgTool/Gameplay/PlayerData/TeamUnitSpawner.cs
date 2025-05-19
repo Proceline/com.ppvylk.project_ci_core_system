@@ -25,7 +25,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
 
             foreach (ILevelCell playerCell in m_SpawnPoints)
             {
-                GameManager.SetCellState(playerCell, CellState.eMovement);
+                TacticBattleManager.SetCellState(playerCell, CellState.eMovement);
             }
         }
 
@@ -40,7 +40,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
         {
             foreach (ILevelCell playerCell in m_SpawnPoints)
             {
-                GameManager.ResetCellState(playerCell);
+                TacticBattleManager.ResetCellState(playerCell);
             }
 
             bIsSpawning = false;
@@ -75,7 +75,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
                         HumanUnitSpawnInfo unitSpawnInfo = m_TeamData.m_UnitRoster[m_CurrentSpawnIndex];
                         if(unitSpawnInfo.m_UnitData)
                         {
-                            GridUnit SpawnedUnit = GameManager.SpawnUnit( unitSpawnInfo.m_UnitData, m_TeamData.GetTeam(), InCell.GetIndex(), unitSpawnInfo.m_StartDirection );
+                            GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit( unitSpawnInfo.m_UnitData, m_TeamData.GetTeam(), InCell.GetIndex(), unitSpawnInfo.m_StartDirection );
                             if(SpawnedUnit)
                             {
                                 SpawnedUnit.SetAsTarget(unitSpawnInfo.m_bIsATarget);
@@ -84,7 +84,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
                             m_CurrentSpawnIndex++;
                             m_UnitsSpawned++;
 
-                            GameManager.ResetCellState(InCell);
+                            TacticBattleManager.ResetCellState(InCell);
 
                             if (m_CurrentSpawnIndex >= RosterCount)
                             {

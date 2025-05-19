@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
     {
         public override List<ILevelCell> GetCellList(GridUnit InCaster, ILevelCell InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
         {
-            List<GridUnit> TeamUnits = GameManager.GetUnitsOnTeam( InCaster.GetTeam() );
+            List<GridUnit> TeamUnits = TacticBattleManager.GetUnitsOnTeam( InCaster.GetTeam() );
 
             List<ILevelCell> cells = new List<ILevelCell>();
             foreach ( var unit in TeamUnits )

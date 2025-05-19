@@ -63,9 +63,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         }
     }
 
-    public class GameManager : MonoBehaviour
+    public class TacticBattleManager : MonoBehaviour
     {
-        static GameManager sInstance = null;
+        static TacticBattleManager sInstance = null;
 
         [Space(10)]
 
@@ -261,7 +261,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         #region Public Statics
 
-        public static GameManager Get()
+        public static TacticBattleManager Get()
         {
             return sInstance;
         }
@@ -698,7 +698,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             if (InCaster.GetCellTeam() != GameTeam.None)
             {
-                GameTeam ObjAffinity = GameManager.GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
+                GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
                 if (ObjAffinity == GameTeam.Friendly && InEffectedTeam == GameTeam.Hostile)
                 {
                     return false;

@@ -12,7 +12,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
     {
         public static void HandleTurnStart(GameTeam InTeam)
         {
-            List<GridUnit> GridUnits = GameManager.GetUnitsOnTeam(InTeam);
+            List<GridUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
             foreach (GridUnit unit in GridUnits)
             {
                 if(unit)
@@ -32,7 +32,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 }
             }
 
-            List<ILevelCell> levelCells = GameManager.GetGrid().GetAllCells();
+            List<ILevelCell> levelCells = TacticBattleManager.GetGrid().GetAllCells();
             foreach (ILevelCell currLevelCell in levelCells)
             {
                 if (currLevelCell)
@@ -79,7 +79,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 
         public static void HandleTurnEnd(GameTeam InTeam)
         {
-            List<GridUnit> GridUnits = GameManager.GetUnitsOnTeam(InTeam);
+            List<GridUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
             foreach (GridUnit unit in GridUnits)
             {
                 if (unit)
@@ -96,7 +96,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 }
             }
 
-            List<ILevelCell> levelCells = GameManager.GetGrid().GetAllCells();
+            List<ILevelCell> levelCells = TacticBattleManager.GetGrid().GetAllCells();
             foreach (ILevelCell currLevelCell in levelCells)
             {
                 if (currLevelCell)

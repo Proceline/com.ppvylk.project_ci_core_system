@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
     {
         protected override bool DidTeamWin(GameTeam InTeam)
         {
-            List<ILevelCell> allCells = GameManager.GetGrid().GetAllCells();
+            List<ILevelCell> allCells = TacticBattleManager.GetGrid().GetAllCells();
             foreach (ILevelCell cell in allCells)
             {
                 if (cell)
@@ -29,13 +29,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
         {
             int CurrentFogCells = 0;
 
-            FogOfWar fogOfWar = GameManager.GetFogOfWar();
+            FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
             if(fogOfWar)
             {
-                CurrentFogCells = GameManager.GetFogOfWar().NumFogCells();
+                CurrentFogCells = TacticBattleManager.GetFogOfWar().NumFogCells();
             }
 
-            int TotalCells = GameManager.GetGrid().GetAllCells().Count;
+            int TotalCells = TacticBattleManager.GetGrid().GetAllCells().Count;
 
             return "(" + (TotalCells - CurrentFogCells) + "/" + TotalCells + ")";
         }
