@@ -18,7 +18,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         Flying,
     }
 
-    [CreateAssetMenu(fileName = "NewAbility", menuName = "TurnBasedTools/Ability/Create New Ability", order = 1)]
+    [CreateAssetMenu(fileName = "NewAbility", menuName = "ProjectCI Tools/Ability/Create New Ability", order = 1)]
     public class UnitAbility : ScriptableObject
     {
         [SerializeField]
@@ -143,18 +143,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #endregion
 
-        public List<ILevelCell> Setup(GridUnit InCasterUnit)
+        public List<LevelCellBase> Setup(GridUnit InCasterUnit)
         {
             if (!GetShape())
             {
-                return new List<ILevelCell>();
+                return new List<LevelCellBase>();
             }
 
-            List<ILevelCell> abilityCells = GetAbilityCells(InCasterUnit);
+            List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
 
             CellState AbilityState = (GetEffectedTeam() == GameTeam.Hostile) ? (CellState.eNegative) : (CellState.ePositive);
 
-            foreach (ILevelCell cell in abilityCells)
+            foreach (LevelCellBase cell in abilityCells)
             {
                 if (cell)
                 {
@@ -165,13 +165,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return abilityCells;
         }
 
-        public List<ILevelCell> GetEffectedCells(GridUnit InCasterUnit, ILevelCell InTarget)
+        public List<LevelCellBase> GetEffectedCells(GridUnit InCasterUnit, LevelCellBase InTarget)
         {
-            List<ILevelCell> EffectCellList = new List<ILevelCell>();
+            List<LevelCellBase> EffectCellList = new List<LevelCellBase>();
 
             if (GetEffectShape() != null)
             {
-                List<ILevelCell> EffectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), GameTeam.All);
+                List<LevelCellBase> EffectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), GameTeam.All);
                 EffectCellList.AddRange(EffectCells);
             }
             else
@@ -186,19 +186,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return EffectCellList;
         }
 
-        public List<ILevelCell> GetAbilityCells(GridUnit InUnit)
+        public List<LevelCellBase> GetAbilityCells(GridUnit InUnit)
         {
             if(!InUnit)
             {
-                return new List<ILevelCell>();
+                return new List<LevelCellBase>();
             }
 
-            List<ILevelCell> AbilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(), DoesAllowBlocked(), GetEffectedTeam());
+            List<LevelCellBase> AbilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(), DoesAllowBlocked(), GetEffectedTeam());
 
             if(GetEffectedUnitType() != EffectedUnitType.All)
             {
-                List<ILevelCell> RemoveList = new List<ILevelCell>();
-                foreach (ILevelCell cell in AbilityCells)
+                List<LevelCellBase> RemoveList = new List<LevelCellBase>();
+                foreach (LevelCellBase cell in AbilityCells)
                 {
                     if(cell)
                     {
@@ -229,7 +229,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     }
                 }
 
-                foreach (ILevelCell cell in RemoveList)
+                foreach (LevelCellBase cell in RemoveList)
                 {
                     AbilityCells.Remove(cell);
                 }
@@ -238,16 +238,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return AbilityCells;
         }
 
-        public IEnumerator Execute(GridUnit InCasterUnit, ILevelCell InTarget, UnityEvent OnComplete = null)
+        public IEnumerator Execute(GridUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
         {
             if( GetShape() )
             {
-                List<ILevelCell> abilityCells = GetAbilityCells(InCasterUnit);
+                List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
                 if (abilityCells.Contains(InTarget))
                 {
                     InCasterUnit.LookAtCell(InTarget);
 
-                    List<ILevelCell> EffectCellList = new List<ILevelCell>();
+                    List<LevelCellBase> EffectCellList = new List<LevelCellBase>();
                     EffectCellList.AddRange( GetEffectedCells( InCasterUnit, InTarget ) );
 
                     if(!EffectCellList.Contains(InTarget))
@@ -283,7 +283,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
                     }
 
-                    foreach ( ILevelCell EffectCell in EffectCellList )
+                    foreach ( LevelCellBase EffectCell in EffectCellList )
                     {
                         InternalHandleEffectedCell(InCasterUnit, EffectCell);
                     }
@@ -306,7 +306,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        void InternalHandleEffectedCell(GridUnit InCasterUnit, ILevelCell InEffectCell)
+        void InternalHandleEffectedCell(GridUnit InCasterUnit, LevelCellBase InEffectCell)
         {
             GridObject targetObj = InEffectCell.GetObjectOnCell();
             GridUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();

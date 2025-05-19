@@ -5,7 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
-    [CreateAssetMenu(fileName = "NewHealAbilityParam", menuName = "TurnBasedTools/Ability/Parameters/ Create HealAbilityParam", order = 1)]
+    [CreateAssetMenu(fileName = "NewHealAbilityParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create HealAbilityParam", order = 1)]
     public class HealParam : AbilityParam
     {
         public int m_HealAmount;

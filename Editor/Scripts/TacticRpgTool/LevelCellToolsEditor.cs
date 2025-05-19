@@ -30,7 +30,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                     {
                         foreach (GameObject objs in Selection.gameObjects)
                         {
-                            ILevelCell objCell = objs.GetComponent<ILevelCell>();
+                            LevelCellBase objCell = objs.GetComponent<LevelCellBase>();
                             if (objCell)
                             {
                                 ReplaceTileWith(objCell, GetRandomTile(tilePiece));
@@ -49,7 +49,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             return InTileListPiece.m_Cells[SelectedIndex];
         }
 
-        void ReplaceTileWith(ILevelCell InCell, GameObject InTileObj)
+        void ReplaceTileWith(LevelCellBase InCell, GameObject InTileObj)
         {
             if(InCell)
             {

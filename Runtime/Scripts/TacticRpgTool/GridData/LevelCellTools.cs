@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 {
-    [RequireComponent(typeof(ILevelCell))]
+    [RequireComponent(typeof(LevelCellBase))]
     public class LevelCellTools : MonoBehaviour
     {
-        [SerializeField] private List<ILevelCell> m_Cells;
+        [SerializeField] private List<LevelCellBase> m_Cells;
 
-        public ILevelCell GetLevelCell()
+        public LevelCellBase GetLevelCell()
         {
-            return gameObject.GetComponent<ILevelCell>();
+            return gameObject.GetComponent<LevelCellBase>();
         }
 
-        public void AddCell(ILevelCell InCell)
+        public void AddCell(LevelCellBase InCell)
         {
             if(InCell != null)
             {
@@ -22,7 +22,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        public void RemoveCell(ILevelCell InCell)
+        public void RemoveCell(LevelCellBase InCell)
         {
             if(InCell != null)
             {
@@ -30,7 +30,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        public List<ILevelCell> GetCells()
+        public List<LevelCellBase> GetCells()
         {
             return m_Cells;
         }

@@ -20,29 +20,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         UsingAbility
     }
 
-    [System.Serializable]
-    public struct UnitAilmentData
-    {
-        public Ailment m_ailment;
-        public int m_NumTurns;
-
-        public UnitAilmentData(Ailment InAilment, int InNumTurns = 0)
-        {
-            m_ailment = InAilment;
-            m_NumTurns = InNumTurns;
-        }
-
-        public bool IsEqual(UnitAilmentData other)
-        {
-            return m_ailment == other.m_ailment;
-        }
-
-        public bool IsEqual(Ailment other)
-        {
-            return m_ailment == other;
-        }
-    }
-
     public class GridUnit : GridObject
     {
         UnitData m_UnitData;
@@ -62,7 +39,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         UnityEvent OnMovementComplete = new UnityEvent();
 
-        List<ILevelCell> m_EditedCells = new List<ILevelCell>();
+        List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
 
         public override void Initalize()
         {
@@ -91,7 +68,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             m_CurrentState = UnitState.Idle;
 
-            foreach (ILevelCell cell in m_EditedCells)
+            foreach (LevelCellBase cell in m_EditedCells)
             {
                 if (cell)
                 {
@@ -102,7 +79,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             m_EditedCells.Clear();
         }
         
-        public void LookAtCell(ILevelCell InCell)
+        public void LookAtCell(LevelCellBase InCell)
         {
             if(InCell && ShouldLookAtTargets())
             {
@@ -121,7 +98,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             AIComponent.SetAIData( InAIData );
         }
         
-        public void CheckCellVisibility(ILevelCell InCell)
+        public void CheckCellVisibility(LevelCellBase InCell)
         {
             if(InCell)
             {
@@ -269,7 +246,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return SelectedPlayerData;
         }
 
-        public Vector3 GetCellAllignPos(ILevelCell InCell)
+        public Vector3 GetCellAllignPos(LevelCellBase InCell)
         {
             if(InCell)
             {
@@ -289,7 +266,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return Vector3.zero;
         }
 
-        Vector3 GetCellLookAtPos(ILevelCell InCell)
+        Vector3 GetCellLookAtPos(LevelCellBase InCell)
         {
             if(InCell)
             {
@@ -306,21 +283,21 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region AbilityStuff
 
-        public List<ILevelCell> GetAbilityHoverCells(ILevelCell InCell)
+        public List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
         {
-            List<ILevelCell> outCells = new List<ILevelCell>();
+            List<LevelCellBase> outCells = new List<LevelCellBase>();
 
             if (GetCurrentState() == UnitState.UsingAbility)
             {
                 UnitAbility ability = GetCurrentAbility();
                 if (ability)
                 {
-                    List<ILevelCell> abilityCells = ability.GetAbilityCells(this);
-                    List<ILevelCell> effectedCells = ability.GetEffectedCells(this, InCell);
+                    List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
+                    List<LevelCellBase> effectedCells = ability.GetEffectedCells(this, InCell);
 
                     if (abilityCells.Contains(InCell))
                     {
-                        foreach (ILevelCell currCell in effectedCells)
+                        foreach (LevelCellBase currCell in effectedCells)
                         {
                             if (currCell)
                             {
@@ -373,7 +350,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     m_CurrentAbility = InAbility;
                     m_CurrentState = UnitState.UsingAbility;
 
-                    List<ILevelCell> EditedAbilityCells = m_CurrentAbility.Setup(this);
+                    List<LevelCellBase> EditedAbilityCells = m_CurrentAbility.Setup(this);
                     m_EditedCells.AddRange(EditedAbilityCells);
 
                     TacticBattleManager.Get().UpdateHoverCells();
@@ -381,7 +358,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void ExecuteAbility(ILevelCell InCell)
+        public void ExecuteAbility(LevelCellBase InCell)
         {
             if( m_CurrentAbility )
             {
@@ -395,7 +372,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void ExecuteAbility(UnitAbility InAbility, ILevelCell InCell)
+        public void ExecuteAbility(UnitAbility InAbility, LevelCellBase InCell)
         {
             if (!IsMoving())
             {
@@ -426,7 +403,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region MovementStuff
 
-        public List<ILevelCell> GetAllowedMovementCells()
+        public List<LevelCellBase> GetAllowedMovementCells()
         {
             return m_UnitData.m_MovementShape.GetCellList(this, GetCell(), m_CurrentMovementPoints, m_UnitData.m_bIsFlying);
         }
@@ -446,9 +423,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             m_CurrentState = UnitState.Moving;
-            List<ILevelCell> abilityCells = GetAllowedMovementCells();
+            List<LevelCellBase> abilityCells = GetAllowedMovementCells();
 
-            foreach (ILevelCell cell in abilityCells)
+            foreach (LevelCellBase cell in abilityCells)
             {
                 if (cell && cell.IsVisible())
                 {
@@ -461,7 +438,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             TacticBattleManager.Get().UpdateHoverCells();
         }
 
-        public bool ExecuteMovement(ILevelCell TargetCell, UnityEvent InOnMovementComplete)
+        public bool ExecuteMovement(LevelCellBase TargetCell, UnityEvent InOnMovementComplete)
         {
             if (IsMoving())
             {
@@ -478,7 +455,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            List<ILevelCell> abilityCells = GetAllowedMovementCells();
+            List<LevelCellBase> abilityCells = GetAllowedMovementCells();
             if (!abilityCells.Contains(TargetCell))
             {
                 return false;
@@ -493,23 +470,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return true;
         }
 
-        public bool ExecuteMovement(ILevelCell TargetCell)
+        public bool ExecuteMovement(LevelCellBase TargetCell)
         {
             UnityEvent OnMovementComplete = new UnityEvent();
             return ExecuteMovement(TargetCell, OnMovementComplete);
         }
 
-        public void TraverseTo(ILevelCell InTargetCell, UnityEvent OnMovementComplete = null, List<ILevelCell> InAllowedCells = null)
+        public void TraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
         {
             StartCoroutine(EnumeratorTraverseTo(InTargetCell, OnMovementComplete, InAllowedCells));
         }
 
-        public void MoveTo(ILevelCell InTargetCell)
+        public void MoveTo(LevelCellBase InTargetCell)
         {
             StartCoroutine(InternalMoveTo(InTargetCell));
         }
 
-        public IEnumerator EnumeratorTraverseTo(ILevelCell InTargetCell, UnityEvent OnMovementComplete = null, List<ILevelCell> InAllowedCells = null)
+        public IEnumerator EnumeratorTraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
         {
             if (InTargetCell)
             {
@@ -519,17 +496,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 TacticBattleManager.AddActionBeingPerformed();
 
-                List<ILevelCell> cellPath = GetPathTo(InTargetCell, InAllowedCells);
+                List<LevelCellBase> cellPath = GetPathTo(InTargetCell, InAllowedCells);
 
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
                 int MovementCount = 0;
 
-                ILevelCell FinalCell = InTargetCell;
+                LevelCellBase FinalCell = InTargetCell;
 
-                ILevelCell StartingCell = GetCell();
+                LevelCellBase StartingCell = GetCell();
 
-                foreach (ILevelCell cell in cellPath)
+                foreach (LevelCellBase cell in cellPath)
                 {
                     FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)
@@ -597,7 +574,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public List<ILevelCell> GetPathTo(ILevelCell InTargetCell, List<ILevelCell> InAllowedCells = null)
+        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells = null)
         {
             AIPathInfo pathInfo = new AIPathInfo();
             pathInfo.StartCell = GetCell();
@@ -607,12 +584,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             pathInfo.AllowedCells = InAllowedCells;
             pathInfo.bAllowBlocked = m_UnitData.m_bIsFlying;
 
-            List<ILevelCell> cellPath = AIManager.GetPath(pathInfo);
+            List<LevelCellBase> cellPath = AIManager.GetPath(pathInfo);
 
             return cellPath;
         }
 
-        IEnumerator InternalMoveTo(ILevelCell InTargetCell)
+        IEnumerator InternalMoveTo(LevelCellBase InTargetCell)
         {
             if (InTargetCell)
             {
@@ -624,15 +601,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 pathInfo.bIgnoreUnits = true;
                 pathInfo.bTakeWeightIntoAccount = false;
 
-                List<ILevelCell> cellPath = AIManager.GetPath(pathInfo);
+                List<LevelCellBase> cellPath = AIManager.GetPath(pathInfo);
 
-                ILevelCell StartingCell = GetCell();
+                LevelCellBase StartingCell = GetCell();
 
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
                 SetCurrentCell(InTargetCell);
 
-                foreach (ILevelCell cell in cellPath)
+                foreach (LevelCellBase cell in cellPath)
                 {
                     FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)

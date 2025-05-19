@@ -10,6 +10,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 {
@@ -70,7 +71,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [Space(10)]
 
         [SerializeField]
-        ILevelGrid m_LevelGrid;
+        LevelGridBase m_LevelGrid;
 
         [SerializeField]
         BattleGameRules m_GameRules;
@@ -127,11 +128,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         Dictionary<GameTeam, int> m_NumberOfKilledTargets = new Dictionary<GameTeam, int>();
         Dictionary<GameTeam, int> m_NumberOfKilledEntities = new Dictionary<GameTeam, int>();
 
-        List<ILevelCell> CurrentHoverCells = new List<ILevelCell>();
+        List<LevelCellBase> CurrentHoverCells = new List<LevelCellBase>();
 
         UnityEvent OnFinishedPerformedActions = new UnityEvent();
 
-        ILevelCell m_CurrentHoverCell;
+        LevelCellBase m_CurrentHoverCell;
 
         int m_NumActionsBeingPerformed;
 
@@ -240,16 +241,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         {
             if (m_LevelGrid)
             {
-                ILevelCell TestCell = null;
+                LevelCellBase TestCell = null;
 
-                List<ILevelCell> LevelCells = m_LevelGrid.GetAllCells();
+                List<LevelCellBase> LevelCells = m_LevelGrid.GetAllCells();
                 if (LevelCells.Count > 0)
                 {
                     TestCell = LevelCells[0];
                 }
                 if (TestCell != null)
                 {
-                    foreach (ILevelCell currCell in LevelCells)
+                    foreach (LevelCellBase currCell in LevelCells)
                     {
                         CellState cellState = currCell.GetNormalState();
                         currCell.SetCellState(cellState);
@@ -266,7 +267,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return sInstance;
         }
 
-        public static ILevelGrid GetGrid()
+        public static LevelGridBase GetGrid()
         {
             return sInstance.m_LevelGrid;
         }
@@ -458,7 +459,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return null;
         }
 
-        public static GridObject SpawnObjectOnCell(GameObject InObject, ILevelCell InCell, Vector3 InOffset = default(Vector3))
+        public static GridObject SpawnObjectOnCell(GameObject InObject, LevelCellBase InCell, Vector3 InOffset = default(Vector3))
         {
             if ( InCell && InObject )
             {
@@ -484,7 +485,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static GridUnit SpawnUnit(UnitData InUnitData, GameTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
         {
-            ILevelCell cell = sInstance.m_LevelGrid[InIndex];
+            LevelCellBase cell = sInstance.m_LevelGrid[InIndex];
 
             if (InTeam == GameTeam.Friendly)
             {
@@ -511,7 +512,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             SpawnedGridUnit.AlignToGrid();
             SpawnedGridUnit.PostInitalize();
 
-            ILevelCell DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
+            LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
             if (DirCell)
             {
                 SpawnedGridUnit.LookAtCell(DirCell);
@@ -661,12 +662,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return GameTeam.None;
         }
 
-        public static void ResetCellState(ILevelCell InCell)
+        public static void ResetCellState(LevelCellBase InCell)
         {
             SetCellState(InCell, InCell.GetNormalState());
         }
 
-        public static void SetCellState(ILevelCell InCell, CellState InCellState)
+        public static void SetCellState(LevelCellBase InCell, CellState InCellState)
         {
             if (sInstance.m_LevelGrid)
             {
@@ -679,7 +680,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        public static bool CanCasterEffectTarget(ILevelCell InCaster, ILevelCell InTarget, GameTeam InEffectedTeam, bool bAllowBlocked)
+        public static bool CanCasterEffectTarget(LevelCellBase InCaster, LevelCellBase InTarget, GameTeam InEffectedTeam, bool bAllowBlocked)
         {
             if (!InCaster || !InTarget)
             {
@@ -819,7 +820,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         #region EventStuff
 
-        void BeginHover(ILevelCell InCell)
+        void BeginHover(LevelCellBase InCell)
         {
             m_CurrentHoverCell = InCell;
             UpdateHoverCells();
@@ -852,13 +853,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                         }
                         else if (unitState == UnitState.Moving)
                         {
-                            List<ILevelCell> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
+                            List<LevelCellBase> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
 
                             if (AllowedMovementCells.Contains(m_CurrentHoverCell))
                             {
-                                List<ILevelCell> PathToCursor = selectedUnit.GetPathTo(m_CurrentHoverCell, AllowedMovementCells);
+                                List<LevelCellBase> PathToCursor = selectedUnit.GetPathTo(m_CurrentHoverCell, AllowedMovementCells);
 
-                                foreach (ILevelCell pathCell in PathToCursor)
+                                foreach (LevelCellBase pathCell in PathToCursor)
                                 {
                                     if (pathCell)
                                     {
@@ -873,7 +874,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                     }
                 }
 
-                foreach (ILevelCell currCell in CurrentHoverCells)
+                foreach (LevelCellBase currCell in CurrentHoverCells)
                 {
                     currCell.SetMaterial(CellState.eHover);
                 }
@@ -882,7 +883,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        void EndHover(ILevelCell InCell)
+        void EndHover(LevelCellBase InCell)
         {
             CleanupHoverCells();
 
@@ -898,7 +899,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         void CleanupHoverCells()
         {
-            foreach (ILevelCell currCell in CurrentHoverCells)
+            foreach (LevelCellBase currCell in CurrentHoverCells)
             {
                 if (currCell)
                 {
@@ -909,7 +910,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             CurrentHoverCells.Clear();
         }
 
-        void HandleCellClicked(ILevelCell InCell)
+        void HandleCellClicked(LevelCellBase InCell)
         {
             if (!InCell)
             {
@@ -985,7 +986,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             m_bIsPlaying = false;
         }
 
-        void HandleInteraction(ILevelCell InCell, CellInteractionState InInteractionState)
+        void HandleInteraction(LevelCellBase InCell, CellInteractionState InInteractionState)
         {
             GridObject ObjOnCell = InCell.GetObjectOnCell();
             if (ObjOnCell)

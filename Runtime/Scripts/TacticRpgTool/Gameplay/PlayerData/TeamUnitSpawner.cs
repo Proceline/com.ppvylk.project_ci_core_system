@@ -9,7 +9,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
     public class TeamUnitSpawner : MonoBehaviour
     {
         HumanTeamData m_TeamData;
-        List<ILevelCell> m_SpawnPoints;
+        List<LevelCellBase> m_SpawnPoints;
         UnityEvent m_OnSpawnComplete;
 
         int m_CurrentSpawnIndex;
@@ -17,13 +17,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
 
         bool bIsSpawning = false;
 
-        public void Init(HumanTeamData InTeamData, List<ILevelCell> InSpawnPoints, UnityEvent InOnSpawnComplete)
+        public void Init(HumanTeamData InTeamData, List<LevelCellBase> InSpawnPoints, UnityEvent InOnSpawnComplete)
         {
             m_TeamData = InTeamData;
             m_SpawnPoints = InSpawnPoints;
             m_OnSpawnComplete = InOnSpawnComplete;
 
-            foreach (ILevelCell playerCell in m_SpawnPoints)
+            foreach (LevelCellBase playerCell in m_SpawnPoints)
             {
                 TacticBattleManager.SetCellState(playerCell, CellState.eMovement);
             }
@@ -38,7 +38,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
 
         public void Finish()
         {
-            foreach (ILevelCell playerCell in m_SpawnPoints)
+            foreach (LevelCellBase playerCell in m_SpawnPoints)
             {
                 TacticBattleManager.ResetCellState(playerCell);
             }
@@ -58,7 +58,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
             
         }
 
-        public void HandleTileSelected(ILevelCell InCell)
+        public void HandleTileSelected(LevelCellBase InCell)
         {
             if (bIsSpawning)
             {

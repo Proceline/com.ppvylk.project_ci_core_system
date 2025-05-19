@@ -5,7 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
 {
-    [CreateAssetMenu(fileName = "NewFogOfWar", menuName = "TurnBasedTools/Create FogOfWar", order = 1)]
+    [CreateAssetMenu(fileName = "NewFogOfWar", menuName = "ProjectCI Tools/Create FogOfWar", order = 1)]
     public class FogOfWar : ScriptableObject
     {
         [SerializeField]
@@ -17,19 +17,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
         [SerializeField]
         int m_FogHeight;
 
-        Dictionary<ILevelCell, List<GameObject>> CellToFogObject = new Dictionary<ILevelCell, List<GameObject>>();
+        Dictionary<LevelCellBase, List<GameObject>> CellToFogObject = new Dictionary<LevelCellBase, List<GameObject>>();
 
         public int NumFogCells()
         {
             return CellToFogObject.Keys.Count;
         }
 
-        public void CheckPoint(ILevelCell InCell)
+        public void CheckPoint(LevelCellBase InCell)
         {
             AIRadiusInfo radiusInfo = new AIRadiusInfo( InCell, m_DiscoverRange );
 
-            List<ILevelCell> DiscoverCells = AIManager.GetRadius( radiusInfo );
-            foreach ( ILevelCell levelCell in DiscoverCells )
+            List<LevelCellBase> DiscoverCells = AIManager.GetRadius( radiusInfo );
+            foreach ( LevelCellBase levelCell in DiscoverCells )
             {
                 if( levelCell )
                 {
@@ -58,9 +58,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
                 return;
             }
 
-            List<ILevelCell> AllCells = TacticBattleManager.GetGrid().GetAllCells();
+            List<LevelCellBase> AllCells = TacticBattleManager.GetGrid().GetAllCells();
 
-            foreach (ILevelCell levelCell in AllCells)
+            foreach (LevelCellBase levelCell in AllCells)
             {
                 if (levelCell)
                 {

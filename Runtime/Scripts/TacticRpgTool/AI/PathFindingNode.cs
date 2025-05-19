@@ -4,7 +4,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 {
     public class PathFindingNode
     {
-        public ILevelCell Cell;
+        public LevelCellBase Cell;
         public PathFindingNode Parent;
         public int G;
         public int H;
@@ -48,12 +48,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return count;
         }
 
-        public PathFindingNode(ILevelCell InCell)
+        public PathFindingNode(LevelCellBase InCell)
         {
             Cell = InCell;
         }
 
-        public PathFindingNode(ILevelCell InCell, PathFindingNode InParent, int GCost, int HCost)
+        public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent, int GCost, int HCost)
         {
             Cell = InCell;
             Parent = InParent;
@@ -61,7 +61,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             H = HCost;
         }
 
-        public PathFindingNode(ILevelCell InCell, PathFindingNode InParent)
+        public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent)
         {
             Cell = InCell;
             Parent = InParent;

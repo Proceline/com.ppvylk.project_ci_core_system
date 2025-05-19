@@ -5,7 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool.Generator
 {
-    public class IGridGenerator<T> : EditorWindow where T : ILevelGrid
+    public class IGridGenerator<T> : EditorWindow where T : LevelGridBase
     {
         public CellPalette m_CellPalette;
         public Vector2 m_GridSize;

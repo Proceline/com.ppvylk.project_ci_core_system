@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
-using UnityEngine;
 
-namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
+namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
-    public class GameUtils : Object
+    public static class GameUtils
     {
         public static System.Type FindType(string qualifiedTypeName)
         {

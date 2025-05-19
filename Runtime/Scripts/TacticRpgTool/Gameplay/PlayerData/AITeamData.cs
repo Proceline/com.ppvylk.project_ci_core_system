@@ -16,7 +16,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
         public bool m_bIsATarget;
     }
 
-    [CreateAssetMenu(fileName = "NewAITeamData", menuName = "TurnBasedTools/PlayerTeamData/Create AITeamData", order = 1)]
+    [CreateAssetMenu(fileName = "NewAITeamData", menuName = "ProjectCI Tools/PlayerTeamData/Create AITeamData", order = 1)]
     public class AITeamData : TeamData
     {
         public List<AIObjectSpawnInfo> m_AISpawnUnits;

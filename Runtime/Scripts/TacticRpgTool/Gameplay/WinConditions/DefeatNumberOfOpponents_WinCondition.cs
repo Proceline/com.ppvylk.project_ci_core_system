@@ -3,7 +3,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 {
-    [CreateAssetMenu(fileName = "DefeatNumberOfOpponents", menuName = "TurnBasedTools/WinCondition/Create DefeatNumberOfOpponents", order = 1)]
+    [CreateAssetMenu(fileName = "DefeatNumberOfOpponents", menuName = "ProjectCI Tools/WinCondition/Create DefeatNumberOfOpponents", order = 1)]
     public class DefeatNumberOfOpponents_WinCondition : WinCondition
     {
         public int m_NumberRequired;

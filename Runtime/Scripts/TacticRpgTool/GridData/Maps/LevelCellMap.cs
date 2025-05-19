@@ -11,9 +11,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
         public CompassDir _Key;
 
         [SerializeField]
-        public ILevelCell _Value;
+        public LevelCellBase _Value;
 
-        public LevelCellPair(CompassDir InKey, ILevelCell InValue) : this()
+        public LevelCellPair(CompassDir InKey, LevelCellBase InValue) : this()
         {
             this._Key = InKey;
             this._Value = InValue;
@@ -31,7 +31,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
             Pairs = new List<LevelCellPair>();
         }
 
-        public LevelCellPair Add(CompassDir InKey, ILevelCell InValue)
+        public LevelCellPair Add(CompassDir InKey, LevelCellBase InValue)
         {
             foreach (LevelCellPair item in Pairs)
             {
@@ -58,7 +58,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
             return false;
         }
 
-        public ILevelCell this[CompassDir InKey]
+        public LevelCellBase this[CompassDir InKey]
         {
             get
             {

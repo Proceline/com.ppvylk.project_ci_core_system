@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
             
         }
         
-        public virtual void ApplyTo(GridUnit InCaster, ILevelCell InCell)
+        public virtual void ApplyTo(GridUnit InCaster, LevelCellBase InCell)
         {
 
         }

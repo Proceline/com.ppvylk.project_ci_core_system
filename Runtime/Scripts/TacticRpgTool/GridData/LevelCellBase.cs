@@ -42,7 +42,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
     [ExecuteInEditMode]
     [RequireComponent(typeof(LevelCellTools))]
-    public class ILevelCell : MonoBehaviour
+    public class LevelCellBase : MonoBehaviour
     {
         [SerializeField]
         CellInfo m_Info;
@@ -100,7 +100,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             m_AdjacentCellsMap.Pairs.Clear();
         }
 
-        public void AddAdjacentCell(CompassDir InDirection, ILevelCell InLevelCell)
+        public void AddAdjacentCell(CompassDir InDirection, LevelCellBase InLevelCell)
         {
             if (!m_AdjacentCellsMap.ContainsKey(InDirection))
             {
@@ -112,11 +112,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        public ILevelCell AddCellTo(CompassDir InDirection)
+        public LevelCellBase AddCellTo(CompassDir InDirection)
         {
             if (!HasAdjacentCell(InDirection))
             {
-                ILevelCell generatedCell = GetGrid().GenerateCellAdjacentTo(GetIndex(), InDirection);
+                LevelCellBase generatedCell = GetGrid().GenerateCellAdjacentTo(GetIndex(), InDirection);
                 return generatedCell;
             }
 
@@ -174,7 +174,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_AdjacentCellsMap.ContainsKey(InDirection) && m_AdjacentCellsMap[InDirection] != null;
         }
 
-        public ILevelCell GetAdjacentCell(CompassDir InDirection)
+        public LevelCellBase GetAdjacentCell(CompassDir InDirection)
         {
             if (m_AdjacentCellsMap.ContainsKey(InDirection))
             {
@@ -186,9 +186,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        public List<ILevelCell> GetAllAdjacentCells()
+        public List<LevelCellBase> GetAllAdjacentCells()
         {
-            List<ILevelCell> outCells = new List<ILevelCell>();
+            List<LevelCellBase> outCells = new List<LevelCellBase>();
 
             foreach (var pair in m_AdjacentCellsMap.Pairs)
             {
@@ -327,12 +327,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_Index;
         }
 
-        public ILevelGrid GetGrid()
+        public LevelGridBase GetGrid()
         {
-            return GetComponentInParent<ILevelGrid>();
+            return GetComponentInParent<LevelGridBase>();
         }
 
-        public CompassDir GetDirectionToAdjacentCell(ILevelCell InTarget)
+        public CompassDir GetDirectionToAdjacentCell(LevelCellBase InTarget)
         {
             foreach (var pair in m_AdjacentCellsMap.Pairs)
             {

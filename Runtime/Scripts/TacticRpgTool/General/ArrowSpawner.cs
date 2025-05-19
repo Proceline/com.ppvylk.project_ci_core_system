@@ -22,12 +22,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 
         }
 
-        public ILevelCell OnRightClick()
+        public LevelCellBase OnRightClick()
         {
             return TileSpawner.SpawnTile(direction, false);
         }
 
-        public ILevelCell OnLeftClick()
+        public LevelCellBase OnLeftClick()
         {
             return TileSpawner.SpawnTile(direction, true);
         }

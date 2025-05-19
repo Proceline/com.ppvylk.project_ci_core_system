@@ -7,15 +7,15 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
 {
-    [CreateAssetMenu(fileName = "NewAbilityShape", menuName = "TurnBasedTools/Ability/Shapes/Create DirectionalAbilityShape", order = 1)]
+    [CreateAssetMenu(fileName = "NewAbilityShape", menuName = "ProjectCI Tools/Ability/Shapes/Create DirectionalAbilityShape", order = 1)]
     public class DirectionalAbilityShape : AbilityShape
     {
         [SerializeField]
         bool m_bOnlyMyEnemies;
 
-        public override List<ILevelCell> GetCellList(GridUnit InCaster, ILevelCell InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        public override List<LevelCellBase> GetCellList(GridUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
         {
-            List<ILevelCell> cells = new List<ILevelCell>();
+            List<LevelCellBase> cells = new List<LevelCellBase>();
 
             if(InCell && InRange > 0)
             {
@@ -31,7 +31,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
 
             if ( m_bOnlyMyEnemies )
             {
-                List<ILevelCell> enemyCells = new List<ILevelCell>();
+                List<LevelCellBase> enemyCells = new List<LevelCellBase>();
                 foreach ( var currCell in cells )
                 {
                     GridUnit unitOnCell = currCell.GetUnitOnCell();
@@ -53,13 +53,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
             }
         }
 
-        List<ILevelCell> GetCellsInDirection(ILevelCell StartCell, int InRange, CompassDir Dir, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        List<LevelCellBase> GetCellsInDirection(LevelCellBase StartCell, int InRange, CompassDir Dir, bool bAllowBlocked, GameTeam m_EffectedTeam)
         {
-            List<ILevelCell> cells = new List<ILevelCell>();
+            List<LevelCellBase> cells = new List<LevelCellBase>();
 
             if(InRange > 0)
             {
-                ILevelCell CurserCell = StartCell.GetAdjacentCell(Dir);
+                LevelCellBase CurserCell = StartCell.GetAdjacentCell(Dir);
 
                 int Count = 0;
                 while (CurserCell)

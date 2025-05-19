@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
 {
-    [CreateAssetMenu(fileName = "NewAbilityShape", menuName = "TurnBasedTools/Ability/Shapes/Create RadiusAbilityShape", order = 1)]
+    [CreateAssetMenu(fileName = "NewAbilityShape", menuName = "ProjectCI Tools/Ability/Shapes/Create RadiusAbilityShape", order = 1)]
     public class RadiusAbilityShape : AbilityShape
     {
         [SerializeField]
@@ -16,7 +16,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
         [SerializeField]
         bool m_bOnlyMyEnemies;
 
-        public override List<ILevelCell> GetCellList(GridUnit InCaster, ILevelCell InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        public override List<LevelCellBase> GetCellList(GridUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
         {
             GridUnit Caster = InCell.GetUnitOnCell();
 
@@ -26,11 +26,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
             radiusInfo.bStopAtBlockedCell = m_bStopAtBlocked;
             radiusInfo.EffectedTeam = m_EffectedTeam;
 
-            List<ILevelCell> radCells = AIManager.GetRadius(radiusInfo);
+            List<LevelCellBase> radCells = AIManager.GetRadius(radiusInfo);
 
             if ( m_bOnlyMyEnemies )
             {
-                List<ILevelCell> enemyCells = new List<ILevelCell>();
+                List<LevelCellBase> enemyCells = new List<LevelCellBase>();
                 foreach ( var currCell in radCells )
                 {
                     GridUnit unitOnCell = currCell.GetUnitOnCell();

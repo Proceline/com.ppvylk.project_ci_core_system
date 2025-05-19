@@ -3,7 +3,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 {
-    [CreateAssetMenu(fileName = "SurviveNumberOfTurns", menuName = "TurnBasedTools/WinCondition/Create SurviveNumberOfTurns", order = 1)]
+    [CreateAssetMenu(fileName = "SurviveNumberOfTurns", menuName = "ProjectCI Tools/WinCondition/Create SurviveNumberOfTurns", order = 1)]
     public class SurviveNumberOfTurns_WinCondition : WinCondition
     {
         public int m_NumberRequired;

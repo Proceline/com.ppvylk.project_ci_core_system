@@ -14,7 +14,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData
         public bool m_bIsATarget;
     }
 
-    [CreateAssetMenu(fileName = "NewHumanTeamData", menuName = "TurnBasedTools/PlayerTeamData/Create HumanTeamData", order = 1)]
+    [CreateAssetMenu(fileName = "NewHumanTeamData", menuName = "ProjectCI Tools/PlayerTeamData/Create HumanTeamData", order = 1)]
     public class HumanTeamData : TeamData
     {
         public List<HumanUnitSpawnInfo> m_UnitRoster;

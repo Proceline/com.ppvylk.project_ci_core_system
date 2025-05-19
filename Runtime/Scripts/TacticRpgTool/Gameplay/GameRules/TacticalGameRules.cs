@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 {
-    [CreateAssetMenu(fileName = "NewGameRules", menuName = "TurnBasedTools/GameRules/Create TacticalGameRules", order = 1)]
+    [CreateAssetMenu(fileName = "NewGameRules", menuName = "ProjectCI Tools/GameRules/Create TacticalGameRules", order = 1)]
     public class TacticalGameRules : BattleGameRules
     {
         [SerializeField]
@@ -47,11 +47,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             HumanTeamData HumanData = TacticBattleManager.GetDataForTeam<HumanTeamData>(InTeam);
             if(HumanData)
             {
-                List<ILevelCell> SpawnList = TacticBattleManager.GetGrid().GetTeamStartPoints(InTeam);
+                List<LevelCellBase> SpawnList = TacticBattleManager.GetGrid().GetTeamStartPoints(InTeam);
 
                 if(InTeam == GameTeam.Friendly)
                 {
-                    foreach (ILevelCell levelCell in SpawnList)
+                    foreach (LevelCellBase levelCell in SpawnList)
                     {
                         if(levelCell)
                         {
@@ -86,12 +86,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             {
                 foreach (AIObjectSpawnInfo ObjInfo in AIData.m_AISpawnUnits)
                 {
-                    List<ILevelCell> CellsToSpawnAt = TacticBattleManager.GetGrid().GetCellsById(ObjInfo.m_SpawnAtCellId);
+                    List<LevelCellBase> CellsToSpawnAt = TacticBattleManager.GetGrid().GetCellsById(ObjInfo.m_SpawnAtCellId);
 
                     if(CellsToSpawnAt.Count > 0)
                     {
                         int selectedIndex = Random.Range(0, CellsToSpawnAt.Count - 1);
-                        ILevelCell selectedCell = CellsToSpawnAt[selectedIndex];
+                        LevelCellBase selectedCell = CellsToSpawnAt[selectedIndex];
                         if(selectedCell)
                         {
                             GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(ObjInfo.m_UnitData, InTeam, selectedCell.GetIndex(), ObjInfo.m_StartDirection);
@@ -107,7 +107,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             }
         }
 
-        void AutoPlaceUnits(HumanTeamData InHumanData, List<ILevelCell> InSpawnList)
+        void AutoPlaceUnits(HumanTeamData InHumanData, List<LevelCellBase> InSpawnList)
         {
             int NumStartPoints = InSpawnList.Count;
 
@@ -117,10 +117,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                 HumanUnitSpawnInfo HumanSpawnInfo = InHumanData.m_UnitRoster[i];
                 if (HumanSpawnInfo.m_UnitData)
                 {
-                    List<ILevelCell> spawnCells = TacticBattleManager.GetGrid().GetCellsById(HumanSpawnInfo.m_SpawnAtCellId);
+                    List<LevelCellBase> spawnCells = TacticBattleManager.GetGrid().GetCellsById(HumanSpawnInfo.m_SpawnAtCellId);
 
-                    List<ILevelCell> cellsToRemove = new List<ILevelCell>();
-                    foreach (ILevelCell cell in spawnCells)
+                    List<LevelCellBase> cellsToRemove = new List<LevelCellBase>();
+                    foreach (LevelCellBase cell in spawnCells)
                     {
                         if (cell)
                         {
@@ -131,7 +131,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                         }
                     }
 
-                    foreach (ILevelCell cell in cellsToRemove)
+                    foreach (LevelCellBase cell in cellsToRemove)
                     {
                         spawnCells.Remove(cell);
                     }
@@ -139,7 +139,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                     if(spawnCells.Count > 0 && HumanSpawnInfo.m_SpawnAtCellId != "")
                     {
                         int selectedIndex = Random.Range(0, spawnCells.Count - 1);
-                        ILevelCell selectedCell = spawnCells[selectedIndex];
+                        LevelCellBase selectedCell = spawnCells[selectedIndex];
                     
                         if(InSpawnList.Contains(selectedCell))
                         {
@@ -155,7 +155,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
                     else if(i < NumStartPoints)
                     {
                         int selectedCellIndex = Random.Range(0, InSpawnList.Count);
-                        ILevelCell selectedCell = InSpawnList[selectedCellIndex];
+                        LevelCellBase selectedCell = InSpawnList[selectedCellIndex];
                         InSpawnList.RemoveAt(selectedCellIndex);
                         GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(HumanSpawnInfo.m_UnitData, InHumanData.GetTeam(), selectedCell.GetIndex(), HumanSpawnInfo.m_StartDirection);
                         if (SpawnedUnit)
@@ -333,7 +333,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             }
         }
 
-        public override void HandleCellSelected(ILevelCell InCell)
+        public override void HandleCellSelected(LevelCellBase InCell)
         {
             if (TacticBattleManager.IsActionBeingPerformed())
             {

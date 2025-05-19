@@ -25,7 +25,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
     [InitializeOnLoad]
     public class GridEditor
     {
-        static ILevelGrid m_CurrentGrid;
+        static LevelGridBase m_CurrentGrid;
 
         static DirectionalCellSpawner m_CurrentTileSpawner;
 
@@ -48,7 +48,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                     GameObject selectedObj = Selection.objects[0] as GameObject;
                     if(selectedObj)
                     {
-                        ILevelCell selectedCell = selectedObj.GetComponent<ILevelCell>();
+                        LevelCellBase selectedCell = selectedObj.GetComponent<LevelCellBase>();
                         if (selectedCell)
                         {
                             InstantiateTileSpawner(selectedCell);
@@ -72,7 +72,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             }
         }
 
-        static void SetCurrentGrid(ILevelGrid InGrid)
+        static void SetCurrentGrid(LevelGridBase InGrid)
         {
             if (m_CurrentGrid)
             {
@@ -85,7 +85,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             }
         }
 
-        static void OnTileChanged(ILevelCell InCell)
+        static void OnTileChanged(LevelCellBase InCell)
         {
             if(InCell)
             {
@@ -96,7 +96,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
         #region MouseEventStuff
 
-        static ILevelCell m_RecentlyGeneratedCell;
+        static LevelCellBase m_RecentlyGeneratedCell;
 
         static Ray CalculateRay(SceneView InScene, Event InEvent)
         {
@@ -106,7 +106,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             return InScene.camera.ScreenPointToRay( scrPos );
         }
 
-        static void InstantiateTileSpawner(ILevelCell InCell)
+        static void InstantiateTileSpawner(LevelCellBase InCell)
         {
             DirectionalCellSpawner[] CellSpawners = GameObject.FindObjectsByType<DirectionalCellSpawner>(FindObjectsSortMode.None);
             foreach (DirectionalCellSpawner cellSpawner in CellSpawners)
@@ -166,7 +166,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
                 if ( hitObj )
                 {
-                    ILevelCell levelCell = hitObj.GetComponent<ILevelCell>();
+                    LevelCellBase levelCell = hitObj.GetComponent<LevelCellBase>();
                     if(levelCell)
                     {
                         SetCurrentGrid(levelCell.GetGrid());

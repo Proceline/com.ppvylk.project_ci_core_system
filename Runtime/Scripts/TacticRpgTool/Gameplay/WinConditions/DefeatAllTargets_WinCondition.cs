@@ -3,7 +3,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 {
-    [CreateAssetMenu(fileName = "DefeatAllTargets", menuName = "TurnBasedTools/WinCondition/Create DefeatAllTargets", order = 1)]
+    [CreateAssetMenu(fileName = "DefeatAllTargets", menuName = "ProjectCI Tools/WinCondition/Create DefeatAllTargets", order = 1)]
     public class DefeatAllTargets_WinCondition : WinCondition
     {
         protected override bool DidTeamWin(GameTeam InTeam)

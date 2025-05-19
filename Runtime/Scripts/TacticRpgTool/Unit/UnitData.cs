@@ -22,7 +22,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
     }
 
-    [CreateAssetMenu(fileName = "NewUnitData", menuName = "TurnBasedTools/Create UnitData", order = 1)]
+    [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
     public class UnitData : ScriptableObject
     {
         public string m_UnitName;

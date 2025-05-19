@@ -10,9 +10,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
         public Vector2 _Key;
 
         [SerializeField]
-        public ILevelCell _Value;
+        public LevelCellBase _Value;
 
-        public PositionToLevelCellPair(Vector2 InKey, ILevelCell InValue) : this()
+        public PositionToLevelCellPair(Vector2 InKey, LevelCellBase InValue) : this()
         {
             this._Key = InKey;
             this._Value = InValue;
@@ -30,7 +30,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
             Pairs = new List<PositionToLevelCellPair>();
         }
 
-        public PositionToLevelCellPair Add(Vector2 InKey, ILevelCell InValue)
+        public PositionToLevelCellPair Add(Vector2 InKey, LevelCellBase InValue)
         {
             foreach (PositionToLevelCellPair item in Pairs)
             {
@@ -74,7 +74,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
             Pairs.Clear();
         }
 
-        public ILevelCell this[Vector2 InKey]
+        public LevelCellBase this[Vector2 InKey]
         {
             get
             {

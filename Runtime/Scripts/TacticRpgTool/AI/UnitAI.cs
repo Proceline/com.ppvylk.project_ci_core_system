@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 {
-    [CreateAssetMenu(fileName = "NewUnitAI", menuName = "TurnBasedTools/AI/Create UnitAIData", order = 1)]
+    [CreateAssetMenu(fileName = "NewUnitAI", menuName = "ProjectCI Tools/AI/Create UnitAIData", order = 1)]
     public class UnitAI : ScriptableObject
     {
         public bool m_bActivateOnStart;
@@ -33,13 +33,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     if( target )
                     {
                         // Do movement.
-                        ILevelCell targetMovementCell = CalculateMoveToCell( InAIUnit, target, abilityIndex );
+                        LevelCellBase targetMovementCell = CalculateMoveToCell( InAIUnit, target, abilityIndex );
                         if( targetMovementCell )
                         {
                             if( targetMovementCell != InAIUnit.GetCell() )
                             {
                                 UnityEvent OnMovementComplete = new UnityEvent();
-                                List<ILevelCell> AllowedCells = InAIUnit.GetAllowedMovementCells();
+                                List<LevelCellBase> AllowedCells = InAIUnit.GetAllowedMovementCells();
                                 yield return TacticBattleManager.Get().StartCoroutine(InAIUnit.EnumeratorTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells));
                             }
                         }
@@ -52,7 +52,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                                 UnitAbility selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
                                 if (selectedAbility)
                                 {
-                                    List<ILevelCell> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
+                                    List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
                                     if (abilityCells.Contains(target.GetCell()))
                                     {
                                         yield return TacticBattleManager.Get().StartCoroutine(AIManager.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
@@ -83,7 +83,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         EffectedTeam = GameTeam.Hostile
                     };
 
-                    List<ILevelCell> ActivationCells = AIManager.GetRadius(radiusInfo);
+                    List<LevelCellBase> ActivationCells = AIManager.GetRadius(radiusInfo);
                     foreach (var cell in ActivationCells)
                     {
                         GridObject objOnCell = cell.GetObjectOnCell();
@@ -124,7 +124,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         bTakeWeightIntoAccount = true
                     };
 
-                    List<ILevelCell> unitPath = AIManager.GetPath(pathInfo);
+                    List<LevelCellBase> unitPath = AIManager.GetPath(pathInfo);
                     if (unitPath.Count < closestIndex)
                     {
                         closestIndex = unitPath.Count;
@@ -160,7 +160,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return -1;
         }
 
-        protected ILevelCell CalculateMoveToCell(GridUnit InAIUnit, GridUnit InTarget, int InAbilityIndex)
+        protected LevelCellBase CalculateMoveToCell(GridUnit InAIUnit, GridUnit InTarget, int InAbilityIndex)
         {
             if (InTarget == null)
             {
@@ -173,23 +173,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 return InAIUnit.GetCell();
             }
 
-            List<ILevelCell> AllowedMovementCells = InAIUnit.GetAllowedMovementCells();
-            List<ILevelCell> OverlapCells = new List<ILevelCell>();
+            List<LevelCellBase> AllowedMovementCells = InAIUnit.GetAllowedMovementCells();
+            List<LevelCellBase> OverlapCells = new List<LevelCellBase>();
 
             if ( InAbilityIndex != -1 )
             {
                 UnitAbility SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
-                List<ILevelCell> CellsAroundUnitToAttack = SelectedAbility.GetShape().GetCellList(InTarget, InTarget.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
+                List<LevelCellBase> CellsAroundUnitToAttack = SelectedAbility.GetShape().GetCellList(InTarget, InTarget.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
 
                 //If you can attack from where you are, do so.
-                List<ILevelCell> AbilityCells = SelectedAbility.GetShape().GetCellList(InAIUnit, InAIUnit.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
+                List<LevelCellBase> AbilityCells = SelectedAbility.GetShape().GetCellList(InAIUnit, InAIUnit.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
                 if (AbilityCells.Contains(InTarget.GetCell()))
                 {
                     return InAIUnit.GetCell();
                 }
 
                 //Find cells that you can move to and attack.
-                foreach (ILevelCell levelCell in CellsAroundUnitToAttack)
+                foreach (LevelCellBase levelCell in CellsAroundUnitToAttack)
                 {
                     if (AllowedMovementCells.Contains(levelCell))
                     {
@@ -203,8 +203,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             {
                 //Cells exist that allow movement, and attack.
                 int currDistance = -1;
-                ILevelCell selectedCell = null;
-                foreach ( ILevelCell levelCell in OverlapCells )
+                LevelCellBase selectedCell = null;
+                foreach ( LevelCellBase levelCell in OverlapCells )
                 {
                     AIPathInfo pathInfo = new AIPathInfo
                     {
@@ -214,7 +214,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         bTakeWeightIntoAccount = true
                     };
 
-                    List<ILevelCell> levelPath = AIManager.GetPath( pathInfo );
+                    List<LevelCellBase> levelPath = AIManager.GetPath( pathInfo );
                     int cellDistance = levelPath.Count - 1;
                     if ( cellDistance > currDistance )
                     {
@@ -228,8 +228,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             else// Move towards target
             {
                 int currDistance = int.MaxValue;
-                ILevelCell selectedCell = null;
-                foreach (ILevelCell levelCell in AllowedMovementCells)
+                LevelCellBase selectedCell = null;
+                foreach (LevelCellBase levelCell in AllowedMovementCells)
                 {
                     AIPathInfo pathInfo = new AIPathInfo
                     {

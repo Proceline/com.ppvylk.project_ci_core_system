@@ -20,15 +20,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
     }
 
     [System.Serializable]
-    public class TileReplacedEvent : UnityEvent<ILevelCell>
+    public class TileReplacedEvent : UnityEvent<LevelCellBase>
     { }
 
     [System.Serializable]
-    public class CellInteractionEvent : UnityEvent<ILevelCell, CellInteractionState>
+    public class CellInteractionEvent : UnityEvent<LevelCellBase, CellInteractionState>
     { }
 
     [ExecuteInEditMode]
-    public class ILevelGrid : MonoBehaviour
+    public class LevelGridBase : MonoBehaviour
     {
         [SerializeField]
         protected GridCellMap m_CellMap;
@@ -46,7 +46,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         public CellInteractionEvent OnCellInteraction;
 
-        public ILevelCell this[Vector2 InIndex]
+        public LevelCellBase this[Vector2 InIndex]
         {
             get
             {
@@ -56,7 +56,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
                 return this[xIndex, yIndex];
             }
         }
-        public ILevelCell this[int InX, int InY]
+        public LevelCellBase this[int InX, int InY]
         {
             get
             {
@@ -88,28 +88,28 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             m_CellPalette = InTileList;
         }
 
-        public virtual ILevelCell AddLevelCellToObject(GameObject InObj)
+        public virtual LevelCellBase AddLevelCellToObject(GameObject InObj)
         {
             if (!InObj)
             {
                 return null;
             }
             
-            return InObj.AddComponent<LevelCell>();
+            return InObj.AddComponent<LevelCellImp>();
         }
 
-        public List<ILevelCell> GetAllCells()
+        public List<LevelCellBase> GetAllCells()
         {
-            List<ILevelCell> AllCells = new List<ILevelCell>();
+            List<LevelCellBase> AllCells = new List<LevelCellBase>();
             foreach (var pair in m_CellMap.Pairs)
             {
                 AllCells.Add(pair._Value);
             }
             return AllCells;
         }
-        public List<ILevelCell> GetTeamStartPoints(GameTeam InTeam)
+        public List<LevelCellBase> GetTeamStartPoints(GameTeam InTeam)
         {
-            List<ILevelCell> outCells = new List<ILevelCell>();
+            List<LevelCellBase> outCells = new List<LevelCellBase>();
 
             if(InTeam == GameTeam.None)
             {
@@ -119,7 +119,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
             foreach (var CellPair in m_CellMap.Pairs)
             {
-                ILevelCell CurrCell = CellPair._Value;
+                LevelCellBase CurrCell = CellPair._Value;
                 if (CurrCell)
                 {
                     switch (InTeam)
@@ -155,31 +155,31 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return m_CellPalette;
         }
 
-        public ILevelCell ReplaceTileWith(Vector2 InIndex, GameObject InObject)
+        public LevelCellBase ReplaceTileWith(Vector2 InIndex, GameObject InObject)
         {
             m_CellObjCursor = InObject;
 
-            ILevelCell OldCell = this[InIndex];
+            LevelCellBase OldCell = this[InIndex];
             Vector3 pos = OldCell.gameObject.transform.position;
 
             RemoveCell(InIndex, true);
-            ILevelCell NewCell = GenerateCell(pos, InIndex);
+            LevelCellBase NewCell = GenerateCell(pos, InIndex);
             SetupAllCellAdjacencies();
 
             OnTileReplaced.Invoke(NewCell);
 
             return NewCell;
         }
-        public ILevelCell GenerateCellAdjacentTo(Vector2 InOriginalIndex, CompassDir InDirection)
+        public LevelCellBase GenerateCellAdjacentTo(Vector2 InOriginalIndex, CompassDir InDirection)
         {
-            ILevelCell referenceCell = this[InOriginalIndex];
-            ILevelCell newCell = this[GetIndex(InOriginalIndex, InDirection)];
+            LevelCellBase referenceCell = this[InOriginalIndex];
+            LevelCellBase newCell = this[GetIndex(InOriginalIndex, InDirection)];
             if (referenceCell && !newCell)
             {
                 Vector2 pos = GetPosition(InOriginalIndex, InDirection);
                 float height = referenceCell.gameObject.transform.position.y;
 
-                ILevelCell generatedCell = GenerateCell(new Vector3(pos.x, height, pos.y), GetIndex(InOriginalIndex, InDirection));
+                LevelCellBase generatedCell = GenerateCell(new Vector3(pos.x, height, pos.y), GetIndex(InOriginalIndex, InDirection));
                 SetupAllCellAdjacencies();
 
                 return generatedCell;
@@ -187,12 +187,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
             return null;
         }
-        public ILevelCell GenerateCell(Vector3 InPos, Vector2 InIndex)
+        public LevelCellBase GenerateCell(Vector3 InPos, Vector2 InIndex)
         {
             GameObject generatedCell = Instantiate(m_CellObjCursor, InPos, m_CellObjCursor.transform.rotation, gameObject.transform);
             generatedCell.name = "CELL: " + InIndex.x + ", " + InIndex.y;
 
-            ILevelCell newCell = AddLevelCellToObject(generatedCell);
+            LevelCellBase newCell = AddLevelCellToObject(generatedCell);
             newCell.Setup();
             newCell.SetIndex(InIndex);
 
@@ -207,14 +207,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return newCell;
         }
 
-        public void HandleCellInteraction(ILevelCell InCell, CellInteractionState InteractionState)
+        public void HandleCellInteraction(LevelCellBase InCell, CellInteractionState InteractionState)
         {
             OnCellInteraction.Invoke(InCell, InteractionState);
         }
 
         public void RemoveCell(Vector2 InIndex, bool bInDestroyObject)
         {
-            ILevelCell CellToRemove = m_CellMap[InIndex];
+            LevelCellBase CellToRemove = m_CellMap[InIndex];
             if (CellToRemove)
             {
                 m_CellMap.Remove(InIndex);
@@ -236,12 +236,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             }
         }
 
-        public List<ILevelCell> GetCellsById(string InCellId)
+        public List<LevelCellBase> GetCellsById(string InCellId)
         {
-            List<ILevelCell> outCells = new List<ILevelCell>();
+            List<LevelCellBase> outCells = new List<LevelCellBase>();
 
-            List<ILevelCell> allCells = GetAllCells();
-            foreach (ILevelCell cell in allCells)
+            List<LevelCellBase> allCells = GetAllCells();
+            foreach (LevelCellBase cell in allCells)
             {
                 if(cell.GetCellId() == InCellId)
                 {
@@ -254,7 +254,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         #region Virtual
 
-        protected virtual void SetupAdjacencies(ILevelCell InCell)
+        protected virtual void SetupAdjacencies(LevelCellBase InCell)
         {
             Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
         }
@@ -273,7 +273,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
             return Vector2.zero;
         }
-        protected virtual Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(ILevelCell InCell)
+        protected virtual Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(LevelCellBase InCell)
         {
             Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
             return new Dictionary<CompassDir, Vector2>();
@@ -283,7 +283,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         #region Private
 
-        void AddCell(ILevelCell InCell)
+        void AddCell(LevelCellBase InCell)
         {
             m_CellMap.Add(InCell.GetIndex(), InCell);
         }
@@ -293,10 +293,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
         }
         void RefreshIndexMap()
         {
-            ILevelCell[] cells = GetComponentsInChildren<ILevelCell>();
+            LevelCellBase[] cells = GetComponentsInChildren<LevelCellBase>();
 
             m_CellMap.Clear();
-            foreach (ILevelCell currCell in cells)
+            foreach (LevelCellBase currCell in cells)
             {
                 m_CellMap.Add(currCell.GetIndex(), currCell);
             }

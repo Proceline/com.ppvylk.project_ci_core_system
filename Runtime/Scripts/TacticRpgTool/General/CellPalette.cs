@@ -14,7 +14,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
         public GameObject[] m_Cells;
     }
 
-    [CreateAssetMenu(fileName = "NewCellPalette", menuName = "TurnBasedTools/Create CellPalette", order = 1)]
+    [CreateAssetMenu(fileName = "NewCellPalette", menuName = "ProjectCI Tools/Create CellPalette", order = 1)]
     public class CellPalette : ScriptableObject
     {
         [SerializeField]

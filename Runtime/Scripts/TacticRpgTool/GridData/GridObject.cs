@@ -27,8 +27,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         public UnityEvent OnHoverBegin = new UnityEvent();
         public UnityEvent OnHoverEnd = new UnityEvent();
 
-        protected ILevelGrid m_AssociatedGrid;
-        protected ILevelCell m_CurrentCell;
+        protected LevelGridBase m_AssociatedGrid;
+        protected LevelCellBase m_CurrentCell;
 
         bool m_bVisible = true;
 
@@ -70,7 +70,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         #region Setters
 
-        public void SetGrid(ILevelGrid InGrid)
+        public void SetGrid(LevelGridBase InGrid)
         {
             m_AssociatedGrid = InGrid;
         }
@@ -80,7 +80,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             m_Team = InTeam;
         }
 
-        public void SetCurrentCell(ILevelCell InCell)
+        public void SetCurrentCell(LevelCellBase InCell)
         {
             if(m_CurrentCell)
             {
@@ -119,12 +119,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_bVisible;
         }
 
-        public ILevelCell GetCell()
+        public LevelCellBase GetCell()
         {
             return m_CurrentCell;
         }
 
-        public ILevelGrid GetGrid()
+        public LevelGridBase GetGrid()
         {
             return m_AssociatedGrid;
         }
@@ -219,7 +219,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         }
 
-        public virtual void HandleOwnerCellChanged(ILevelCell NewCell)
+        public virtual void HandleOwnerCellChanged(LevelCellBase NewCell)
         {
             
         }

@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
-    [CreateAssetMenu(fileName = "NewSpawnObjectParam", menuName = "TurnBasedTools/Ability/Parameters/ Create SpawnObjectAbilityParam", order = 1)]
+    [CreateAssetMenu(fileName = "NewSpawnObjectParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create SpawnObjectAbilityParam", order = 1)]
     public class SpawnObjParam : AbilityParam
     {
         public GameObject m_Object;
         public Vector3 m_Offset;
 
-        public override void ApplyTo(GridUnit InCaster, ILevelCell InCell)
+        public override void ApplyTo(GridUnit InCaster, LevelCellBase InCell)
         {
             if(!InCell.IsObjectOnCell())
             {

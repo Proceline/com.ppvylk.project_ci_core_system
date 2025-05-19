@@ -12,7 +12,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         public AudioClip m_AudioClip;
     }
 
-    [CreateAssetMenu(fileName = "NewAilment", menuName = "TurnBasedTools/Create New Ailment", order = 1)]
+    [CreateAssetMenu(fileName = "NewAilment", menuName = "ProjectCI Tools/Create New Ailment", order = 1)]
     public class Ailment : ScriptableObject
     {
         public string m_AilmentName;

@@ -117,7 +117,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
         }
         
-        public virtual void HandleCellSelected(ILevelCell InCell)
+        public virtual void HandleCellSelected(LevelCellBase InCell)
         {
 
         }

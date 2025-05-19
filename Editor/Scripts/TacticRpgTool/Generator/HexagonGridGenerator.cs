@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool.Generator
 {
     public class HexagonGridGenerator : IGridGenerator<HexagonGrid>
     {
-        [MenuItem("TurnBasedTools/HexagonGrid Generator")]
+        [MenuItem("ProjectCI Tools/HexagonGrid Generator")]
         static void Init()
         {
             HexagonGridGenerator window = (HexagonGridGenerator)EditorWindow.GetWindow(typeof(HexagonGridGenerator));

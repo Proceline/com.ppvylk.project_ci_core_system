@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
-    [CreateAssetMenu(fileName = "NewDamageAbilityParam", menuName = "TurnBasedTools/Ability/Parameters/ Create DamageAbilityParam", order = 1)]
+    [CreateAssetMenu(fileName = "NewDamageAbilityParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create DamageAbilityParam", order = 1)]
     public class DamageAbilityParam : AbilityParam
     {
         public int m_Damage;

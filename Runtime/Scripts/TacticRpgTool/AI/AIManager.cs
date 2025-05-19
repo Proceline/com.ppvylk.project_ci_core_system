@@ -10,14 +10,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 {
     public struct AIPathInfo
     {
-        public ILevelCell StartCell;
-        public ILevelCell TargetCell;
+        public LevelCellBase StartCell;
+        public LevelCellBase TargetCell;
         public bool bIgnoreUnits;
         public bool bAllowBlocked;
         public bool bTakeWeightIntoAccount;
-        public List<ILevelCell> AllowedCells;
+        public List<LevelCellBase> AllowedCells;
 
-        public AIPathInfo(ILevelCell InStart, ILevelCell InTarget)
+        public AIPathInfo(LevelCellBase InStart, LevelCellBase InTarget)
         {
             StartCell = InStart;
             TargetCell = InTarget;
@@ -31,14 +31,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
     public struct AIRadiusInfo
     {
-        public ILevelCell StartCell;
+        public LevelCellBase StartCell;
         public int Radius;
         public GridObject Caster;
         public bool bAllowBlocked;
         public bool bStopAtBlockedCell;
         public GameTeam EffectedTeam;
 
-        public AIRadiusInfo(ILevelCell InStart, int InRadius)
+        public AIRadiusInfo(LevelCellBase InStart, int InRadius)
         {
             StartCell = InStart;
             Radius = InRadius;
@@ -66,9 +66,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return m_MovementSpeed;
         }
 
-        public static List<ILevelCell> GetPath(AIPathInfo InPathInfo)
+        public static List<LevelCellBase> GetPath(AIPathInfo InPathInfo)
         {
-            List<ILevelCell> outPath = new List<ILevelCell>();
+            List<LevelCellBase> outPath = new List<LevelCellBase>();
 
             if (InPathInfo.StartCell == null || InPathInfo.TargetCell == null)
             {
@@ -103,7 +103,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 OpenSet.Remove(CurrNode);
                 ClosedSet.Add(CurrNode);
 
-                List<ILevelCell> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
+                List<LevelCellBase> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
                 foreach (var cell in AdjCells)
                 {
                     PathFindingNode NewPathFindNode = AStarCalculatePathNode(CurrNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
@@ -154,9 +154,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return outPath;
         }
 
-        public static List<ILevelCell> GetRadius(AIRadiusInfo InRadiusInfo)
+        public static List<LevelCellBase> GetRadius(AIRadiusInfo InRadiusInfo)
         {
-            List<ILevelCell> outPath = new List<ILevelCell>();
+            List<LevelCellBase> outPath = new List<LevelCellBase>();
 
             if (InRadiusInfo.StartCell == null)
             {
@@ -199,7 +199,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 OpenSet.Remove(CurrNode);
                 ClosedSet.Add(CurrNode);
 
-                List<ILevelCell> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
+                List<LevelCellBase> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
                 foreach (var cell in AdjCells)
                 {
                     PathFindingNode NewPathFindNode = new PathFindingNode(cell, CurrNode);
@@ -237,8 +237,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             if(!InRadiusInfo.bStopAtBlockedCell)
             {
-                List<ILevelCell> CellsToRemove = new List<ILevelCell>();
-                foreach (ILevelCell cell in outPath)
+                List<LevelCellBase> CellsToRemove = new List<LevelCellBase>();
+                foreach (LevelCellBase cell in outPath)
                 {
                     if( !AllowCellInRadius(cell, InRadiusInfo) )
                     {
@@ -246,7 +246,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     }
                 }
 
-                foreach (ILevelCell cellToRemove in CellsToRemove)
+                foreach (LevelCellBase cellToRemove in CellsToRemove)
                 {
                     outPath.Remove(cellToRemove);
                 }
@@ -265,7 +265,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return outPath;
         }
 
-        static bool AllowCellInRadius(ILevelCell InCell, AIRadiusInfo InRadiusInfo)
+        static bool AllowCellInRadius(LevelCellBase InCell, AIRadiusInfo InRadiusInfo)
         {
             if (!InCell)
             {
@@ -331,7 +331,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             OnComplete.Invoke();
         }
         
-        public static IEnumerator ExecuteAbility(GridUnit InCaster, ILevelCell InTarget, UnitAbility InAbility)
+        public static IEnumerator ExecuteAbility(GridUnit InCaster, LevelCellBase InTarget, UnitAbility InAbility)
         {
             if(InCaster)
             {
@@ -344,14 +344,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         #region AStarComponents
 
-        static PathFindingNode AStarCalculatePathNode(PathFindingNode InParent, ILevelCell InCurrent, ILevelCell InStart, ILevelCell InTarget, AIPathInfo InPathInfo)
+        static PathFindingNode AStarCalculatePathNode(PathFindingNode InParent, LevelCellBase InCurrent, LevelCellBase InStart, LevelCellBase InTarget, AIPathInfo InPathInfo)
         {
             int gCost = AStarCalculateG(InCurrent, InParent, InPathInfo);
             int hCost = AStarDistance(InCurrent, InTarget);
 
             return new PathFindingNode(InCurrent, InParent, gCost, hCost);
         }
-        static int AStarCalculateG(ILevelCell InCurrent, PathFindingNode InParent, AIPathInfo InPathInfo)
+        static int AStarCalculateG(LevelCellBase InCurrent, PathFindingNode InParent, AIPathInfo InPathInfo)
         {
             int weight = 0;
             if(InPathInfo.bTakeWeightIntoAccount)
@@ -361,7 +361,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return 1 + (InParent != null ? InParent.G : 0) + weight;
         }
-        static int AStarDistance(ILevelCell InStart, ILevelCell InDest)
+        static int AStarDistance(LevelCellBase InStart, LevelCellBase InDest)
         {
             return (int)(InStart.GetIndex() - InDest.GetIndex()).SqrMagnitude();
         }
@@ -401,7 +401,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         #region DijkstraRadiusComponents
 
-        static int DijCalculateG(ILevelCell InCurrent, PathFindingNode InParent)
+        static int DijCalculateG(LevelCellBase InCurrent, PathFindingNode InParent)
         {
             return 1 + (InParent != null ? InParent.G : 0);
         }

@@ -5,13 +5,13 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
 {
-    [CreateAssetMenu(fileName = "DiscoverArea", menuName = "TurnBasedTools/WinCondition/Create DiscoverArea", order = 1)]
+    [CreateAssetMenu(fileName = "DiscoverArea", menuName = "ProjectCI Tools/WinCondition/Create DiscoverArea", order = 1)]
     public class DiscoverArea_WinCondition : WinCondition
     {
         protected override bool DidTeamWin(GameTeam InTeam)
         {
-            List<ILevelCell> allCells = TacticBattleManager.GetGrid().GetAllCells();
-            foreach (ILevelCell cell in allCells)
+            List<LevelCellBase> allCells = TacticBattleManager.GetGrid().GetAllCells();
+            foreach (LevelCellBase cell in allCells)
             {
                 if (cell)
                 {

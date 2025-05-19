@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {

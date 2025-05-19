@@ -11,7 +11,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         public Ailment m_ailment;
         public int m_NumTurns;
         public List<GameObject> m_SpawnedObjectList;
-        public ILevelCell m_AssociatedCell;
+        public LevelCellBase m_AssociatedCell;
         public GridUnit m_CastedBy;
 
         public AilmentContainedData(Ailment InAilment, int InNumTurns = 0)
@@ -55,7 +55,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             return m_Ailments;
         }
 
-        public void AddAilment(GridUnit InCaster, CellAilment InAilment, ILevelCell InCell)
+        public void AddAilment(GridUnit InCaster, CellAilment InAilment, LevelCellBase InCell)
         {
             if (InAilment)
             {

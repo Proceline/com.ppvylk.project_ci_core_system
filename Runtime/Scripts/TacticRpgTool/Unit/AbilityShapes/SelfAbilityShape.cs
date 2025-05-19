@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
 {
-    [CreateAssetMenu(fileName = "NewSelfAbilityShape", menuName = "TurnBasedTools/Ability/Shapes/Create SelfAbilityShape", order = 1)]
+    [CreateAssetMenu(fileName = "NewSelfAbilityShape", menuName = "ProjectCI Tools/Ability/Shapes/Create SelfAbilityShape", order = 1)]
     public class SelfAbilityShape : AbilityShape
     {
-        public override List<ILevelCell> GetCellList(GridUnit InCaster, ILevelCell InCell, int InRange, bool bAllowBlocked = true, GameTeam m_EffectedTeam = GameTeam.None)
+        public override List<LevelCellBase> GetCellList(GridUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked = true, GameTeam m_EffectedTeam = GameTeam.None)
         {
-            return new List<ILevelCell> { InCaster.GetCell() };
+            return new List<LevelCellBase> { InCaster.GetCell() };
         }
     }
 }

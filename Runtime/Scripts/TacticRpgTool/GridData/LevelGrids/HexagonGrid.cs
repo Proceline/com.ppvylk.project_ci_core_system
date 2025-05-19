@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 {
-    public class HexagonGrid : ILevelGrid
+    public class HexagonGrid : LevelGridBase
     {
-        protected override void SetupAdjacencies(ILevelCell InCell)
+        protected override void SetupAdjacencies(LevelCellBase InCell)
         {
             if (InCell)
             {
@@ -22,7 +22,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
                         val -= new Vector2(1, 0);
                     }
 
-                    ILevelCell adjContender = this[val];
+                    LevelCellBase adjContender = this[val];
                     if (adjContender)
                     {
                         InCell.AddAdjacentCell(currAdjVect.Key, adjContender);
@@ -43,7 +43,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         protected override Vector2 GetPosition(Vector2 OriginalIndex, CompassDir dir)
         {
-            ILevelCell OriginalCell = this[OriginalIndex];
+            LevelCellBase OriginalCell = this[OriginalIndex];
 
             Vector3 bounds = m_CellObjCursor.GetComponent<Renderer>().bounds.size;
 
@@ -115,7 +115,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return Offset;
         }
 
-        protected override Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(ILevelCell InCell)
+        protected override Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(LevelCellBase InCell)
         {
             Dictionary<CompassDir, Vector2> AdjacentVects = new Dictionary<CompassDir, Vector2>();
 

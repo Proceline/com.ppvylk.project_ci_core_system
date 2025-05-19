@@ -32,8 +32,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 }
             }
 
-            List<ILevelCell> levelCells = TacticBattleManager.GetGrid().GetAllCells();
-            foreach (ILevelCell currLevelCell in levelCells)
+            List<LevelCellBase> levelCells = TacticBattleManager.GetGrid().GetAllCells();
+            foreach (LevelCellBase currLevelCell in levelCells)
             {
                 if (currLevelCell)
                 {
@@ -96,8 +96,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 }
             }
 
-            List<ILevelCell> levelCells = TacticBattleManager.GetGrid().GetAllCells();
-            foreach (ILevelCell currLevelCell in levelCells)
+            List<LevelCellBase> levelCells = TacticBattleManager.GetGrid().GetAllCells();
+            foreach (LevelCellBase currLevelCell in levelCells)
             {
                 if (currLevelCell)
                 {
@@ -123,7 +123,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         }
 
 
-        public static void HandleUnitOnCell(GridUnit InUnit, ILevelCell InCell)
+        public static void HandleUnitOnCell(GridUnit InUnit, LevelCellBase InCell)
         {
             if (InCell && InUnit)
             {
@@ -169,7 +169,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             }
         }
 
-        static void HandleCellAilmentExecution(ILevelCell InCell, AilmentExecutionInfo InAilmentExecution)
+        static void HandleCellAilmentExecution(LevelCellBase InCell, AilmentExecutionInfo InAilmentExecution)
         {
             GridUnit unitOnCell = InCell.GetUnitOnCell();
             if(unitOnCell)

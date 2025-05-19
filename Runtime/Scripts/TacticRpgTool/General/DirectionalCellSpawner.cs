@@ -9,7 +9,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
     [ExecuteInEditMode]
     public class DirectionalCellSpawner : MonoBehaviour
     {
-        public ILevelCell ReferenceCell;
+        public LevelCellBase ReferenceCell;
 
         List<CompassDir> m_AllowedDirections = new List<CompassDir>();
 
@@ -25,7 +25,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 
         }
 
-        public void SetCurrentTile(ILevelCell InCell)
+        public void SetCurrentTile(LevelCellBase InCell)
         {
             if ( ReferenceCell )
             {
@@ -81,11 +81,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
             }
         }
 
-        public ILevelCell SpawnTile(CompassDir Direction, bool bSelectNewTile)
+        public LevelCellBase SpawnTile(CompassDir Direction, bool bSelectNewTile)
         {
             if(ReferenceCell)
             {
-                ILevelCell generatedCell = ReferenceCell.AddCellTo(Direction);
+                LevelCellBase generatedCell = ReferenceCell.AddCellTo(Direction);
                 UpdateArrows();
 
                 return generatedCell;
