@@ -148,12 +148,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         void Start()
         {
-            DirectionalCellSpawner[] CellSpawners = FindObjectsByType<DirectionalCellSpawner>(FindObjectsSortMode.None);
-            foreach (DirectionalCellSpawner cellSpawner in CellSpawners)
-            {
-                Destroy(cellSpawner.gameObject);
-            }
-
             if (!m_LevelGrid)
             {
                 Debug.Log("([TurnBasedTools]::GameManager::Start) Missing Grid");
