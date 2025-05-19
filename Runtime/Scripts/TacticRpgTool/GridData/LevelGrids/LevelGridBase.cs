@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-using UnityEditor.SceneManagement;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps;
 
@@ -27,7 +24,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
     public class CellInteractionEvent : UnityEvent<LevelCellBase, CellInteractionState>
     { }
 
-    [ExecuteInEditMode]
     public class LevelGridBase : MonoBehaviour
     {
         [SerializeField]
@@ -187,6 +183,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
             return null;
         }
+
         public LevelCellBase GenerateCell(Vector3 InPos, Vector2 InIndex)
         {
             GameObject generatedCell = Instantiate(m_CellObjCursor, InPos, m_CellObjCursor.transform.rotation, gameObject.transform);
@@ -197,13 +194,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             newCell.SetIndex(InIndex);
 
             AddCell(newCell);
-
-            if( Application.isEditor && !Application.isPlaying )
-            {
-                EditorUtility.SetDirty(generatedCell);
-                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            }
-
             return newCell;
         }
 
