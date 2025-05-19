@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -41,7 +40,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
     }
 
     [ExecuteInEditMode]
-    [RequireComponent(typeof(LevelCellTools))]
     public class LevelCellBase : MonoBehaviour
     {
         [SerializeField]
