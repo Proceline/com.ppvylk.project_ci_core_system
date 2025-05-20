@@ -190,12 +190,30 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             return SpawnedGridUnit;
         }
 
-        public static GridUnit ChangeUnitToBattleUnit<T>(GameObject originPawn,
-            LevelGridBase InGrid, UnitData InUnitData,
-            GameTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+        /// <summary>
+        /// 自动根据originPawn的位置查找最近未被占用的cell并生成战斗单位
+        /// </summary>
+        public static GridUnit ChangeUnitToBattleUnit<T>(
+            GameObject originPawn,
+            LevelGridBase InGrid,
+            UnitData InUnitData,
+            GameTeam InTeam,
+            float searchRadius,
+            LayerMask cellLayer,
+            CompassDir InStartDirection = CompassDir.S)
             where T : GridUnit
         {
-            LevelCellBase cell = InGrid[InIndex];
+            if (originPawn == null || InGrid == null)
+            {
+                Debug.LogWarning("originPawn or InGrid is null");
+                return null;
+            }
+            LevelCellBase cell = FindNearestUnoccupiedCell(originPawn.transform.position, searchRadius, cellLayer);
+            if (cell == null)
+            {
+                Debug.LogWarning("No unoccupied cell found near the given position.");
+                return null;
+            }
 
             if (InTeam == GameTeam.Friendly)
             {
@@ -313,6 +331,35 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             }
 
             return foundObjects;
+        }
+
+        /// <summary>
+        /// 查找距离position最近的未被占用的LevelCellBase（通过OverlapSphere）
+        /// </summary>
+        /// <param name="position">目标点</param>
+        /// <param name="searchRadius">搜索半径</param>
+        /// <param name="cellLayer">cell所在的LayerMask</param>
+        /// <returns>最近的未被占用的LevelCellBase，找不到则返回null</returns>
+        public static LevelCellBase FindNearestUnoccupiedCell(Vector3 position, float searchRadius, LayerMask cellLayer)
+        {
+            Collider[] colliders = Physics.OverlapSphere(position, searchRadius, cellLayer);
+            LevelCellBase nearestCell = null;
+            float minDist = float.MaxValue;
+
+            foreach (var col in colliders)
+            {
+                LevelCellBase cell = col.GetComponent<LevelCellBase>();
+                if (cell != null && !cell.IsObjectOnCell())
+                {
+                    float dist = Vector3.Distance(position, cell.transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        nearestCell = cell;
+                    }
+                }
+            }
+            return nearestCell;
         }
     }
 } 

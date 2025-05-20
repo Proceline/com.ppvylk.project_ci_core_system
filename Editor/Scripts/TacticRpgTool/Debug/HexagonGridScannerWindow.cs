@@ -7,6 +7,8 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 using UnityEditorInternal;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
@@ -34,8 +36,9 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         private Vector3 testAreaCenter = Vector3.zero;
         private float testAreaRadius = 5f;
         private bool testAreaIsCircle = true;
-        private LayerMask testAreaLayerMask = 0;
-        private int testAreaMaxResults = 10;
+        private LayerMask pawnDetectLayerMask = 0;
+        private int detectMaxResults = 10;
+        private UnitData unitData;
 
         [MenuItem("ProjectCI Tools/Debug/Hexagon Grid Scanner")]
         public static void ShowWindow()
@@ -75,12 +78,20 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             friendlyTeamData = EditorGUILayout.ObjectField("Friendly Team Data", friendlyTeamData, typeof(HumanTeamData), true) as HumanTeamData;
             hostileTeamData = EditorGUILayout.ObjectField("Hostile Team Data", hostileTeamData, typeof(TeamData), true) as TeamData;
 
+            unitData = EditorGUILayout.ObjectField("Unit Data", unitData, typeof(UnitData), false) as UnitData;
+
+            string[] pawnLayerNames = InternalEditorUtility.layers;
+            int testMaskValue = pawnDetectLayerMask.value;
+            testMaskValue = EditorGUILayout.MaskField("Layer Mask", testMaskValue, pawnLayerNames);
+            pawnDetectLayerMask.value = testMaskValue;
+            detectMaxResults = EditorGUILayout.IntField("Max Results", detectMaxResults);
+
             EditorGUILayout.Space();
 
             GUI.enabled = Application.isPlaying;
-            if (GUILayout.Button("Scan and Generate Grid"))
+            if (GUILayout.Button("Generate Battle"))
             {
-                ScanAndGenerateGrid();
+                ScanAndGenerateBattle();
             }
             GUI.enabled = true;
 
@@ -95,11 +106,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             testAreaCenter = EditorGUILayout.Vector3Field("Test Center", testAreaCenter);
             testAreaRadius = EditorGUILayout.FloatField("Test Radius", testAreaRadius);
             testAreaIsCircle = EditorGUILayout.Toggle("Is Circle", testAreaIsCircle);
-            string[] allLayerNames = InternalEditorUtility.layers;
-            int testMaskValue = testAreaLayerMask.value;
-            testMaskValue = EditorGUILayout.MaskField("Layer Mask", testMaskValue, allLayerNames);
-            testAreaLayerMask.value = testMaskValue;
-            testAreaMaxResults = EditorGUILayout.IntField("Max Results", testAreaMaxResults);
 
             if (GUILayout.Button("Test ScanAreaForObjects<Animator>"))
             {
@@ -108,7 +114,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             EditorGUILayout.EndVertical();
         }
 
-        private void ScanAndGenerateGrid()
+        private void ScanAndGenerateBattle()
         {
             if (cellPalette == null)
             {
@@ -161,6 +167,23 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 {
                     Debug.Log("Successfully created Battle Manager");
                 }
+
+                var animators = GridBattleUtils.ScanAreaForObjects<Animator>(
+                    new Vector3(centerPosition.x, 0, centerPosition.z),
+                    gridWidth > gridHeight ? gridWidth * 2 : gridHeight * 2,
+                    true,
+                    pawnDetectLayerMask,
+                    detectMaxResults
+                );
+
+                Debug.Log($"Found {animators.Count} Animator(s) in area.");
+
+                foreach (var animator in animators)
+                {
+                    GridBattleUtils.ChangeUnitToBattleUnit<GridUnit>
+                        (animator.gameObject, levelGrid, unitData, 
+                        GameTeam.Friendly, 1, pawnDetectLayerMask);
+                }
             }
         }
 
@@ -170,8 +193,8 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 testAreaCenter,
                 testAreaRadius,
                 testAreaIsCircle,
-                testAreaLayerMask,
-                testAreaMaxResults
+                pawnDetectLayerMask,
+                detectMaxResults
             );
             Debug.Log($"Found {animators.Count} Animator(s) in area.");
             foreach (var animator in animators)
