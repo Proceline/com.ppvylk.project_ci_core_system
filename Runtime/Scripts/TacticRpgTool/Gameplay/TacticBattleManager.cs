@@ -67,11 +67,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
     public class TacticBattleManager : MonoBehaviour
     {
         static TacticBattleManager sInstance = null;
+        protected virtual LevelGridBase LevelGrid { get; set; }
+
+        protected virtual HumanTeamData FriendlyTeamData { get; set; }
+
+        protected virtual TeamData HostileTeamData { get; set; }
 
         [Space(10)]
-
-        [SerializeField]
-        LevelGridBase m_LevelGrid;
 
         [SerializeField]
         BattleGameRules m_GameRules;
@@ -88,21 +90,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         GameObject m_SelectedHoverObject;
 
         [Space(10)]
-        [Header("Team Data")]
-
-        [SerializeField]
-        HumanTeamData m_FriendlyTeamData;
-
-        [SerializeField]
-        TeamData m_HostileTeamData;
-
-        [Space(10)]
 
         [SerializeField]
         WinCondition[] m_WinConditions;
 
         [SerializeField]
-        GameObject[] m_SpawnOnStart;
+        protected GameObject[] m_SpawnOnStart;
 
         [SerializeField]
         GameObject[] m_AddToSpawnedUnits;
@@ -146,41 +139,21 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        void Start()
+        protected virtual void Start()
         {
-            if (!m_LevelGrid)
+            if (!LevelGrid)
             {
-                Debug.Log("([TurnBasedTools]::GameManager::Start) Missing Grid");
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing Grid");
             }
 
             if (!m_GameRules)
             {
-                Debug.Log("([TurnBasedTools]::GameManager::Start) Missing GameRules");
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing GameRules");
             }
 
             if (m_WinConditions.Length == 0)
             {
-                Debug.Log("([TurnBasedTools]::GameManager::Start) Missing WinConditions");
-            }
-
-            if (!m_FriendlyTeamData)
-            {
-                Debug.Log("([TurnBasedTools]::GameManager::Start) Missing Friendly Team Data");
-            }
-
-            if (!m_HostileTeamData)
-            {
-                Debug.Log("([TurnBasedTools]::GameManager::Start) Missing Hostile Team Data");
-            }
-
-            if (m_FriendlyTeamData)
-            {
-                m_FriendlyTeamData.SetTeam(GameTeam.Friendly);
-            }
-
-            if (m_HostileTeamData)
-            {
-                m_HostileTeamData.SetTeam(GameTeam.Hostile);
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing WinConditions");
             }
 
             if (m_GameRules)
@@ -223,21 +196,21 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         void SetupGrid()
         {
-            if (m_LevelGrid)
+            if (LevelGrid)
             {
-                m_LevelGrid.SetupAllCellAdjacencies();
-                m_LevelGrid.OnCellInteraction.AddListener(HandleInteraction);
+                LevelGrid.SetupAllCellAdjacencies();
+                LevelGrid.OnCellInteraction.AddListener(HandleInteraction);
             }
             SetupMaterials();
         }
 
         void SetupMaterials()
         {
-            if (m_LevelGrid)
+            if (LevelGrid)
             {
                 LevelCellBase TestCell = null;
 
-                List<LevelCellBase> LevelCells = m_LevelGrid.GetAllCells();
+                List<LevelCellBase> LevelCells = LevelGrid.GetAllCells();
                 if (LevelCells.Count > 0)
                 {
                     TestCell = LevelCells[0];
@@ -263,7 +236,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static LevelGridBase GetGrid()
         {
-            return sInstance.m_LevelGrid;
+            return sInstance.LevelGrid;
         }
 
         public static BattleGameRules GetRules()
@@ -418,12 +391,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static HumanTeamData GetFriendlyTeamData()
         {
-            return sInstance.m_FriendlyTeamData;
+            return sInstance.FriendlyTeamData;
         }
 
         public static TeamData GetHostileTeamData()
         {
-            return sInstance.m_HostileTeamData;
+            return sInstance.HostileTeamData;
         }
 
         public static TeamData GetDataForTeam(GameTeam InTeam)
@@ -436,7 +409,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                     return GetHostileTeamData();
             }
 
-            Debug.Log("([TurnBasedTools]::GameManager::GetDataForTeam) Trying to get TeamData for invalid team: " + InTeam.ToString());
+            Debug.Log("([ProjectCI]::TacticBattleManager::GetDataForTeam) Trying to get TeamData for invalid team: " + InTeam.ToString());
             return new TeamData();
         }
 
@@ -479,7 +452,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static GridUnit SpawnUnit(UnitData InUnitData, GameTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
         {
-            LevelCellBase cell = sInstance.m_LevelGrid[InIndex];
+            LevelCellBase cell = sInstance.LevelGrid[InIndex];
 
             if (InTeam == GameTeam.Friendly)
             {
@@ -501,7 +474,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             SpawnedGridUnit.Initalize();
             SpawnedGridUnit.SetUnitData(InUnitData);
             SpawnedGridUnit.SetTeam(InTeam);
-            SpawnedGridUnit.SetGrid(sInstance.m_LevelGrid);
+            SpawnedGridUnit.SetGrid(sInstance.LevelGrid);
             SpawnedGridUnit.SetCurrentCell(cell);
             SpawnedGridUnit.AlignToGrid();
             SpawnedGridUnit.PostInitalize();
@@ -520,24 +493,29 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 }
             }
 
-            sInstance.SpawnedCellObjects.Add(SpawnedGridUnit);
+            AddUnitToTeam(SpawnedGridUnit, InTeam);
+
+            return SpawnedGridUnit;
+        }
+
+        public static void AddUnitToTeam(GridUnit InUnit, GameTeam InTeam)
+        {
+            sInstance.SpawnedCellObjects.Add(InUnit);
 
             if (!sInstance.m_Teams.ContainsKey(InTeam))
             {
                 sInstance.m_Teams.Add(InTeam, new List<GridUnit>());
             }
 
-            sInstance.m_Teams[InTeam].Add(SpawnedGridUnit);
+            sInstance.m_Teams[InTeam].Add(InUnit);
 
             if (InTeam == GameTeam.Friendly)
             {
                 if (sInstance.m_FogOfWar)
                 {
-                    sInstance.m_FogOfWar.CheckPoint(SpawnedGridUnit.GetCell());
+                    sInstance.m_FogOfWar.CheckPoint(InUnit.GetCell());
                 }
             }
-
-            return SpawnedGridUnit;
         }
 
         void SpawnDeathParticlesForUnit(GridUnit InUnit)
@@ -602,7 +580,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         {
             if (InTeam == GameTeam.None)
             {
-                Debug.Log("([TurnBasedTools]::GameManager::GetUnitsOnTeam) Trying to get units for invalid team: " + InTeam.ToString());
+                Debug.Log("([ProjectCI]::TacticBattleManager::GetUnitsOnTeam) Trying to get units for invalid team: " + InTeam.ToString());
             }
 
             if (sInstance.m_Teams.ContainsKey(InTeam))
@@ -663,7 +641,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static void SetCellState(LevelCellBase InCell, CellState InCellState)
         {
-            if (sInstance.m_LevelGrid)
+            if (sInstance.LevelGrid)
             {
                 InCell.SetMaterial(InCellState);
                 InCell.SetCellState(InCellState);

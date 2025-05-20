@@ -4,6 +4,8 @@ using UnityEngine;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -168,6 +170,63 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             levelGrid.SetupAllCellAdjacencies();
 
             return levelGrid;
+        }
+
+        public static void SpawnUnit(Vector3 InPos, LevelCellBase InCell,
+            GameTeam InTeam, UnitData InUnitData, bool bIsATarget, CompassDir InStartDirection)
+        {
+            GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(
+                InUnitData, InTeam, InCell.GetIndex(), InStartDirection);
+            if (SpawnedUnit)
+            {
+                SpawnedUnit.SetAsTarget(bIsATarget);
+            }
+
+            TacticBattleManager.ResetCellState(InCell);
+        }
+
+        private static GridUnit SetupBattleUnit<T>(
+            GameObject originPawn,
+            LevelGridBase InGrid,
+            UnitData InUnitData,
+            GameTeam InTeam,
+            LevelCellBase cell
+        ) where T : GridUnit
+        {
+            GridUnit SpawnedGridUnit = originPawn.AddComponent<T>();
+            SpawnedGridUnit.Initalize();
+            SpawnedGridUnit.SetUnitData(InUnitData);
+            SpawnedGridUnit.SetTeam(InTeam);
+            SpawnedGridUnit.SetGrid(InGrid);
+            SpawnedGridUnit.SetCurrentCell(cell);
+            SpawnedGridUnit.AlignToGrid();
+            SpawnedGridUnit.PostInitalize();
+            return SpawnedGridUnit;
+        }
+
+        public static GridUnit ChangeUnitToBattleUnit<T>(GameObject originPawn,
+            LevelGridBase InGrid, UnitData InUnitData,
+            GameTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+            where T : GridUnit
+        {
+            LevelCellBase cell = InGrid[InIndex];
+
+            if (InTeam == GameTeam.Friendly)
+            {
+                cell.SetVisible(true);
+            }
+
+            GridUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
+
+            LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
+            if (DirCell)
+            {
+                SpawnedGridUnit.LookAtCell(DirCell);
+            }
+
+            TacticBattleManager.AddUnitToTeam(SpawnedGridUnit, InTeam);
+
+            return SpawnedGridUnit;
         }
     }
 } 
