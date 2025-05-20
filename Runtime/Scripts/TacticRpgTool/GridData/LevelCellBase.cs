@@ -62,6 +62,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public UnityEvent OnCellDestroyed = new UnityEvent();
 
+        private LevelGridBase m_Grid;
+
+        public LevelGridBase Grid
+        {
+            get
+            {
+                if (m_Grid == null)
+                {
+                    m_Grid = GetComponentInParent<LevelGridBase>();
+                }
+                return m_Grid;
+            }
+        }
+
         public void Reset()
         {
             m_Info = CellInfo.Default();
@@ -114,7 +128,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         {
             if (!HasAdjacentCell(InDirection))
             {
-                LevelCellBase generatedCell = GetGrid().GenerateCellAdjacentTo(GetIndex(), InDirection);
+                LevelCellBase generatedCell = Grid.GenerateCellAdjacentTo(GetIndex(), InDirection);
                 return generatedCell;
             }
 
@@ -123,9 +137,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void RemoveCell(bool bInRemoveObj)
         {
-            if (GetGrid())
+            if (Grid)
             {
-                GetGrid().RemoveCell(GetIndex(), bInRemoveObj);
+                Grid.RemoveCell(GetIndex(), bInRemoveObj);
             }
         }
         
@@ -325,11 +339,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_Index;
         }
 
-        public LevelGridBase GetGrid()
-        {
-            return GetComponentInParent<LevelGridBase>();
-        }
-
         public CompassDir GetDirectionToAdjacentCell(LevelCellBase InTarget)
         {
             foreach (var pair in m_AdjacentCellsMap.Pairs)
@@ -476,52 +485,32 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
                 if (!EventSystem.current.IsPointerOverGameObject())
                 {
-                    if (GetGrid())
+                    if (Grid)
                     {
                         if (!bIsHovering)
                         {
                             bIsHovering = true;
-                            OnInteraction(CellInteractionState.eBeginHover);
-                        }
-
-                        if (Input.GetMouseButtonDown(0))//Left click
-                        {
-                            OnInteraction(CellInteractionState.eLeftClick);
-                        }
-
-                        if (Input.GetMouseButtonDown(1))//Right click
-                        {
-                            OnInteraction(CellInteractionState.eRightClick);
-                        }
-
-                        if (Input.GetMouseButtonDown(2))//Middle click
-                        {
-                            OnInteraction(CellInteractionState.eMiddleClick);
+                            Grid.OnCellBeingInteracted?.Invoke(this, CellInteractionState.eBeginFocused);
                         }
                     }
                 }
             }
             else
             {
-                Debug.Log("[TurnBasedTools] You need to add an EventSystem to your scene. It's under UI in the right-click menu.");
+                Debug.LogWarning("[ProjectCI] You need to add an EventSystem to your scene.");
             }
         }
 
         public void OnMouseExit()
         {
-            if (GetGrid())
+            if (Grid)
             {
                 if (bIsHovering)
                 {
                     bIsHovering = false;
-                    OnInteraction(CellInteractionState.eEndHover);
+                    Grid.OnCellBeingInteracted.Invoke(this, CellInteractionState.eEndFocused);
                 }
             }
-        }
-
-        void OnInteraction(CellInteractionState InInteractionState)
-        {
-            GetGrid().HandleCellInteraction(this, InInteractionState);
         }
 
         #endregion

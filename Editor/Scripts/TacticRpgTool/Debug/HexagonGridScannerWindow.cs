@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 using UnityEditorInternal;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     public class HexagonGridScannerWindow : EditorWindow
     {
-        private Vector3 centerPosition = Vector3.zero;
+        private Vector3 centerPosition = new Vector3(0, 10, 0);
         private float hexWidth = 2f;
         private float hexHeight = 2f;
         private int gridWidth = 5;
@@ -19,6 +21,14 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         private LayerMask layerMask = 0;
         [SerializeField]
         private CellPalette cellPalette;
+
+        [Header("Battle Manager Settings")]
+        [SerializeField]
+        private TacticBattleManager battleManagerPrefab;
+        [SerializeField]
+        private HumanTeamData friendlyTeamData;
+        [SerializeField]
+        private TeamData hostileTeamData;
 
         [MenuItem("ProjectCI Tools/Debug/Hexagon Grid Scanner")]
         public static void ShowWindow()
@@ -52,6 +62,14 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
             EditorGUILayout.Space();
 
+            // Battle Manager 参数
+            EditorGUILayout.LabelField("Battle Manager Parameters", EditorStyles.boldLabel);
+            battleManagerPrefab = EditorGUILayout.ObjectField("Battle Manager Prefab", battleManagerPrefab, typeof(TacticBattleManager), true) as TacticBattleManager;
+            friendlyTeamData = EditorGUILayout.ObjectField("Friendly Team Data", friendlyTeamData, typeof(HumanTeamData), true) as HumanTeamData;
+            hostileTeamData = EditorGUILayout.ObjectField("Hostile Team Data", hostileTeamData, typeof(TeamData), true) as TeamData;
+
+            EditorGUILayout.Space();
+
             // 按钮
             GUI.enabled = Application.isPlaying;
             if (GUILayout.Button("Scan and Generate Grid"))
@@ -74,6 +92,24 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 return;
             }
 
+            if (battleManagerPrefab == null)
+            {
+                EditorUtility.DisplayDialog("Error", "Please assign a Battle Manager Prefab", "OK");
+                return;
+            }
+
+            if (friendlyTeamData == null)
+            {
+                EditorUtility.DisplayDialog("Error", "Please assign Friendly Team Data", "OK");
+                return;
+            }
+
+            if (hostileTeamData == null)
+            {
+                EditorUtility.DisplayDialog("Error", "Please assign Hostile Team Data", "OK");
+                return;
+            }
+
             // 使用 GridBattleUtils 生成网格
             var levelGrid = GridBattleUtils.GenerateLevelGridFromGround<HexagonGrid>(
                 centerPosition,
@@ -87,6 +123,20 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             if (levelGrid != null)
             {
                 Debug.Log($"Successfully generated grid with {gridWidth * gridHeight} cells");
+
+                // 创建 Battle Manager
+                var battleManager = GridBattleUtils.CreateBattleManager(
+                    battleManagerPrefab,
+                    levelGrid,
+                    friendlyTeamData,
+                    hostileTeamData
+                );
+                battleManager.Initialize();
+
+                if (battleManager != null)
+                {
+                    Debug.Log("Successfully created Battle Manager");
+                }
             }
         }
     }

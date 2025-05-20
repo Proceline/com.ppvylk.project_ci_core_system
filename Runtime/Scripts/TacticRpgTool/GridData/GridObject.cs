@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using UnityEngine;
@@ -21,11 +20,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         Renderer m_ObjectRenderer;
 
-        public UnityEvent OnLeftClick = new UnityEvent();
-        public UnityEvent OnRightClick = new UnityEvent();
-        public UnityEvent OnMiddleClick = new UnityEvent();
-        public UnityEvent OnHoverBegin = new UnityEvent();
-        public UnityEvent OnHoverEnd = new UnityEvent();
+        public UnityEvent OnGetConfirmed = new UnityEvent();
+        public UnityEvent OnGetCanceled = new UnityEvent();
+        public UnityEvent OnBegingFocused = new UnityEvent();
+        public UnityEvent OnEndFocused = new UnityEvent();
 
         protected LevelGridBase m_AssociatedGrid;
         protected LevelCellBase m_CurrentCell;
@@ -167,56 +165,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         #region EventListeners
 
-        public void HandleInteraction(CellInteractionState InInteractionState)
+        public virtual void HandleBeingConfirmed()
         {
-            switch ( InInteractionState )
-            {
-                case CellInteractionState.eLeftClick:
-                    OnLeftClick.Invoke();
-                    HandleLeftClick();
-                    break;
-                case CellInteractionState.eRightClick:
-                    OnRightClick.Invoke();
-                    HandleRightClick();
-                    break;
-                case CellInteractionState.eMiddleClick:
-                    OnMiddleClick.Invoke();
-                    HandleMiddleClick();
-                    break;
-                case CellInteractionState.eBeginHover:
-                    OnHoverBegin.Invoke();
-                    HandleHoverBegin();
-                    break;
-                case CellInteractionState.eEndHover:
-                    OnHoverEnd.Invoke();
-                    HandleHoverEnd();
-                    break;
-            }
+            OnGetConfirmed.Invoke();
         }
 
-        public virtual void HandleLeftClick()
+        public virtual void HandleBeingCanceled()
         {
-            
+            OnGetCanceled.Invoke();
         }
 
-        public virtual void HandleRightClick()
+        public virtual void HandleBegingFocused()
         {
-
+            OnBegingFocused.Invoke();
         }
 
-        public virtual void HandleMiddleClick()
+        public virtual void HandleEndFocused()
         {
-            
-        }
-
-        public virtual void HandleHoverBegin()
-        {
-
-        }
-
-        public virtual void HandleHoverEnd()
-        {
-
+            OnEndFocused.Invoke();
         }
 
         public virtual void HandleOwnerCellChanged(LevelCellBase NewCell)

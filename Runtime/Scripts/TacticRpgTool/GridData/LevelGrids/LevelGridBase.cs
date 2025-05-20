@@ -4,24 +4,18 @@ using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps;
+using System;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 {
     public enum CellInteractionState
     {
-        eLeftClick,
-        eRightClick,
-        eMiddleClick,
-        eBeginHover,
-        eEndHover
+        eBeginFocused,
+        eEndFocused
     }
 
     [System.Serializable]
     public class TileReplacedEvent : UnityEvent<LevelCellBase>
-    { }
-
-    [System.Serializable]
-    public class CellInteractionEvent : UnityEvent<LevelCellBase, CellInteractionState>
     { }
 
     public class LevelGridBase : MonoBehaviour
@@ -40,7 +34,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         public List<GameObject> m_ObjectsToDestroy = new List<GameObject>();
 
-        public CellInteractionEvent OnCellInteraction;
+        public Action<LevelCellBase, CellInteractionState> OnCellBeingInteracted;
 
         public LevelCellBase this[Vector2 InIndex]
         {
@@ -52,6 +46,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
                 return this[xIndex, yIndex];
             }
         }
+        
         public LevelCellBase this[int InX, int InY]
         {
             get
@@ -195,11 +190,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
             AddCell(newCell);
             return newCell;
-        }
-
-        public void HandleCellInteraction(LevelCellBase InCell, CellInteractionState InteractionState)
-        {
-            OnCellInteraction.Invoke(InCell, InteractionState);
         }
 
         public void RemoveCell(Vector2 InIndex, bool bInDestroyObject)

@@ -6,6 +6,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -172,26 +173,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             return levelGrid;
         }
 
-        public static void SpawnUnit(Vector3 InPos, LevelCellBase InCell,
-            GameTeam InTeam, UnitData InUnitData, bool bIsATarget, CompassDir InStartDirection)
-        {
-            GridUnit SpawnedUnit = TacticBattleManager.SpawnUnit(
-                InUnitData, InTeam, InCell.GetIndex(), InStartDirection);
-            if (SpawnedUnit)
-            {
-                SpawnedUnit.SetAsTarget(bIsATarget);
-            }
-
-            TacticBattleManager.ResetCellState(InCell);
-        }
-
         private static GridUnit SetupBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
             UnitData InUnitData,
             GameTeam InTeam,
-            LevelCellBase cell
-        ) where T : GridUnit
+            LevelCellBase cell) where T : GridUnit
         {
             GridUnit SpawnedGridUnit = originPawn.AddComponent<T>();
             SpawnedGridUnit.Initalize();
@@ -227,6 +214,106 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             TacticBattleManager.AddUnitToTeam(SpawnedGridUnit, InTeam);
 
             return SpawnedGridUnit;
+        }
+
+        /// <summary>
+        /// 根据预制体创建并初始化TacticBattleManager
+        /// </summary>
+        /// <param name="prefab">TacticBattleManager预制体</param>
+        /// <param name="levelGrid">关卡网格</param>
+        /// <param name="humanTeamData">人类队伍数据</param>
+        /// <param name="teamData">队伍数据</param>
+        /// <returns>创建并初始化好的TacticBattleManager实例</returns>
+        public static TacticBattleManager CreateBattleManager(
+            TacticBattleManager prefab,
+            LevelGridBase levelGrid,
+            HumanTeamData humanTeamData,
+            TeamData teamData)
+        {
+            if (prefab == null)
+            {
+                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing TacticBattleManager prefab");
+                return null;
+            }
+
+            if (levelGrid == null)
+            {
+                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing LevelGrid");
+                return null;
+            }
+
+            if (humanTeamData == null)
+            {
+                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing HumanTeamData");
+                return null;
+            }
+
+            if (teamData == null)
+            {
+                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing TeamData");
+                return null;
+            }
+
+            TacticBattleManager instance = Object.Instantiate(prefab);
+            instance.name = "TacticBattleManager";
+            instance.LevelGrid = levelGrid;
+            instance.FriendlyTeamData = humanTeamData;
+            instance.HostileTeamData = teamData;
+            return instance;
+        }
+
+        /// <summary>
+        /// 扫描指定区域内的对象
+        /// </summary>
+        /// <typeparam name="T">要查找的组件类型，必须继承自Component</typeparam>
+        /// <param name="center">区域中心点</param>
+        /// <param name="radius">如果是圆形区域，则为半径；如果是矩形区域，则为半边长</param>
+        /// <param name="isCircle">true为圆形区域，false为矩形区域</param>
+        /// <param name="layerMask">要检测的层</param>
+        /// <param name="maxResults">最大返回结果数</param>
+        /// <returns>区域内的对象列表</returns>
+        public static List<T> ScanAreaForObjects<T>(
+            Vector3 center,
+            float radius,
+            bool isCircle = true,
+            LayerMask layerMask = default,
+            int maxResults = 10) where T : Component
+        {
+            List<T> foundObjects = new List<T>();
+            
+            if (isCircle)
+            {
+                // 圆形区域扫描
+                Collider[] colliders = Physics.OverlapSphere(center, radius, layerMask);
+                foreach (var collider in colliders)
+                {
+                    if (foundObjects.Count >= maxResults) break;
+
+                    T component = collider.GetComponent<T>();
+                    if (component != null)
+                    {
+                        foundObjects.Add(component);
+                    }
+                }
+            }
+            else
+            {
+                // 矩形区域扫描
+                Vector3 halfExtents = new Vector3(radius, radius, radius);
+                Collider[] colliders = Physics.OverlapBox(center, halfExtents, Quaternion.identity, layerMask);
+                foreach (var collider in colliders)
+                {
+                    if (foundObjects.Count >= maxResults) break;
+
+                    T component = collider.GetComponent<T>();
+                    if (component != null)
+                    {
+                        foundObjects.Add(component);
+                    }
+                }
+            }
+
+            return foundObjects;
         }
     }
 } 

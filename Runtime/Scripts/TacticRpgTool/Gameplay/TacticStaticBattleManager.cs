@@ -19,7 +19,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [SerializeField]
         private LevelGridBase m_LevelGrid;
 
-        protected override LevelGridBase LevelGrid => m_LevelGrid;
+        public override LevelGridBase LevelGrid => m_LevelGrid;
 
         [Space(10)]
         [Header("Team Data")]
@@ -30,12 +30,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [SerializeField]
         private TeamData m_HostileTeamData;
 
-        protected override HumanTeamData FriendlyTeamData => m_FriendlyTeamData;
+        public override HumanTeamData FriendlyTeamData => m_FriendlyTeamData;
 
-        protected override TeamData HostileTeamData => m_HostileTeamData;
+        public override TeamData HostileTeamData => m_HostileTeamData;
 
-        protected override void Start()
+        private void Start()
         {
+            if (!LevelGrid)
+            {
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing Grid");
+            }
+
             if (FriendlyTeamData)
             {
                 FriendlyTeamData.SetTeam(GameTeam.Friendly);
@@ -54,7 +59,31 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 Debug.Log("([ProjectCI]::TacticStaticBattleManager::Start) Missing Hostile Team Data");
             }
 
-            base.Start();
+            if (!m_GameRules)
+            {
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing GameRules");
+            }
+
+            if (m_WinConditions.Length == 0)
+            {
+                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing WinConditions");
+            }
+
+            Initialize();
+        }
+
+        public static TeamData GetDataForTeam(GameTeam InTeam)
+        {
+            switch (InTeam)
+            {
+                case GameTeam.Friendly:
+                    return GetFriendlyTeamData();
+                case GameTeam.Hostile:
+                    return GetHostileTeamData();
+            }
+
+            Debug.Log("([ProjectCI]::TacticBattleManager::GetDataForTeam) Trying to get TeamData for invalid team: " + InTeam.ToString());
+            return new TeamData();
         }
     }
 }

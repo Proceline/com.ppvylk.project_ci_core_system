@@ -1,0 +1,207 @@
+using System.Collections.Generic;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
+using UnityEngine.InputSystem;
+
+namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
+{
+    public partial class TacticBattleManager
+    {
+        #region EventStuff
+
+        private void RegisterControlActions()
+        {
+            m_InputActionManager.ConfirmAction.action.canceled += HandleConfirmAction;
+            m_InputActionManager.CancelAction.action.canceled += HandleCancelAction;
+        }
+
+        private void UnregisterControlActions()
+        {
+            m_InputActionManager.ConfirmAction.action.canceled -= HandleConfirmAction;
+            m_InputActionManager.CancelAction.action.canceled -= HandleCancelAction;
+        }
+
+        private void HandleConfirmAction(InputAction.CallbackContext context)
+        {
+            if (m_CurrentHoverCell)
+            {
+                GridObject ObjOnCell = m_CurrentHoverCell.GetObjectOnCell();
+                if (ObjOnCell)
+                {
+                    ObjOnCell.HandleBeingConfirmed();
+                }
+            }
+
+            HandleCellClicked(m_CurrentHoverCell);
+        }
+
+        private void HandleCancelAction(InputAction.CallbackContext context)
+        {
+            if (m_CurrentHoverCell)
+            {
+                GridObject ObjOnCell = m_CurrentHoverCell.GetObjectOnCell();
+                if (ObjOnCell)
+                {
+                    ObjOnCell.HandleBeingCanceled();
+                }
+            }
+        }
+
+        private void BeginHover(LevelCellBase InCell)
+        {
+            m_CurrentHoverCell = InCell;
+            UpdateHoverCells();
+        }
+
+        public void UpdateHoverCells()
+        {
+            CleanupHoverCells();
+
+            if (m_CurrentHoverCell)
+            {
+                GridUnit hoverGrid = m_CurrentHoverCell.GetUnitOnCell();
+                if (hoverGrid)
+                {
+                    OnUnitHover.Invoke(hoverGrid);
+                }
+
+                CurrentHoverCells.Add(m_CurrentHoverCell);
+
+                BattleGameRules gameRules = GetRules();
+                if (gameRules)
+                {
+                    GridUnit selectedUnit = gameRules.GetSelectedUnit();
+                    if (selectedUnit)
+                    {
+                        UnitState unitState = selectedUnit.GetCurrentState();
+                        if (unitState == UnitState.UsingAbility)
+                        {
+                            CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
+                        }
+                        else if (unitState == UnitState.Moving)
+                        {
+                            List<LevelCellBase> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
+
+                            if (AllowedMovementCells.Contains(m_CurrentHoverCell))
+                            {
+                                List<LevelCellBase> PathToCursor = selectedUnit.GetPathTo(m_CurrentHoverCell, AllowedMovementCells);
+
+                                foreach (LevelCellBase pathCell in PathToCursor)
+                                {
+                                    if (pathCell)
+                                    {
+                                        if (AllowedMovementCells.Contains(pathCell))
+                                        {
+                                            CurrentHoverCells.Add(pathCell);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (LevelCellBase currCell in CurrentHoverCells)
+                {
+                    currCell.SetMaterial(CellState.eHover);
+                }
+
+                m_CurrentHoverCell.HandleMouseOver();
+            }
+        }
+
+        void EndHover(LevelCellBase InCell)
+        {
+            CleanupHoverCells();
+
+            if (InCell)
+            {
+                InCell.HandleMouseExit();
+            }
+
+            m_CurrentHoverCell = null;
+
+            OnUnitHover.Invoke(null);
+        }
+
+        void CleanupHoverCells()
+        {
+            foreach (LevelCellBase currCell in CurrentHoverCells)
+            {
+                if (currCell)
+                {
+                    currCell.SetMaterial(currCell.GetCellState());
+                }
+            }
+
+            CurrentHoverCells.Clear();
+        }
+
+        void HandleCellClicked(LevelCellBase InCell)
+        {
+            if (!InCell)
+            {
+                return;
+            }
+
+            if (!m_GameRules)
+            {
+                return;
+            }
+
+            GridUnit gridUnit = InCell.GetUnitOnCell();
+            if (gridUnit)
+            {
+                GameTeam CurrentTurnTeam = m_GameRules.GetCurrentTeam();
+                GameTeam UnitsTeam = gridUnit.GetTeam();
+
+                if (UnitsTeam == CurrentTurnTeam)
+                {
+                    m_GameRules.HandlePlayerSelected(gridUnit);
+                }
+                else
+                {
+                    if (UnitsTeam == GameTeam.Hostile)
+                    {
+                        m_GameRules.HandleEnemySelected(gridUnit);
+                    }
+                }
+            }
+            m_GameRules.HandleCellSelected(InCell);
+        }
+
+        void HandleGameComplete()
+        {
+            m_CurrentHoverCell = null;
+            CleanupHoverCells();
+            m_bIsPlaying = false;
+        }
+
+        private void HandleInteractionFocused(LevelCellBase InCell, CellInteractionState InInteractionState)
+        {
+            GridObject ObjOnCell = InCell.GetObjectOnCell();
+
+            switch (InInteractionState)
+            {
+                case CellInteractionState.eBeginFocused:
+                    BeginHover(InCell);
+                    if (ObjOnCell)
+                    {
+                        ObjOnCell.HandleBegingFocused();
+                    }
+                    break;
+                case CellInteractionState.eEndFocused:
+                    EndHover(InCell);
+                    if (ObjOnCell)
+                    {
+                        ObjOnCell.HandleEndFocused();
+                    }
+                    break;
+            }
+        }
+
+        #endregion
+    }
+} 

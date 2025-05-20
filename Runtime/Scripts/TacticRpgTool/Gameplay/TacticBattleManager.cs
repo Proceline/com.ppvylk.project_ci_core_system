@@ -11,6 +11,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
+using ProjectCI.CoreSystem.Runtime.InputSupport;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 {
@@ -64,44 +65,47 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         }
     }
 
-    public class TacticBattleManager : MonoBehaviour
+    public partial class TacticBattleManager : MonoBehaviour
     {
         static TacticBattleManager sInstance = null;
-        protected virtual LevelGridBase LevelGrid { get; set; }
+        public virtual LevelGridBase LevelGrid { get; set; }
 
-        protected virtual HumanTeamData FriendlyTeamData { get; set; }
+        public virtual HumanTeamData FriendlyTeamData { get; set; }
 
-        protected virtual TeamData HostileTeamData { get; set; }
-
-        [Space(10)]
-
-        [SerializeField]
-        BattleGameRules m_GameRules;
-
-        [SerializeField]
-        FogOfWar m_FogOfWar;
-
-        [SerializeField]
-        CameraController m_CameraController;
+        public virtual TeamData HostileTeamData { get; set; }
 
         [Space(10)]
 
         [SerializeField]
-        GameObject m_SelectedHoverObject;
+        private InputActionManager m_InputActionManager;
+
+        [SerializeField]
+        protected BattleGameRules m_GameRules;
+
+        [SerializeField]
+        protected FogOfWar m_FogOfWar;
+
+        [SerializeField]
+        protected CameraController m_CameraController;
 
         [Space(10)]
 
         [SerializeField]
-        WinCondition[] m_WinConditions;
+        protected GameObject m_SelectedHoverObject;
+
+        [Space(10)]
+
+        [SerializeField]
+        protected WinCondition[] m_WinConditions;
 
         [SerializeField]
         protected GameObject[] m_SpawnOnStart;
 
         [SerializeField]
-        GameObject[] m_AddToSpawnedUnits;
+        protected GameObject[] m_AddToSpawnedUnits;
 
         [SerializeField]
-        AbilityParticle[] m_DeathParticles;
+        protected AbilityParticle[] m_DeathParticles;
 
         [Space(10)]
 
@@ -139,37 +143,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        protected virtual void Start()
+        protected virtual void OnDestroy()
         {
-            if (!LevelGrid)
-            {
-                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing Grid");
-            }
-
-            if (!m_GameRules)
-            {
-                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing GameRules");
-            }
-
-            if (m_WinConditions.Length == 0)
-            {
-                Debug.Log("([ProjectCI]::TacticBattleManager::Start) Missing WinConditions");
-            }
-
-            if (m_GameRules)
-            {
-                OnTeamWon.AddListener(m_GameRules.HandleTeamWon);
-            }
-
-            Initalize();
-
-            foreach (GameObject SpawnObj in m_SpawnOnStart)
-            {
-                if (SpawnObj)
-                {
-                    Instantiate(SpawnObj);
-                }
-            }
+            UnregisterControlActions();
         }
 
         void Update()
@@ -180,17 +156,28 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        void Initalize()
+        public virtual void Initialize()
         {
             SetupGrid();
+
             if (m_GameRules)
             {
+                OnTeamWon.AddListener(m_GameRules.HandleTeamWon);
                 m_GameRules.InitalizeRules();
             }
 
             if (m_FogOfWar)
             {
                 m_FogOfWar.SpawnFogObjects();
+            }
+
+            RegisterControlActions();
+            foreach (GameObject SpawnObj in m_SpawnOnStart)
+            {
+                if (SpawnObj)
+                {
+                    Instantiate(SpawnObj);
+                }
             }
         }
 
@@ -199,7 +186,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             if (LevelGrid)
             {
                 LevelGrid.SetupAllCellAdjacencies();
-                LevelGrid.OnCellInteraction.AddListener(HandleInteraction);
+                LevelGrid.OnCellBeingInteracted += HandleInteractionFocused;
             }
             SetupMaterials();
         }
@@ -397,20 +384,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         public static TeamData GetHostileTeamData()
         {
             return sInstance.HostileTeamData;
-        }
-
-        public static TeamData GetDataForTeam(GameTeam InTeam)
-        {
-            switch (InTeam)
-            {
-                case GameTeam.Friendly:
-                    return GetFriendlyTeamData();
-                case GameTeam.Hostile:
-                    return GetHostileTeamData();
-            }
-
-            Debug.Log("([ProjectCI]::TacticBattleManager::GetDataForTeam) Trying to get TeamData for invalid team: " + InTeam.ToString());
-            return new TeamData();
         }
 
         public static T GetDataForTeam<T>(GameTeam InTeam) where T : TeamData
@@ -790,131 +763,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         #endregion
 
-        #region EventStuff
-
-        void BeginHover(LevelCellBase InCell)
-        {
-            m_CurrentHoverCell = InCell;
-            UpdateHoverCells();
-        }
-
-        public void UpdateHoverCells()
-        {
-            CleanupHoverCells();
-
-            if (m_CurrentHoverCell)
-            {
-                GridUnit hoverGrid = m_CurrentHoverCell.GetUnitOnCell();
-                if (hoverGrid)
-                {
-                    OnUnitHover.Invoke(hoverGrid);
-                }
-
-                CurrentHoverCells.Add(m_CurrentHoverCell);
-
-                BattleGameRules gameRules = GetRules();
-                if (gameRules)
-                {
-                    GridUnit selectedUnit = gameRules.GetSelectedUnit();
-                    if (selectedUnit)
-                    {
-                        UnitState unitState = selectedUnit.GetCurrentState();
-                        if (unitState == UnitState.UsingAbility)
-                        {
-                            CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
-                        }
-                        else if (unitState == UnitState.Moving)
-                        {
-                            List<LevelCellBase> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
-
-                            if (AllowedMovementCells.Contains(m_CurrentHoverCell))
-                            {
-                                List<LevelCellBase> PathToCursor = selectedUnit.GetPathTo(m_CurrentHoverCell, AllowedMovementCells);
-
-                                foreach (LevelCellBase pathCell in PathToCursor)
-                                {
-                                    if (pathCell)
-                                    {
-                                        if (AllowedMovementCells.Contains(pathCell))
-                                        {
-                                            CurrentHoverCells.Add(pathCell);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                foreach (LevelCellBase currCell in CurrentHoverCells)
-                {
-                    currCell.SetMaterial(CellState.eHover);
-                }
-
-                m_CurrentHoverCell.HandleMouseOver();
-            }
-        }
-
-        void EndHover(LevelCellBase InCell)
-        {
-            CleanupHoverCells();
-
-            if (InCell)
-            {
-                InCell.HandleMouseExit();
-            }
-
-            m_CurrentHoverCell = null;
-
-            OnUnitHover.Invoke(null);
-        }
-
-        void CleanupHoverCells()
-        {
-            foreach (LevelCellBase currCell in CurrentHoverCells)
-            {
-                if (currCell)
-                {
-                    currCell.SetMaterial(currCell.GetCellState());
-                }
-            }
-
-            CurrentHoverCells.Clear();
-        }
-
-        void HandleCellClicked(LevelCellBase InCell)
-        {
-            if (!InCell)
-            {
-                return;
-            }
-
-            if (!m_GameRules)
-            {
-                return;
-            }
-
-            GridUnit gridUnit = InCell.GetUnitOnCell();
-            if (gridUnit)
-            {
-                GameTeam CurrentTurnTeam = m_GameRules.GetCurrentTeam();
-                GameTeam UnitsTeam = gridUnit.GetTeam();
-
-                if (UnitsTeam == CurrentTurnTeam)
-                {
-                    m_GameRules.HandlePlayerSelected(gridUnit);
-                }
-                else
-                {
-                    if (UnitsTeam == GameTeam.Hostile)
-                    {
-                        m_GameRules.HandleEnemySelected(gridUnit);
-                    }
-                }
-            }
-            m_GameRules.HandleCellSelected(InCell);
-        }
-
+        #region Conditions
         static bool DidTeamPassCondition(WinCondition InCondition, GameTeam InTeam)
         {
             if (InCondition)
@@ -949,35 +798,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         {
             GameTeam WinningTeam = InTeam == GameTeam.Friendly ? GameTeam.Hostile : GameTeam.Friendly;
             TeamWon(WinningTeam);
-        }
-
-        void HandleGameComplete()
-        {
-            m_CurrentHoverCell = null;
-            CleanupHoverCells();
-            m_bIsPlaying = false;
-        }
-
-        void HandleInteraction(LevelCellBase InCell, CellInteractionState InInteractionState)
-        {
-            GridObject ObjOnCell = InCell.GetObjectOnCell();
-            if (ObjOnCell)
-            {
-                ObjOnCell.HandleInteraction(InInteractionState);
-            }
-
-            switch (InInteractionState)
-            {
-                case CellInteractionState.eBeginHover:
-                    BeginHover(InCell);
-                    break;
-                case CellInteractionState.eEndHover:
-                    EndHover(InCell);
-                    break;
-                case CellInteractionState.eLeftClick:
-                    HandleCellClicked(InCell);
-                    break;
-            }
         }
 
         #endregion

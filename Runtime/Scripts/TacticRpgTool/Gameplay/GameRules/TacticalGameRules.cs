@@ -27,7 +27,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         protected override void Init()
         {
             SetupCellSpawns();
-            cancelAction.action.performed += CancelActionPerformed;
+            cancelAction.action.canceled += CancelActionExtension;
             // TODO: Add num pressed event
             // HandleNumPressed
         }
@@ -370,7 +370,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             UnselectUnit();
         }
 
-        private void CancelActionPerformed(InputAction.CallbackContext context)
+        private void CancelActionExtension(InputAction.CallbackContext context)
         {
             if (TacticBattleManager.IsActionBeingPerformed())
             {
