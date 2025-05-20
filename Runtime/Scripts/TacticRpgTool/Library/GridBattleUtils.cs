@@ -18,60 +18,59 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// <param name="center">Center position of the scan area</param>
         /// <param name="hexWidth">Width of each hexagon cell</param>
         /// <param name="hexHeight">Height of each hexagon cell</param>
-        /// <param name="gridWidth">Number of cells in width</param>
-        /// <param name="gridHeight">Number of cells in height</param>
+        /// <param name="radiusWidth">Width of the hexagon grid</param>
+        /// <param name="radiusHeight">Height of the hexagon grid</param>
         /// <param name="maxDistance">Maximum raycast distance</param>
         /// <param name="layerMask">Layer mask for raycast</param>
+        /// <param name="useEllipseBoundary">Use ellipse boundary instead of square boundary</param>
         /// <returns>Dictionary with grid positions as keys and hit points as values</returns>
         public static Dictionary<Vector2, Vector3> ScanHexagonGroundGrid(
             Vector3 center,
             float hexWidth,
             float hexHeight,
-            int gridWidth,
-            int gridHeight,
+            int radiusWidth,
+            int radiusHeight,
             float maxDistance = 100f,
-            LayerMask layerMask = default)
+            LayerMask layerMask = default,
+            bool useEllipseBoundary = false)
         {
             Dictionary<Vector2, Vector3> hitPoints = new Dictionary<Vector2, Vector3>();
-            
-            // Calculate start position (top-left corner)
-            Vector3 startPos = center + new Vector3(
-                -hexWidth * gridWidth * 0.5f,
-                0,
-                -hexHeight * gridHeight * 0.5f
-            );
 
-            for (int y = 0; y < gridHeight; y++)
+            for (int q = -radiusWidth; q <= radiusWidth; q++)
             {
-                // Offset for even rows
-                float xOffset = (y % 2 == 0) ? hexWidth * 0.5f : 0;
-                
-                // Y position with hexagon spacing
-                float yPos = y * hexHeight * 0.75f;
-
-                for (int x = 0; x < gridWidth; x++)
+                for (int r = -radiusHeight; r <= radiusHeight; r++)
                 {
-                    // Calculate ray start position
-                    Vector3 rayStart = startPos + new Vector3(
-                        x * hexWidth + xOffset,
-                        0,
-                        -yPos
-                    );
+                    // 椭圆形边界判断（默认不用）
+                    if (useEllipseBoundary)
+                    {
+                        float normQ = (float)q / radiusWidth;
+                        float normR = (float)r / radiusHeight;
+                        if (normQ * normQ + normR * normR > 1f)
+                            continue;
+                    }
 
-                    Ray ray = new Ray(rayStart, Vector3.down);
+                    Vector3 pos = HexToWorld(center, q, r, hexWidth, hexHeight);
+                    Ray ray = new Ray(pos, Vector3.down);
 #if UNITY_EDITOR
-                    Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.cyan, 2f);
+                    Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.magenta, 2f);
 #endif
-
                     if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
                     {
-                        Vector2 gridPos = new Vector2(x, y);
-                        hitPoints[gridPos] = hit.point;
+                        hitPoints[new Vector2(q, r)] = hit.point;
                     }
                 }
             }
-
             return hitPoints;
+        }
+
+        /// <summary>
+        /// 六边形轴坐标转世界坐标
+        /// </summary>
+        private static Vector3 HexToWorld(Vector3 center, int q, int r, float hexWidth, float hexHeight)
+        {
+            float x = hexWidth * (q + r / 2f);
+            float z = hexHeight * r * 0.75f;
+            return center + new Vector3(x, 0, z);
         }
 
         /// <summary>

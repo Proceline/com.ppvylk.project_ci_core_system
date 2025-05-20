@@ -30,6 +30,13 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         [SerializeField]
         private TeamData hostileTeamData;
 
+        // Test Area fields
+        private Vector3 testAreaCenter = Vector3.zero;
+        private float testAreaRadius = 5f;
+        private bool testAreaIsCircle = true;
+        private LayerMask testAreaLayerMask = 0;
+        private int testAreaMaxResults = 10;
+
         [MenuItem("ProjectCI Tools/Debug/Hexagon Grid Scanner")]
         public static void ShowWindow()
         {
@@ -70,7 +77,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
             EditorGUILayout.Space();
 
-            // 按钮
             GUI.enabled = Application.isPlaying;
             if (GUILayout.Button("Scan and Generate Grid"))
             {
@@ -82,6 +88,24 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             {
                 EditorGUILayout.HelpBox("Scan button only works in Play Mode", MessageType.Warning);
             }
+
+            // Test Area
+            EditorGUILayout.LabelField("Test Area", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical("box");
+            testAreaCenter = EditorGUILayout.Vector3Field("Test Center", testAreaCenter);
+            testAreaRadius = EditorGUILayout.FloatField("Test Radius", testAreaRadius);
+            testAreaIsCircle = EditorGUILayout.Toggle("Is Circle", testAreaIsCircle);
+            string[] allLayerNames = InternalEditorUtility.layers;
+            int testMaskValue = testAreaLayerMask.value;
+            testMaskValue = EditorGUILayout.MaskField("Layer Mask", testMaskValue, allLayerNames);
+            testAreaLayerMask.value = testMaskValue;
+            testAreaMaxResults = EditorGUILayout.IntField("Max Results", testAreaMaxResults);
+
+            if (GUILayout.Button("Test ScanAreaForObjects<Animator>"))
+            {
+                TestScanAreaForAnimators();
+            }
+            EditorGUILayout.EndVertical();
         }
 
         private void ScanAndGenerateGrid()
@@ -137,6 +161,22 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 {
                     Debug.Log("Successfully created Battle Manager");
                 }
+            }
+        }
+
+        private void TestScanAreaForAnimators()
+        {
+            var animators = GridBattleUtils.ScanAreaForObjects<Animator>(
+                testAreaCenter,
+                testAreaRadius,
+                testAreaIsCircle,
+                testAreaLayerMask,
+                testAreaMaxResults
+            );
+            Debug.Log($"Found {animators.Count} Animator(s) in area.");
+            foreach (var animator in animators)
+            {
+                Debug.Log($"Animator: {animator.name} at {animator.transform.position}");
             }
         }
     }
