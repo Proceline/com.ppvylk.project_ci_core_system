@@ -171,6 +171,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 m_FogOfWar.SpawnFogObjects();
             }
 
+            m_InputActionManager.EnableAllActions();
             RegisterControlActions();
             foreach (GameObject SpawnObj in m_SpawnOnStart)
             {
