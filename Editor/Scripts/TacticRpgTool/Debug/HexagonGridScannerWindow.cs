@@ -161,7 +161,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                     friendlyTeamData,
                     hostileTeamData
                 );
-                battleManager.Initialize();
 
                 if (battleManager != null)
                 {
@@ -184,6 +183,8 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                         (animator.gameObject, levelGrid, unitData, 
                         GameTeam.Friendly, 1, pawnDetectLayerMask);
                 }
+                
+                battleManager.Initialize();
             }
         }
 

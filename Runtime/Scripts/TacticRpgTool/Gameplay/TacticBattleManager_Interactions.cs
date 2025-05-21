@@ -13,14 +13,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         private void RegisterControlActions()
         {
-            m_InputActionManager.ConfirmAction.action.canceled += HandleConfirmAction;
-            m_InputActionManager.CancelAction.action.canceled += HandleCancelAction;
+            m_InputActionManager.BindConfirmAction(HandleConfirmAction);
+            m_InputActionManager.BindCancelAction(HandleCancelAction);
         }
 
         private void UnregisterControlActions()
         {
-            m_InputActionManager.ConfirmAction.action.canceled -= HandleConfirmAction;
-            m_InputActionManager.CancelAction.action.canceled -= HandleCancelAction;
+            m_InputActionManager.UnbindConfirmAction(HandleConfirmAction);
+            m_InputActionManager.UnbindCancelAction(HandleCancelAction);
         }
 
         private void HandleConfirmAction(InputAction.CallbackContext context)

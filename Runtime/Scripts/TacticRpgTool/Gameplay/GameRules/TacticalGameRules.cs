@@ -30,6 +30,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             cancelAction.action.canceled += CancelActionExtension;
             // TODO: Add num pressed event
             // HandleNumPressed
+            
+            StartGame();
         }
         
         void SetupCellSpawns()

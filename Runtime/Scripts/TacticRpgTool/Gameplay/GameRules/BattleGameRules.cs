@@ -15,7 +15,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         public bool bShowHitAnimOnMove;
     }
 
-    public class BattleGameRules : ScriptableObject
+    public abstract class BattleGameRules : ScriptableObject
     {
         public GameTeam m_StartingTeam;
 
@@ -26,11 +26,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         int m_TurnNumber = 0;
 
         public TeamTurnChangeEvent OnTeamTurnBegin = new TeamTurnChangeEvent();
-
-        protected virtual void Init()
-        {
-            StartGame();
-        }
 
         public GameTeam GetCurrentTeam()
         {
@@ -54,6 +49,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             return m_GameplayData;
         }
 
+        protected abstract void Init();
+        
         protected void StartGame()
         {
             m_CurrentTeam = m_StartingTeam;

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1c6e86ba06b5184e97a73f819c2b457, type: 3}
   m_Name: DirectionalAbilityShapeOnlyEnemies
   m_EditorClassIdentifier: 
-  m_bOnlyMyEnemies: 0
+  m_bOnlyMyEnemies: 1
