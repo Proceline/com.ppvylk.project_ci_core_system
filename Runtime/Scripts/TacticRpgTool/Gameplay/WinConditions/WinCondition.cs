@@ -19,7 +19,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
         [SerializeField]
         protected bool m_bCheckHostileTeam = true;
 
-        public bool CheckTeamWin(GameTeam InTeam)
+        public bool CheckTeamWin(BattleTeam InTeam)
         {
             if(!AllowsTeam(InTeam))
             {
@@ -29,7 +29,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
             return DidTeamWin(InTeam);
         }
 
-        public bool CheckTeamLost(GameTeam InTeam)
+        public bool CheckTeamLost(BattleTeam InTeam)
         {
             if (!AllowsTeam(InTeam))
             {
@@ -39,23 +39,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
             return DidTeamLose(InTeam);
         }
 
-        protected virtual bool DidTeamWin(GameTeam InTeam)
+        protected virtual bool DidTeamWin(BattleTeam InTeam)
         {
             return false;
         }
 
-        protected virtual bool DidTeamLose(GameTeam InTeam)
+        protected virtual bool DidTeamLose(BattleTeam InTeam)
         {
             return TacticBattleManager.AreAllUnitsOnTeamDead(InTeam);
         }
 
-        bool AllowsTeam(GameTeam InTeam)
+        bool AllowsTeam(BattleTeam InTeam)
         {
             switch (InTeam)
             {
-                case GameTeam.Friendly:
+                case BattleTeam.Friendly:
                     return m_bCheckFriendlyTeam;
-                case GameTeam.Hostile:
+                case BattleTeam.Hostile:
                     return m_bCheckHostileTeam;
             }
 

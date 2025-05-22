@@ -98,11 +98,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             }
             return AllCells;
         }
-        public List<LevelCellBase> GetTeamStartPoints(GameTeam InTeam)
+        public List<LevelCellBase> GetTeamStartPoints(BattleTeam InTeam)
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
 
-            if(InTeam == GameTeam.None)
+            if(InTeam == BattleTeam.None)
             {
                 Debug.Log("([TurnBasedTools]::LevelGrid::GetTeamStartPoint) Trying to get start points for invalid team. Start cells don't exist for: " + InTeam.ToString());
                 return outCells;
@@ -115,19 +115,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
                 {
                     switch (InTeam)
                     {
-                        case GameTeam.Friendly:
+                        case BattleTeam.Friendly:
                             if (CurrCell.IsFriendlySpawnPoint())
                             {
                                 outCells.Add(CurrCell);
                             }
                             break;
-                        case GameTeam.Hostile:
+                        case BattleTeam.Hostile:
                             if (CurrCell.IsHostileSpawnPoint())
                             {
                                 outCells.Add(CurrCell);
                             }
                             break;
-                        case GameTeam.All:
+                        case BattleTeam.All:
                             {
                                 outCells.Add(CurrCell);
                             }

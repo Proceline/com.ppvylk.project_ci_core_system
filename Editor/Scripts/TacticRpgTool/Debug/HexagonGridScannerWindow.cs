@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 using UnityEditorInternal;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
@@ -27,10 +25,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         [Header("Battle Manager Settings")]
         [SerializeField]
         private TacticBattleManager battleManagerPrefab;
-        [SerializeField]
-        private HumanTeamData friendlyTeamData;
-        [SerializeField]
-        private TeamData hostileTeamData;
 
         // Test Area fields
         private Vector3 testAreaCenter = Vector3.zero;
@@ -75,8 +69,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             // Battle Manager 参数
             EditorGUILayout.LabelField("Battle Manager Parameters", EditorStyles.boldLabel);
             battleManagerPrefab = EditorGUILayout.ObjectField("Battle Manager Prefab", battleManagerPrefab, typeof(TacticBattleManager), true) as TacticBattleManager;
-            friendlyTeamData = EditorGUILayout.ObjectField("Friendly Team Data", friendlyTeamData, typeof(HumanTeamData), true) as HumanTeamData;
-            hostileTeamData = EditorGUILayout.ObjectField("Hostile Team Data", hostileTeamData, typeof(TeamData), true) as TeamData;
 
             unitData = EditorGUILayout.ObjectField("Unit Data", unitData, typeof(UnitData), false) as UnitData;
 
@@ -128,18 +120,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 return;
             }
 
-            if (friendlyTeamData == null)
-            {
-                EditorUtility.DisplayDialog("Error", "Please assign Friendly Team Data", "OK");
-                return;
-            }
-
-            if (hostileTeamData == null)
-            {
-                EditorUtility.DisplayDialog("Error", "Please assign Hostile Team Data", "OK");
-                return;
-            }
-
             // 使用 GridBattleUtils 生成网格
             var levelGrid = GridBattleUtils.GenerateLevelGridFromGround<HexagonGrid>(
                 centerPosition,
@@ -157,9 +137,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 // 创建 Battle Manager
                 var battleManager = GridBattleUtils.CreateBattleManager(
                     battleManagerPrefab,
-                    levelGrid,
-                    friendlyTeamData,
-                    hostileTeamData
+                    levelGrid
                 );
 
                 if (battleManager != null)
@@ -179,9 +157,9 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
                 foreach (var animator in animators)
                 {
-                    GridBattleUtils.ChangeUnitToBattleUnit<GridUnit>
+                    GridBattleUtils.ChangeUnitToBattleUnit<GridPawnUnit>
                         (animator.gameObject, levelGrid, unitData, 
-                        GameTeam.Friendly, 1, pawnDetectLayerMask);
+                        BattleTeam.Friendly, 1, pawnDetectLayerMask);
                 }
                 
                 battleManager.Initialize();

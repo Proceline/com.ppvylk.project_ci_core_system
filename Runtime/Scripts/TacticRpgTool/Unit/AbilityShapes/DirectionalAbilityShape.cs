@@ -13,7 +13,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
         [SerializeField]
         bool m_bOnlyMyEnemies;
 
-        public override List<LevelCellBase> GetCellList(GridUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        public override List<LevelCellBase> GetCellList(GridPawnUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, BattleTeam m_EffectedTeam)
         {
             List<LevelCellBase> cells = new List<LevelCellBase>();
 
@@ -34,11 +34,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
                 List<LevelCellBase> enemyCells = new List<LevelCellBase>();
                 foreach ( var currCell in cells )
                 {
-                    GridUnit unitOnCell = currCell.GetUnitOnCell();
+                    GridPawnUnit unitOnCell = currCell.GetUnitOnCell();
                     if ( unitOnCell )
                     {
-                        GameTeam AffinityToCaster = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
-                        if ( AffinityToCaster == GameTeam.Hostile )
+                        BattleTeam AffinityToCaster = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), unitOnCell.GetTeam() );
+                        if ( AffinityToCaster == BattleTeam.Hostile )
                         {
                             enemyCells.Add( currCell );
                         }
@@ -53,7 +53,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
             }
         }
 
-        List<LevelCellBase> GetCellsInDirection(LevelCellBase StartCell, int InRange, CompassDir Dir, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        List<LevelCellBase> GetCellsInDirection(LevelCellBase StartCell, int InRange, CompassDir Dir, bool bAllowBlocked, BattleTeam m_EffectedTeam)
         {
             List<LevelCellBase> cells = new List<LevelCellBase>();
 
@@ -72,13 +72,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
                     GridObject gridObj = CurserCell.GetObjectOnCell();
                     if (gridObj)
                     {
-                        if (m_EffectedTeam == GameTeam.None)
+                        if (m_EffectedTeam == BattleTeam.None)
                         {
                             break;
                         }
 
-                        GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), StartCell.GetCellTeam());
-                        if (ObjAffinity == GameTeam.Friendly && m_EffectedTeam == GameTeam.Hostile)
+                        BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), StartCell.GetCellTeam());
+                        if (ObjAffinity == BattleTeam.Friendly && m_EffectedTeam == BattleTeam.Hostile)
                         {
                             break;
                         }

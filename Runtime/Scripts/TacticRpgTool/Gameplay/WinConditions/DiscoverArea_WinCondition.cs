@@ -8,7 +8,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
     [CreateAssetMenu(fileName = "DiscoverArea", menuName = "ProjectCI Tools/WinCondition/Create DiscoverArea", order = 1)]
     public class DiscoverArea_WinCondition : WinCondition
     {
-        protected override bool DidTeamWin(GameTeam InTeam)
+        protected override bool DidTeamWin(BattleTeam InTeam)
         {
             List<LevelCellBase> allCells = TacticBattleManager.GetGrid().GetAllCells();
             foreach (LevelCellBase cell in allCells)

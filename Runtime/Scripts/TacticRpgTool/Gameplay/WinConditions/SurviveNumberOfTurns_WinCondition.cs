@@ -8,12 +8,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions
     {
         public int m_NumberRequired;
 
-        protected override bool DidTeamWin(GameTeam InTeam)
+        protected override bool DidTeamWin(BattleTeam InTeam)
         {
             return TacticBattleManager.GetRules().GetTurnNumber() >= m_NumberRequired;
         }
 
-        protected override bool DidTeamLose(GameTeam InTeam)
+        protected override bool DidTeamLose(BattleTeam InTeam)
         {
             bool bAllUnitsDead = TacticBattleManager.AreAllUnitsOnTeamDead(InTeam);
             return bAllUnitsDead;

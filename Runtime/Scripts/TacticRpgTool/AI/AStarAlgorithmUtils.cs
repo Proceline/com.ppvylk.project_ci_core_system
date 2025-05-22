@@ -36,7 +36,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         public GridObject Caster;
         public bool bAllowBlocked;
         public bool bStopAtBlockedCell;
-        public GameTeam EffectedTeam;
+        public BattleTeam EffectedTeam;
 
         public AIRadiusInfo(LevelCellBase InStart, int InRadius)
         {
@@ -45,14 +45,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             Caster = null;
             bAllowBlocked = true;
             bStopAtBlockedCell = true;
-            EffectedTeam = GameTeam.All;
+            EffectedTeam = BattleTeam.All;
         }
     }
 
-    public class AIManager : MonoBehaviour
+    public static class AStarAlgorithmUtils
     {
-        [SerializeField] private List<UnitAIComponent> m_AIUnits;
-
         static float m_CellWaitTime = 0.0f;
         static float m_MovementSpeed = 9.0f;
 
@@ -280,20 +278,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             GridObject gridObj = InCell.GetObjectOnCell();
             if (gridObj)
             {
-                if (InRadiusInfo.EffectedTeam == GameTeam.None)
+                if (InRadiusInfo.EffectedTeam == BattleTeam.None)
                 {
                     return false;
                 }
 
                 if(InRadiusInfo.Caster != null)
                 {
-                    GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
-                    if (ObjAffinity == GameTeam.Friendly && InRadiusInfo.EffectedTeam == GameTeam.Hostile)
+                    BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
+                    if (ObjAffinity == BattleTeam.Friendly && InRadiusInfo.EffectedTeam == BattleTeam.Hostile)
                     {
                         return false;
                     }
 
-                    if (ObjAffinity == GameTeam.Hostile && InRadiusInfo.EffectedTeam == GameTeam.Friendly)
+                    if (ObjAffinity == BattleTeam.Hostile && InRadiusInfo.EffectedTeam == BattleTeam.Friendly)
                     {
                         return false;
                     }
@@ -305,7 +303,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         #region UnitAI
 
-        public static void RunAI(List<GridUnit> InAIUnits, UnityAction OnComplete)
+        public static void RunAI(List<GridPawnUnit> InAIUnits, UnityAction OnComplete)
         {
             UnityEvent OnAIComplete = new UnityEvent();
             OnAIComplete.AddListener(OnComplete);
@@ -313,9 +311,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             TacticBattleManager.Get().StartCoroutine(InternalRunAI(InAIUnits, OnAIComplete));
         }
 
-        static IEnumerator InternalRunAI(List<GridUnit> InAIUnits, UnityEvent OnComplete)
+        static IEnumerator InternalRunAI(List<GridPawnUnit> InAIUnits, UnityEvent OnComplete)
         {
-            foreach (GridUnit AIUnit in InAIUnits)
+            foreach (GridPawnUnit AIUnit in InAIUnits)
             {
                 if (AIUnit && !AIUnit.IsDead())
                 {
@@ -331,7 +329,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             OnComplete.Invoke();
         }
         
-        public static IEnumerator ExecuteAbility(GridUnit InCaster, LevelCellBase InTarget, UnitAbility InAbility)
+        public static IEnumerator ExecuteAbility(GridPawnUnit InCaster, LevelCellBase InTarget, BasicUnitAbility InAbility)
         {
             if(InCaster)
             {
@@ -438,26 +436,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         }
 
         #endregion
-
-        public void AddAIUnit(UnitAIComponent InAIUnit)
-        {
-            if(InAIUnit != null)
-            {
-                m_AIUnits.Add(InAIUnit);
-            }
-        }
-
-        public void RemoveAIUnit(UnitAIComponent InAIUnit)
-        {
-            if(InAIUnit != null)
-            {
-                m_AIUnits.Remove(InAIUnit);
-            }
-        }
-
-        public List<UnitAIComponent> GetAIUnits()
-        {
-            return m_AIUnits;
-        }
     }
 }

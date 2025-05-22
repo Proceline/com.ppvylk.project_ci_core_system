@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 {
-    public enum GameTeam
+    public enum BattleTeam
     {
         None,
         Friendly,
@@ -16,7 +16,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
     public class GridObject : MonoBehaviour
     {
-        GameTeam m_Team;
+        BattleTeam m_Team;
 
         Renderer m_ObjectRenderer;
 
@@ -73,7 +73,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             m_AssociatedGrid = InGrid;
         }
 
-        public void SetTeam(GameTeam InTeam)
+        public void SetTeam(BattleTeam InTeam)
         {
             m_Team = InTeam;
         }
@@ -127,7 +127,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_AssociatedGrid;
         }
 
-        public GameTeam GetTeam()
+        public BattleTeam GetTeam()
         {
             return m_Team;
         }

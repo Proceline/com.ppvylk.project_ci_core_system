@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
     {
         public int m_HealAmount;
 
-        public override void ApplyTo(GridUnit InCaster, GridObject InObject)
+        public override void ApplyTo(GridPawnUnit InCaster, GridObject InObject)
         {
             if(InObject)
             {

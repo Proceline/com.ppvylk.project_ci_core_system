@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         public int m_Damage;
         public bool m_bMagicalDamage;
 
-        public override void ApplyTo(GridUnit InCaster, GridObject InObject)
+        public override void ApplyTo(GridPawnUnit InCaster, GridObject InObject)
         {
             BattleHealth healthComp = InObject.GetComponent<BattleHealth>();
             if (healthComp)

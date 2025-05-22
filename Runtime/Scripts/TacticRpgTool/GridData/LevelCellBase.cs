@@ -272,7 +272,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         {
             float objectHeightOffset = 0.0f;
 
-            GridUnit gridUnit = InObject as GridUnit;
+            GridPawnUnit gridUnit = InObject as GridPawnUnit;
             if (gridUnit)
             {
                 objectHeightOffset += gridUnit.GetUnitData().m_HeightOffset;
@@ -314,19 +314,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return m_ObjectOnCell;
         }
 
-        public GridUnit GetUnitOnCell()
+        public GridPawnUnit GetUnitOnCell()
         {
             if (m_ObjectOnCell)
             {
-                return m_ObjectOnCell as GridUnit;
+                return m_ObjectOnCell as GridPawnUnit;
             }
 
             return null;
         }
 
-        public GameTeam GetCellTeam()
+        public BattleTeam GetCellTeam()
         {
-            return m_ObjectOnCell ? m_ObjectOnCell.GetTeam() : GameTeam.None;
+            return m_ObjectOnCell ? m_ObjectOnCell.GetTeam() : BattleTeam.None;
         }
 
         public string GetCellId()
@@ -454,7 +454,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void HandleVisibilityChanged()
         {
-            GridUnit unit = GetUnitOnCell();
+            GridPawnUnit unit = GetUnitOnCell();
             if (unit)
             {
                 unit.CheckCellVisibility();

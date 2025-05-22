@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         public GameObject m_Object;
         public Vector3 m_Offset;
 
-        public override void ApplyTo(GridUnit InCaster, LevelCellBase InCell)
+        public override void ApplyTo(GridPawnUnit InCaster, LevelCellBase InCell)
         {
             if(!InCell.IsObjectOnCell())
             {

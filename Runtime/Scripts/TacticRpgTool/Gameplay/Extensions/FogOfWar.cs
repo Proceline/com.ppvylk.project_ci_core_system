@@ -28,7 +28,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
         {
             AIRadiusInfo radiusInfo = new AIRadiusInfo( InCell, m_DiscoverRange );
 
-            List<LevelCellBase> DiscoverCells = AIManager.GetRadius( radiusInfo );
+            List<LevelCellBase> DiscoverCells = AStarAlgorithmUtils.GetRadius( radiusInfo );
             foreach ( LevelCellBase levelCell in DiscoverCells )
             {
                 if( levelCell )

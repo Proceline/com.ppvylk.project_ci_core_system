@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
@@ -14,9 +13,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         public bool m_bActivateOnStart;
         public int m_ActivationRange = 5;
 
-        public virtual IEnumerator RunOnUnit(GridUnit InAIUnit)
+        public virtual async Awaitable RunOnUnit(GridPawnUnit InAIUnit)
         {
-            yield return new WaitForSeconds(0.0f);
+            // TODO: Check if this is needed.
+            // await Awaitable.WaitForSecondsAsync(0.0f);
+            await Awaitable.EndOfFrameAsync();
 
             if ( InAIUnit )
             {
@@ -25,7 +26,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 if ( InAIUnit.IsActivated() )
                 {
                     //Calculate target
-                    GridUnit target = CalculateTargetUnit( InAIUnit );
+                    GridPawnUnit target = CalculateTargetUnit( InAIUnit );
 
                     //Calculate ability
                     int abilityIndex = CalculateAbilityIndex( InAIUnit );
@@ -40,7 +41,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             {
                                 UnityEvent OnMovementComplete = new UnityEvent();
                                 List<LevelCellBase> AllowedCells = InAIUnit.GetAllowedMovementCells();
-                                yield return TacticBattleManager.Get().StartCoroutine(InAIUnit.EnumeratorTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells));
+                                await InAIUnit.OnGridTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells);
                             }
                         }
 
@@ -49,13 +50,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             // Do ability.
                             if (abilityIndex >= 0)
                             {
-                                UnitAbility selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
+                                BasicUnitAbility selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
                                 if (selectedAbility)
                                 {
                                     List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
                                     if (abilityCells.Contains(target.GetCell()))
                                     {
-                                        yield return TacticBattleManager.Get().StartCoroutine(AIManager.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
+                                        // TODO: Remove this
+                                        TacticBattleManager.Get().StartCoroutine(AStarAlgorithmUtils.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
                                     }
                                 }
                             }
@@ -65,7 +67,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             }
         }
 
-        protected void CheckActivation(GridUnit InUnit)
+        protected void CheckActivation(GridPawnUnit InUnit)
         {
             if (!InUnit.IsActivated())
             {
@@ -80,16 +82,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         Caster = InUnit,
                         bAllowBlocked = true,
                         bStopAtBlockedCell = true,
-                        EffectedTeam = GameTeam.Hostile
+                        EffectedTeam = BattleTeam.Hostile
                     };
 
-                    List<LevelCellBase> ActivationCells = AIManager.GetRadius(radiusInfo);
+                    List<LevelCellBase> ActivationCells = AStarAlgorithmUtils.GetRadius(radiusInfo);
                     foreach (var cell in ActivationCells)
                     {
                         GridObject objOnCell = cell.GetObjectOnCell();
                         if (objOnCell)
                         {
-                            if (TacticBattleManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == GameTeam.Hostile)
+                            if (TacticBattleManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == BattleTeam.Hostile)
                             {
                                 InUnit.SetActivated(true);
                             }
@@ -99,20 +101,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             }
         }
 
-        protected GridUnit CalculateTargetUnit(GridUnit InAIUnit)
+        protected GridPawnUnit CalculateTargetUnit(GridPawnUnit InAIUnit)
         {
-            GameTeam SelectedTeam = GameTeam.Hostile;
+            BattleTeam SelectedTeam = BattleTeam.Hostile;
 
-            if (InAIUnit.GetTeam() == GameTeam.Hostile)
+            if (InAIUnit.GetTeam() == BattleTeam.Hostile)
             {
-                SelectedTeam = GameTeam.Friendly;
+                SelectedTeam = BattleTeam.Friendly;
             }
 
-            List<GridUnit> AIUnits = TacticBattleManager.GetUnitsOnTeam(SelectedTeam);
+            List<GridPawnUnit> AIUnits = TacticBattleManager.GetUnitsOnTeam(SelectedTeam);
 
             int closestIndex = int.MaxValue;
-            GridUnit selectedTarget = null;
-            foreach (GridUnit currUnit in AIUnits)
+            GridPawnUnit selectedTarget = null;
+            foreach (GridPawnUnit currUnit in AIUnits)
             {
                 if ( currUnit && !currUnit.IsDead() )
                 {
@@ -124,7 +126,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         bTakeWeightIntoAccount = true
                     };
 
-                    List<LevelCellBase> unitPath = AIManager.GetPath(pathInfo);
+                    List<LevelCellBase> unitPath = AStarAlgorithmUtils.GetPath(pathInfo);
                     if (unitPath.Count < closestIndex)
                     {
                         closestIndex = unitPath.Count;
@@ -136,7 +138,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return selectedTarget;
         }
 
-        protected int CalculateAbilityIndex(GridUnit InAIUnit)
+        protected int CalculateAbilityIndex(GridPawnUnit InAIUnit)
         {
             if (InAIUnit)
             {
@@ -146,7 +148,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 {
                     for (int i = 0; i < abilities.Count; i++)
                     {
-                        if (abilities[i].unitAbility && abilities[i].unitAbility.GetEffectedTeam() == GameTeam.Hostile)
+                        if (abilities[i].unitAbility && abilities[i].unitAbility.GetEffectedTeam() == BattleTeam.Hostile)
                         {
                             if (abilities[i].unitAbility.GetActionPointCost() <= allowedAP)
                             {
@@ -160,7 +162,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return -1;
         }
 
-        protected LevelCellBase CalculateMoveToCell(GridUnit InAIUnit, GridUnit InTarget, int InAbilityIndex)
+        protected LevelCellBase CalculateMoveToCell(GridPawnUnit InAIUnit, GridPawnUnit InTarget, int InAbilityIndex)
         {
             if (InTarget == null)
             {
@@ -178,7 +180,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             if ( InAbilityIndex != -1 )
             {
-                UnitAbility SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
+                BasicUnitAbility SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
                 List<LevelCellBase> CellsAroundUnitToAttack = SelectedAbility.GetShape().GetCellList(InTarget, InTarget.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
 
                 //If you can attack from where you are, do so.
@@ -214,7 +216,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         bTakeWeightIntoAccount = true
                     };
 
-                    List<LevelCellBase> levelPath = AIManager.GetPath( pathInfo );
+                    List<LevelCellBase> levelPath = AStarAlgorithmUtils.GetPath( pathInfo );
                     int cellDistance = levelPath.Count - 1;
                     if ( cellDistance > currDistance )
                     {
@@ -239,7 +241,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         bTakeWeightIntoAccount = true
                     };
 
-                    int cellDistance = AIManager.GetPath(pathInfo).Count - 1;
+                    int cellDistance = AStarAlgorithmUtils.GetPath(pathInfo).Count - 1;
                     if (cellDistance < currDistance)
                     {
                         selectedCell = levelCell;

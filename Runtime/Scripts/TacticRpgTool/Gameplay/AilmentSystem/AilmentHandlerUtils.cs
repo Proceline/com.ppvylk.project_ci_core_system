@@ -8,12 +8,12 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 {
-    public class AilmentHandler : Object
+    public static class AilmentHandlerUtils
     {
-        public static void HandleTurnStart(GameTeam InTeam)
+        public static void HandleTurnStart(BattleTeam InTeam)
         {
-            List<GridUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
-            foreach (GridUnit unit in GridUnits)
+            List<GridPawnUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
+            foreach (GridPawnUnit unit in GridUnits)
             {
                 if(unit)
                 {
@@ -37,7 +37,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 if (currLevelCell)
                 {
-                    GridUnit unit = currLevelCell.GetUnitOnCell();
+                    GridPawnUnit unit = currLevelCell.GetUnitOnCell();
                     
                     AilmentContainer ailmentContainer = currLevelCell.GetAilmentContainer();
                     if (ailmentContainer)
@@ -52,7 +52,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                                 AilmentExecutionInfo StartExecution = currAilment.m_ailment.m_ExecuteOnStartOfTurn;
                                 HandleCellAilmentExecution(currAilment.m_AssociatedCell, StartExecution);
 
-                                GridUnit Caster = currAilment.m_CastedBy;
+                                GridPawnUnit Caster = currAilment.m_CastedBy;
                                 if (Caster)//If there is a caster, then check if it's their turn to increment the ailment
                                 {
                                     bool bShouldIncrementAilment = InTeam == Caster.GetTeam();
@@ -63,7 +63,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                                 }
                                 else//If there was no caster, check if it was friendly
                                 {
-                                    if (InTeam == GameTeam.Friendly)
+                                    if (InTeam == BattleTeam.Friendly)
                                     {
                                         ailmentContainer.IncrementAilment(currAilment);
                                     }
@@ -77,10 +77,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             }
         }
 
-        public static void HandleTurnEnd(GameTeam InTeam)
+        public static void HandleTurnEnd(BattleTeam InTeam)
         {
-            List<GridUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
-            foreach (GridUnit unit in GridUnits)
+            List<GridPawnUnit> GridUnits = TacticBattleManager.GetUnitsOnTeam(InTeam);
+            foreach (GridPawnUnit unit in GridUnits)
             {
                 if (unit)
                 {
@@ -101,7 +101,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 if (currLevelCell)
                 {
-                    GridUnit unit = currLevelCell.GetUnitOnCell();
+                    GridPawnUnit unit = currLevelCell.GetUnitOnCell();
                     if(unit && unit.GetTeam() == InTeam)
                     {
                         AilmentContainer ailmentContainer = currLevelCell.GetAilmentContainer();
@@ -123,7 +123,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         }
 
 
-        public static void HandleUnitOnCell(GridUnit InUnit, LevelCellBase InCell)
+        public static void HandleUnitOnCell(GridPawnUnit InUnit, LevelCellBase InCell)
         {
             if (InCell && InUnit)
             {
@@ -146,7 +146,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             }
         }
 
-        static void HandleAilmentExecution(GridUnit InUnit, AilmentExecutionInfo InAilmentExecution)
+        static void HandleAilmentExecution(GridPawnUnit InUnit, AilmentExecutionInfo InAilmentExecution)
         {
             foreach (AbilityParam abilityParam in InAilmentExecution.m_Params)
             {
@@ -157,7 +157,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 Vector3 pos = InUnit.transform.position;
                 Quaternion rot = abilityParticle.transform.rotation;
-                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, rot).GetComponent<AbilityParticle>();
+                AbilityParticle CreatedAbilityParticle = GameObject.Instantiate(abilityParticle.gameObject, pos, rot).GetComponent<AbilityParticle>();
                 CreatedAbilityParticle.Setup(null, null, InUnit.GetCell());
             }
 
@@ -171,7 +171,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 
         static void HandleCellAilmentExecution(LevelCellBase InCell, AilmentExecutionInfo InAilmentExecution)
         {
-            GridUnit unitOnCell = InCell.GetUnitOnCell();
+            GridPawnUnit unitOnCell = InCell.GetUnitOnCell();
             if(unitOnCell)
             {
                 foreach (AbilityParam abilityParam in InAilmentExecution.m_Params)
@@ -183,7 +183,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 {
                     Vector3 pos = unitOnCell.transform.position;
                     Quaternion rot = abilityParticle.transform.rotation;
-                    AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, rot).GetComponent<AbilityParticle>();
+                    AbilityParticle CreatedAbilityParticle = GameObject.Instantiate(abilityParticle.gameObject, pos, rot).GetComponent<AbilityParticle>();
                     CreatedAbilityParticle.Setup(null, null, unitOnCell.GetCell());
                 }
 

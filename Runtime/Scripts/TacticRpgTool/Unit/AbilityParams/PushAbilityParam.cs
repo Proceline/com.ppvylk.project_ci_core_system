@@ -9,9 +9,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
     {
         public int m_Distance;
 
-        public override void ApplyTo(GridUnit InCaster, LevelCellBase InCell)
+        public override void ApplyTo(GridPawnUnit InCaster, LevelCellBase InCell)
         {
-            GridUnit TargetUnit = InCell.GetUnitOnCell();
+            GridPawnUnit TargetUnit = InCell.GetUnitOnCell();
 
             if (TargetUnit && InCaster)
             {
@@ -27,7 +27,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
                     }
                 }
 
-                TargetUnit.MoveTo(targetCell);
+                TargetUnit.ForceMoveTo(targetCell);
             }
         }
 

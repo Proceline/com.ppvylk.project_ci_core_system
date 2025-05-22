@@ -10,22 +10,23 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
+using System;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
-    public enum UnitState
+    public enum UnitBattleState
     {
         Idle,
         Moving,
         UsingAbility
     }
 
-    public class GridUnit : GridObject
+    public class GridPawnUnit : GridObject
     {
         UnitData m_UnitData;
 
-        UnitState m_CurrentState;
-        UnitAbility m_CurrentAbility;
+        UnitBattleState m_CurrentState;
+        BasicUnitAbility m_CurrentAbility;
 
         int m_CurrentMovementPoints;
         int m_CurrentAbilityPoints;
@@ -40,6 +41,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         UnityEvent OnMovementComplete = new UnityEvent();
 
         List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
+
+        public event Action OnPreStandIdleAnimRequired;
+        public event Action OnPreMovementAnimRequired;
+        public event Action OnPreHitAnimRequired;
+        public event Action OnPreHealAnimRequired;
 
         public override void Initalize()
         {
@@ -66,7 +72,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         
         public void CleanUp()
         {
-            m_CurrentState = UnitState.Idle;
+            m_CurrentState = UnitBattleState.Idle;
 
             foreach (LevelCellBase cell in m_EditedCells)
             {
@@ -180,7 +186,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return ailmentHandler;
         }
 
-        public UnitState GetCurrentState()
+        public UnitBattleState GetCurrentState()
         {
             return m_CurrentState;
         }
@@ -230,7 +236,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_CurrentAbilityPoints;
         }
 
-        public UnitAbilityPlayerData GetUnitAbilityPlayerData(UnitAbility InAbility)
+        public UnitAbilityPlayerData GetUnitAbilityPlayerData(BasicUnitAbility InAbility)
         {
             UnitAbilityPlayerData SelectedPlayerData = new UnitAbilityPlayerData();
 
@@ -287,9 +293,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
 
-            if (GetCurrentState() == UnitState.UsingAbility)
+            if (GetCurrentState() == UnitBattleState.UsingAbility)
             {
-                UnitAbility ability = GetCurrentAbility();
+                BasicUnitAbility ability = GetCurrentAbility();
                 if (ability)
                 {
                     List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
@@ -301,7 +307,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         {
                             if (currCell)
                             {
-                                GameTeam EffectedTeam = (currCell == InCell) ? ability.GetEffectedTeam() : GameTeam.All;
+                                BattleTeam EffectedTeam = (currCell == InCell) ? ability.GetEffectedTeam() : BattleTeam.All;
 
                                 if (TacticBattleManager.CanCasterEffectTarget(GetCell(), currCell, EffectedTeam, ability.DoesAllowBlocked()))
                                 {
@@ -321,7 +327,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return new List<UnitAbilityPlayerData>(m_UnitData.m_Abilities);
         }
 
-        public UnitAbility GetCurrentAbility()
+        public BasicUnitAbility GetCurrentAbility()
         {
             return m_CurrentAbility;
         }
@@ -334,7 +340,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void SetupAbility(UnitAbility InAbility)
+        public void SetupAbility(BasicUnitAbility InAbility)
         {
             if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
@@ -348,7 +354,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     CleanUp();
 
                     m_CurrentAbility = InAbility;
-                    m_CurrentState = UnitState.UsingAbility;
+                    m_CurrentState = UnitBattleState.UsingAbility;
 
                     List<LevelCellBase> EditedAbilityCells = m_CurrentAbility.Setup(this);
                     m_EditedCells.AddRange(EditedAbilityCells);
@@ -372,7 +378,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void ExecuteAbility(UnitAbility InAbility, LevelCellBase InCell)
+        public void ExecuteAbility(BasicUnitAbility InAbility, LevelCellBase InCell)
         {
             if (!IsMoving())
             {
@@ -382,8 +388,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                     UnityEvent OnAbilityComplete = new UnityEvent();
                     OnAbilityComplete.AddListener(HandleAbilityFinished);
-
-                    StartCoroutine( InAbility.Execute(this, InCell, OnAbilityComplete) );
+                    StartCoroutine(InAbility.Execute(this, InCell, OnAbilityComplete));
                 }
             }
 
@@ -422,7 +427,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return;
             }
 
-            m_CurrentState = UnitState.Moving;
+            m_CurrentState = UnitBattleState.Moving;
             List<LevelCellBase> abilityCells = GetAllowedMovementCells();
 
             foreach (LevelCellBase cell in abilityCells)
@@ -476,23 +481,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return ExecuteMovement(TargetCell, OnMovementComplete);
         }
 
-        public void TraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
+        public async void TraverseTo(LevelCellBase InTargetCell, 
+            UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
         {
-            StartCoroutine(EnumeratorTraverseTo(InTargetCell, OnMovementComplete, InAllowedCells));
+            await OnGridTraverseTo(InTargetCell, OnMovementComplete, InAllowedCells);
         }
 
-        public void MoveTo(LevelCellBase InTargetCell)
+        public async void ForceMoveTo(LevelCellBase InTargetCell)
         {
-            StartCoroutine(InternalMoveTo(InTargetCell));
+            await ForceMoveToInternally(InTargetCell);
         }
 
-        public IEnumerator EnumeratorTraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
+        public virtual async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
         {
             if (InTargetCell)
             {
                 m_bIsMoving = true;
 
-                PlayAnimation(GetUnitData().m_MovementAnimation);
+                OnPreMovementAnimRequired?.Invoke();
 
                 TacticBattleManager.AddActionBeingPerformed();
 
@@ -511,7 +517,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)
                     {
-                        if (GetTeam() == GameTeam.Friendly)
+                        if (GetTeam() == BattleTeam.Friendly)
                         {
                             fogOfWar.CheckPoint(cell);
                         }
@@ -525,21 +531,22 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     Vector3 EndPos = cell.GetAllignPos(this);
                     while (TimeTo < 1.5f)
                     {
-                        TimeTo += Time.deltaTime * AIManager.GetMovementSpeed();
+                        TimeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
                         gameObject.transform.position = Vector3.MoveTowards(StartPos, EndPos, TimeTo);
 
                         LookAtCell(cell);
 
-                        yield return new WaitForSeconds(0.00001f);
+                        await Awaitable.WaitForSecondsAsync(0.00001f);
                     }
 
                     gameObject.transform.position = EndPos;
                     StartPos = cell.GetAllignPos(this);
-                    yield return new WaitForSeconds(AIManager.GetWaitTime());
+
+                    await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
 
                     if ( cell != StartingCell )
                     {
-                        AilmentHandler.HandleUnitOnCell(this, cell);
+                        AilmentHandlerUtils.HandleUnitOnCell(this, cell);
                         PlayTravelAudio();
                     }
 
@@ -560,7 +567,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     SetCurrentCell(FinalCell);
                     RemoveMovementPoints(cellPath.Count - 1);
 
-                    PlayAnimation(GetUnitData().m_IdleAnimation);
+                    OnPreStandIdleAnimRequired?.Invoke();
                 }
 
                 TacticBattleManager.RemoveActionBeingPerformed();
@@ -574,22 +581,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells = null)
-        {
-            AIPathInfo pathInfo = new AIPathInfo();
-            pathInfo.StartCell = GetCell();
-            pathInfo.TargetCell = InTargetCell;
-            pathInfo.bIgnoreUnits = true;
-            pathInfo.bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam());
-            pathInfo.AllowedCells = InAllowedCells;
-            pathInfo.bAllowBlocked = m_UnitData.m_bIsFlying;
-
-            List<LevelCellBase> cellPath = AIManager.GetPath(pathInfo);
-
-            return cellPath;
-        }
-
-        IEnumerator InternalMoveTo(LevelCellBase InTargetCell)
+        protected virtual async Awaitable ForceMoveToInternally(LevelCellBase InTargetCell)
         {
             if (InTargetCell)
             {
@@ -601,7 +593,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 pathInfo.bIgnoreUnits = true;
                 pathInfo.bTakeWeightIntoAccount = false;
 
-                List<LevelCellBase> cellPath = AIManager.GetPath(pathInfo);
+                List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
 
                 LevelCellBase StartingCell = GetCell();
 
@@ -614,7 +606,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
                     if (fogOfWar)
                     {
-                        if (GetTeam() == GameTeam.Friendly)
+                        if (GetTeam() == BattleTeam.Friendly)
                         {
                             fogOfWar.CheckPoint(cell);
                         }
@@ -628,23 +620,40 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     Vector3 EndPos = cell.GetAllignPos(this);
                     while (TimeTo < 1.5f)
                     {
-                        TimeTo += Time.deltaTime * AIManager.GetMovementSpeed();
+                        TimeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
                         gameObject.transform.position = Vector3.MoveTowards(StartPos, EndPos, TimeTo);
-                        yield return new WaitForSeconds(0.00001f);
+
+                        await Awaitable.WaitForSecondsAsync(0.00001f);
                     }
 
                     gameObject.transform.position = EndPos;
                     StartPos = cell.GetAllignPos(this);
-                    yield return new WaitForSeconds(AIManager.GetWaitTime());
+
+                    await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
 
                     if ( cell != StartingCell )
                     {
-                        AilmentHandler.HandleUnitOnCell(this, cell);
+                        AilmentHandlerUtils.HandleUnitOnCell(this, cell);
                     }
                 }
 
                 TacticBattleManager.RemoveActionBeingPerformed();
             }
+        }
+
+        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells = null)
+        {
+            AIPathInfo pathInfo = new AIPathInfo();
+            pathInfo.StartCell = GetCell();
+            pathInfo.TargetCell = InTargetCell;
+            pathInfo.bIgnoreUnits = true;
+            pathInfo.bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam());
+            pathInfo.AllowedCells = InAllowedCells;
+            pathInfo.bAllowBlocked = m_UnitData.m_bIsFlying;
+
+            List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
+
+            return cellPath;
         }
 
         public void RemoveMovementPoints(int InMoveCount)
@@ -653,70 +662,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             if(m_CurrentMovementPoints < 0)
             {
                 m_CurrentMovementPoints = 0;
-            }
-        }
-
-        #endregion
-
-        #region Animation
-
-        int CurrPlayClipID = 0;
-
-        Dictionary<int, AnimationClip> m_ClipIdToAnim = new Dictionary<int, AnimationClip>();
-
-        public void PlayAnimation(AnimationClip InClip, bool bInPlayIdleAfter = false)
-        {
-            if(InClip)
-            {
-
-                if ( m_ClipIdToAnim.ContainsKey( CurrPlayClipID ) )
-                {
-                    if ( m_ClipIdToAnim[ CurrPlayClipID ] == InClip )
-                    {
-                        return;
-                    }
-                }
-
-                Animator animator = GetComponent<Animator>();
-                if(animator)
-                {
-                    animator.Play(InClip.name);
-                }
-
-                if(bInPlayIdleAfter)
-                {
-                    StartCoroutine(PlayClipAfterTime(GetUnitData().m_IdleAnimation, InClip.length, ++CurrPlayClipID));
-                }
-            }
-        }
-
-        IEnumerator PlayClipAfterTime(AnimationClip InClip, float InTime, int PlayClipID)
-        {
-            m_ClipIdToAnim.Add( PlayClipID, InClip );
-
-            yield return new WaitForSeconds(InTime);
-
-            m_ClipIdToAnim.Remove( PlayClipID );
-
-            if ( CurrPlayClipID == PlayClipID )
-            {
-                if(InClip)
-                {
-                    Animator animator = GetComponent<Animator>();
-                    if (animator)
-                    {
-                        AnimationClip MovementClip = GetUnitData().m_MovementAnimation;
-                        if ( IsMoving() && MovementClip )
-                        {
-                            animator.Play(GetUnitData().m_MovementAnimation.name);
-                        }
-                        else
-                        {
-                            animator.Play( InClip.name );
-                        }
-
-                    }
-                }
             }
         }
 
@@ -734,7 +679,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             m_bIsAttacking = false;
 
-            GameTeam team = TacticBattleManager.GetUnitTeam(this);
+            BattleTeam team = TacticBattleManager.GetUnitTeam(this);
             if( TacticBattleManager.IsTeamHuman(team) && TacticBattleManager.IsPlaying() && !IsDead() )
             {
                 SetupMovement();
@@ -797,20 +742,21 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             Destroy(gameObject);
         }
 
-        void HandleHit()
+        protected virtual void HandleHit()
         {
             bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
             if ( !IsMoving() || bShowHitAnimationOnMove )
             {
-                PlayAnimation( GetUnitData().m_DamagedAnimation, true );
+                OnPreHitAnimRequired?.Invoke();
             }
 
             PlayDamagedAudio();
         }
 
-        void HandleHeal()
+        protected virtual void HandleHeal()
         {
-            PlayAnimation(GetUnitData().m_HealAnimation, true);
+            OnPreHealAnimRequired?.Invoke();
+
             PlayHealAudio();
 
             AbilityParticle[] particles = GetUnitData().m_SpawnOnHeal;

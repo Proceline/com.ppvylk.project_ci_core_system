@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
@@ -6,7 +5,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -172,14 +170,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             return levelGrid;
         }
 
-        private static GridUnit SetupBattleUnit<T>(
+        private static GridPawnUnit SetupBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
             UnitData InUnitData,
-            GameTeam InTeam,
-            LevelCellBase cell) where T : GridUnit
+            BattleTeam InTeam,
+            LevelCellBase cell) where T : GridPawnUnit
         {
-            GridUnit SpawnedGridUnit = originPawn.AddComponent<T>();
+            GridPawnUnit SpawnedGridUnit = originPawn.AddComponent<T>();
             SpawnedGridUnit.Initalize();
             SpawnedGridUnit.SetUnitData(InUnitData);
             SpawnedGridUnit.SetTeam(InTeam);
@@ -193,15 +191,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// <summary>
         /// 自动根据originPawn的位置查找最近未被占用的cell并生成战斗单位
         /// </summary>
-        public static GridUnit ChangeUnitToBattleUnit<T>(
+        public static GridPawnUnit ChangeUnitToBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
             UnitData InUnitData,
-            GameTeam InTeam,
+            BattleTeam InTeam,
             float searchRadius,
             LayerMask cellLayer,
             CompassDir InStartDirection = CompassDir.S)
-            where T : GridUnit
+            where T : GridPawnUnit
         {
             if (originPawn == null || InGrid == null)
             {
@@ -215,12 +213,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 return null;
             }
 
-            if (InTeam == GameTeam.Friendly)
+            if (InTeam == BattleTeam.Friendly)
             {
                 cell.SetVisible(true);
             }
 
-            GridUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
+            GridPawnUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
 
             LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
             if (DirCell)
@@ -238,14 +236,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// </summary>
         /// <param name="prefab">TacticBattleManager预制体</param>
         /// <param name="levelGrid">关卡网格</param>
-        /// <param name="humanTeamData">人类队伍数据</param>
-        /// <param name="teamData">队伍数据</param>
         /// <returns>创建并初始化好的TacticBattleManager实例</returns>
         public static TacticBattleManager CreateBattleManager(
             TacticBattleManager prefab,
-            LevelGridBase levelGrid,
-            HumanTeamData humanTeamData,
-            TeamData teamData)
+            LevelGridBase levelGrid)
         {
             if (prefab == null)
             {
@@ -259,23 +253,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 return null;
             }
 
-            if (humanTeamData == null)
-            {
-                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing HumanTeamData");
-                return null;
-            }
-
-            if (teamData == null)
-            {
-                Debug.LogError("[GridBattleUtils]::CreateBattleManager) Missing TeamData");
-                return null;
-            }
-
             TacticBattleManager instance = Object.Instantiate(prefab);
             instance.name = "TacticBattleManager";
             instance.LevelGrid = levelGrid;
-            instance.FriendlyTeamData = humanTeamData;
-            instance.HostileTeamData = teamData;
             return instance;
         }
 

@@ -4,7 +4,6 @@ using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.PlayerData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
@@ -26,11 +25,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
     }
 
     [System.Serializable]
-    public class GameTeamEvent : UnityEvent<GameTeam>
+    public class GameTeamEvent : UnityEvent<BattleTeam>
     { }
 
     [System.Serializable]
-    public class GridUnitEvent : UnityEvent<GridUnit>
+    public class GridUnitEvent : UnityEvent<GridPawnUnit>
     { }
 
     [System.Serializable]
@@ -69,10 +68,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
     {
         static TacticBattleManager sInstance = null;
         public virtual LevelGridBase LevelGrid { get; set; }
-
-        public virtual HumanTeamData FriendlyTeamData { get; set; }
-
-        public virtual TeamData HostileTeamData { get; set; }
 
         [Space(10)]
 
@@ -120,10 +115,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         List<GridObject> SpawnedCellObjects = new List<GridObject>();
 
-        Dictionary<GameTeam, List<GridUnit>> m_Teams = new Dictionary<GameTeam, List<GridUnit>>();
+        Dictionary<BattleTeam, List<GridPawnUnit>> m_Teams = new Dictionary<BattleTeam, List<GridPawnUnit>>();
 
-        Dictionary<GameTeam, int> m_NumberOfKilledTargets = new Dictionary<GameTeam, int>();
-        Dictionary<GameTeam, int> m_NumberOfKilledEntities = new Dictionary<GameTeam, int>();
+        Dictionary<BattleTeam, int> m_NumberOfKilledTargets = new Dictionary<BattleTeam, int>();
+        Dictionary<BattleTeam, int> m_NumberOfKilledEntities = new Dictionary<BattleTeam, int>();
 
         List<LevelCellBase> CurrentHoverCells = new List<LevelCellBase>();
 
@@ -252,24 +247,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return new List<WinCondition>(sInstance.m_WinConditions);
         }
 
-        public static GameTeam GetTeamAffinity(GameTeam InTeam1, GameTeam InTeam2)
+        public static BattleTeam GetTeamAffinity(BattleTeam InTeam1, BattleTeam InTeam2)
         {
             if (InTeam1 == InTeam2)
             {
-                return GameTeam.Friendly;
+                return BattleTeam.Friendly;
             }
 
-            return GameTeam.Hostile;
+            return BattleTeam.Hostile;
         }
 
-        public static Dictionary<GameTeam, List<GridUnit>> GetTeamsMap()
+        public static Dictionary<BattleTeam, List<GridPawnUnit>> GetTeamsMap()
         {
             return sInstance.m_Teams;
         }
 
-        public static List<GameTeam> GetTeamList()
+        public static List<BattleTeam> GetTeamList()
         {
-            List<GameTeam> outTeams = new List<GameTeam>();
+            List<BattleTeam> outTeams = new List<BattleTeam>();
 
             foreach (var item in GetTeamsMap().Keys)
             {
@@ -310,7 +305,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             sInstance.OnFinishedPerformedActions.RemoveListener(InAction);
         }
 
-        public static int GetNumTargetsKilled(GameTeam InTeam)
+        public static int GetNumTargetsKilled(BattleTeam InTeam)
         {
             if (sInstance.m_NumberOfKilledTargets.ContainsKey(InTeam))
             {
@@ -320,7 +315,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return 0;
         }
 
-        public static int NumUnitsKilled(GameTeam InTeam)
+        public static int NumUnitsKilled(BattleTeam InTeam)
         {
             if (sInstance.m_NumberOfKilledEntities.ContainsKey(InTeam))
             {
@@ -330,7 +325,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return 0;
         }
 
-        public static bool AreAllUnitsOnTeamDead(GameTeam InTeam)
+        public static bool AreAllUnitsOnTeamDead(BattleTeam InTeam)
         {
             return NumUnitsKilled(InTeam) == sInstance.m_Teams[InTeam].Count;
         }
@@ -349,18 +344,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return (!bActionBeingPerformed && bIsTeamHuman);
         }
 
-        public static int GetNumOfTargets(GameTeam InTeam)
+        public static int GetNumOfTargets(BattleTeam InTeam)
         {
             return GetTeamTargets(InTeam).Count;
         }
 
-        public static List<GridUnit> GetTeamTargets(GameTeam InTeam)
+        public static List<GridPawnUnit> GetTeamTargets(BattleTeam InTeam)
         {
-            List<GridUnit> units = new List<GridUnit>();
+            List<GridPawnUnit> units = new List<GridPawnUnit>();
 
             if(sInstance.m_Teams.ContainsKey(InTeam))
             {
-                foreach (GridUnit unit in sInstance.m_Teams[InTeam])
+                foreach (GridPawnUnit unit in sInstance.m_Teams[InTeam])
                 {
                     if (unit.IsTarget())
                     {
@@ -372,32 +367,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return units;
         }
 
-        public static bool KilledAllTargets(GameTeam InTeam)
+        public static bool KilledAllTargets(BattleTeam InTeam)
         {
             return GetNumTargetsKilled(InTeam) == GetNumOfTargets(InTeam);
-        }
-
-        public static HumanTeamData GetFriendlyTeamData()
-        {
-            return sInstance.FriendlyTeamData;
-        }
-
-        public static TeamData GetHostileTeamData()
-        {
-            return sInstance.HostileTeamData;
-        }
-
-        public static T GetDataForTeam<T>(GameTeam InTeam) where T : TeamData
-        {
-            switch (InTeam)
-            {
-                case GameTeam.Friendly:
-                    return GetFriendlyTeamData() as T;
-                case GameTeam.Hostile:
-                    return GetHostileTeamData() as T;
-            }
-
-            return null;
         }
 
         public static GridObject SpawnObjectOnCell(GameObject InObject, LevelCellBase InCell, Vector3 InOffset = default(Vector3))
@@ -424,25 +396,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return null;
         }
 
-        public static GridUnit SpawnUnit(UnitData InUnitData, GameTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+        public static GridPawnUnit SpawnUnit(UnitData InUnitData, BattleTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
         {
             LevelCellBase cell = sInstance.LevelGrid[InIndex];
 
-            if (InTeam == GameTeam.Friendly)
+            if (InTeam == BattleTeam.Friendly)
             {
                 cell.SetVisible(true);
             }
 
-            GridUnit SpawnedGridUnit;
+            GridPawnUnit SpawnedGridUnit;
 
             if (InUnitData.m_UnitClass == "")
             {
-                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent<GridUnit>();
+                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent<GridPawnUnit>();
             }
             else
             {
                 System.Type classType = GameUtils.FindType(InUnitData.m_UnitClass);
-                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent(classType) as GridUnit;
+                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent(classType) as GridPawnUnit;
             }
 
             SpawnedGridUnit.Initalize();
@@ -472,18 +444,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return SpawnedGridUnit;
         }
 
-        public static void AddUnitToTeam(GridUnit InUnit, GameTeam InTeam)
+        public static void AddUnitToTeam(GridPawnUnit InUnit, BattleTeam InTeam)
         {
             sInstance.SpawnedCellObjects.Add(InUnit);
 
             if (!sInstance.m_Teams.ContainsKey(InTeam))
             {
-                sInstance.m_Teams.Add(InTeam, new List<GridUnit>());
+                sInstance.m_Teams.Add(InTeam, new List<GridPawnUnit>());
             }
 
             sInstance.m_Teams[InTeam].Add(InUnit);
 
-            if (InTeam == GameTeam.Friendly)
+            if (InTeam == BattleTeam.Friendly)
             {
                 if (sInstance.m_FogOfWar)
                 {
@@ -492,7 +464,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        void SpawnDeathParticlesForUnit(GridUnit InUnit)
+        void SpawnDeathParticlesForUnit(GridPawnUnit InUnit)
         {
             foreach (AbilityParticle particle in m_DeathParticles)
             {
@@ -550,9 +522,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return new Vector3();
         }
 
-        public static List<GridUnit> GetUnitsOnTeam(GameTeam InTeam)
+        public static List<GridPawnUnit> GetUnitsOnTeam(BattleTeam InTeam)
         {
-            if (InTeam == GameTeam.None)
+            if (InTeam == BattleTeam.None)
             {
                 Debug.Log("([ProjectCI]::TacticBattleManager::GetUnitsOnTeam) Trying to get units for invalid team: " + InTeam.ToString());
             }
@@ -562,20 +534,31 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 return sInstance.m_Teams[InTeam];
             }
 
-            return new List<GridUnit>();
+            return new List<GridPawnUnit>();
         }
 
-        public static bool IsTeamHuman(GameTeam InTeam)
+        protected virtual bool IsTeamHumanByBattleTeam(BattleTeam InTeam)
         {
-            return GetDataForTeam<HumanTeamData>(InTeam) != null;
+            switch (InTeam)
+            {
+                case BattleTeam.Friendly:
+                    return true;
+                case BattleTeam.Hostile:
+                    return false;
+            }
+            return false;
         }
-
-        public static bool IsTeamAI(GameTeam InTeam)
+        public static bool IsTeamHuman(BattleTeam InTeam)
         {
-            return GetDataForTeam<AITeamData>(InTeam) != null;
+            return sInstance.IsTeamHumanByBattleTeam(InTeam);
         }
 
-        public static bool IsUnitOnTeam(GridUnit InUnit, GameTeam InTeam)
+        public static bool IsTeamAI(BattleTeam InTeam)
+        {
+            return !sInstance.IsTeamHumanByBattleTeam(InTeam);
+        }
+
+        public static bool IsUnitOnTeam(GridPawnUnit InUnit, BattleTeam InTeam)
         {
             if(sInstance.m_Teams.ContainsKey(InTeam))
             {
@@ -594,18 +577,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             sInstance.m_bIsPlaying = true;
         }
 
-        public static GameTeam GetUnitTeam(GridUnit InUnit)
+        public static BattleTeam GetUnitTeam(GridPawnUnit InUnit)
         {
-            if (IsUnitOnTeam(InUnit, GameTeam.Friendly))
+            if (IsUnitOnTeam(InUnit, BattleTeam.Friendly))
             {
-                return GameTeam.Friendly;
+                return BattleTeam.Friendly;
             }
-            if (IsUnitOnTeam(InUnit, GameTeam.Hostile))
+            if (IsUnitOnTeam(InUnit, BattleTeam.Hostile))
             {
-                return GameTeam.Hostile;
+                return BattleTeam.Hostile;
             }
 
-            return GameTeam.None;
+            return BattleTeam.None;
         }
 
         public static void ResetCellState(LevelCellBase InCell)
@@ -626,7 +609,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        public static bool CanCasterEffectTarget(LevelCellBase InCaster, LevelCellBase InTarget, GameTeam InEffectedTeam, bool bAllowBlocked)
+        public static bool CanCasterEffectTarget(LevelCellBase InCaster, LevelCellBase InTarget, BattleTeam InEffectedTeam, bool bAllowBlocked)
         {
             if (!InCaster || !InTarget)
             {
@@ -638,15 +621,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 return false;
             }
 
-            if (InEffectedTeam == GameTeam.None)
+            if (InEffectedTeam == BattleTeam.None)
             {
                 return false;
             }
 
-            if (InCaster.GetCellTeam() != GameTeam.None)
+            if (InCaster.GetCellTeam() != BattleTeam.None)
             {
-                GameTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
-                if (ObjAffinity == GameTeam.Friendly && InEffectedTeam == GameTeam.Hostile)
+                BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
+                if (ObjAffinity == BattleTeam.Friendly && InEffectedTeam == BattleTeam.Hostile)
                 {
                     return false;
                 }
@@ -675,10 +658,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 return;
             }
 
-            Dictionary<GameTeam, int> TeamToWinCount = new Dictionary<GameTeam, int>()
+            Dictionary<BattleTeam, int> TeamToWinCount = new Dictionary<BattleTeam, int>()
             {
-                { GameTeam.Friendly, 0},
-                { GameTeam.Hostile, 0}
+                { BattleTeam.Friendly, 0},
+                { BattleTeam.Hostile, 0}
             };
 
             int NumWinConditions = sInstance.m_WinConditions.Length;
@@ -689,43 +672,43 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 {
                     if (currWinCondition.m_bCheckWinFirst)
                     {
-                        if (DidTeamPassCondition(currWinCondition, GameTeam.Friendly))
+                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Friendly))
                         {
-                            if (++TeamToWinCount[GameTeam.Friendly] >= NumWinConditions)
+                            if (++TeamToWinCount[BattleTeam.Friendly] >= NumWinConditions)
                             {
-                                TeamWon(GameTeam.Friendly);
+                                TeamWon(BattleTeam.Friendly);
                             }
                         }
 
-                        if (DidTeamPassCondition(currWinCondition, GameTeam.Hostile))
+                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Hostile))
                         {
-                            if (++TeamToWinCount[GameTeam.Hostile] >= NumWinConditions)
+                            if (++TeamToWinCount[BattleTeam.Hostile] >= NumWinConditions)
                             {
-                                TeamWon(GameTeam.Hostile);
+                                TeamWon(BattleTeam.Hostile);
                             }
                         }
 
-                        CheckLost(currWinCondition, GameTeam.Friendly);
-                        CheckLost(currWinCondition, GameTeam.Hostile);
+                        CheckLost(currWinCondition, BattleTeam.Friendly);
+                        CheckLost(currWinCondition, BattleTeam.Hostile);
                     }
                     else
                     {
-                        CheckLost(currWinCondition, GameTeam.Friendly);
-                        CheckLost(currWinCondition, GameTeam.Hostile);
+                        CheckLost(currWinCondition, BattleTeam.Friendly);
+                        CheckLost(currWinCondition, BattleTeam.Hostile);
 
-                        if (DidTeamPassCondition(currWinCondition, GameTeam.Friendly))
+                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Friendly))
                         {
-                            if (++TeamToWinCount[GameTeam.Friendly] >= NumWinConditions)
+                            if (++TeamToWinCount[BattleTeam.Friendly] >= NumWinConditions)
                             {
-                                TeamWon(GameTeam.Friendly);
+                                TeamWon(BattleTeam.Friendly);
                             }
                         }
 
-                        if (DidTeamPassCondition(currWinCondition, GameTeam.Hostile))
+                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Hostile))
                         {
-                            if (++TeamToWinCount[GameTeam.Hostile] >= NumWinConditions)
+                            if (++TeamToWinCount[BattleTeam.Hostile] >= NumWinConditions)
                             {
-                                TeamWon(GameTeam.Hostile);
+                                TeamWon(BattleTeam.Hostile);
                             }
                         }
                     }
@@ -733,7 +716,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        public static void HandleUnitDeath(GridUnit InUnit)
+        public static void HandleUnitDeath(GridPawnUnit InUnit)
         {
             if (!sInstance.m_NumberOfKilledEntities.ContainsKey(InUnit.GetTeam()))
             {
@@ -757,7 +740,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             CheckWinConditions();
         }
 
-        public static void HandleUnitActivated(GridUnit InUnit)
+        public static void HandleUnitActivated(GridPawnUnit InUnit)
         {
 
         }
@@ -765,7 +748,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         #endregion
 
         #region Conditions
-        static bool DidTeamPassCondition(WinCondition InCondition, GameTeam InTeam)
+        static bool DidTeamPassCondition(WinCondition InCondition, BattleTeam InTeam)
         {
             if (InCondition)
             {
@@ -778,7 +761,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return false;
         }
 
-        static void CheckLost(WinCondition InCondition, GameTeam InTeam)
+        static void CheckLost(WinCondition InCondition, BattleTeam InTeam)
         {
             if (InCondition)
             {
@@ -789,15 +772,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
         }
 
-        static void TeamWon(GameTeam InTeam)
+        static void TeamWon(BattleTeam InTeam)
         {
             sInstance.OnTeamWon.Invoke(InTeam);
             sInstance.HandleGameComplete();
         }
 
-        static void TeamLost(GameTeam InTeam)
+        static void TeamLost(BattleTeam InTeam)
         {
-            GameTeam WinningTeam = InTeam == GameTeam.Friendly ? GameTeam.Hostile : GameTeam.Friendly;
+            BattleTeam WinningTeam = InTeam == BattleTeam.Friendly ? BattleTeam.Hostile : BattleTeam.Friendly;
             TeamWon(WinningTeam);
         }
 

@@ -6,13 +6,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 {
     public class TargetIndicator : MonoBehaviour
     {
-        GridUnit m_AssocaitedUnit = null;
+        GridPawnUnit m_AssocaitedUnit = null;
         
         void Update()
         {
             if( m_AssocaitedUnit == null )
             {
-                m_AssocaitedUnit = GetComponentInParent<GridUnit>();
+                m_AssocaitedUnit = GetComponentInParent<GridPawnUnit>();
                 if( m_AssocaitedUnit )
                 {
                     bool bIsTarget = TacticBattleManager.GetTeamTargets(m_AssocaitedUnit.GetTeam()).Contains(m_AssocaitedUnit);

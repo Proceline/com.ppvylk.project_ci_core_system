@@ -5,12 +5,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
     public class AbilityParam : ScriptableObject
     {
-        public virtual void ApplyTo(GridUnit InCaster, GridObject InObject)
+        public virtual void ApplyTo(GridPawnUnit InCaster, GridObject InObject)
         {
             
         }
         
-        public virtual void ApplyTo(GridUnit InCaster, LevelCellBase InCell)
+        public virtual void ApplyTo(GridPawnUnit InCaster, LevelCellBase InCell)
         {
 
         }

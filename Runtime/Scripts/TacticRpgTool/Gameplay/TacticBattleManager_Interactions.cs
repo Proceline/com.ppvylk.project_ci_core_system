@@ -61,7 +61,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             if (m_CurrentHoverCell)
             {
-                GridUnit hoverGrid = m_CurrentHoverCell.GetUnitOnCell();
+                GridPawnUnit hoverGrid = m_CurrentHoverCell.GetUnitOnCell();
                 if (hoverGrid)
                 {
                     OnUnitHover.Invoke(hoverGrid);
@@ -72,15 +72,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 BattleGameRules gameRules = GetRules();
                 if (gameRules)
                 {
-                    GridUnit selectedUnit = gameRules.GetSelectedUnit();
+                    GridPawnUnit selectedUnit = gameRules.GetSelectedUnit();
                     if (selectedUnit)
                     {
-                        UnitState unitState = selectedUnit.GetCurrentState();
-                        if (unitState == UnitState.UsingAbility)
+                        UnitBattleState unitState = selectedUnit.GetCurrentState();
+                        if (unitState == UnitBattleState.UsingAbility)
                         {
                             CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
                         }
-                        else if (unitState == UnitState.Moving)
+                        else if (unitState == UnitBattleState.Moving)
                         {
                             List<LevelCellBase> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
 
@@ -151,11 +151,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 return;
             }
 
-            GridUnit gridUnit = InCell.GetUnitOnCell();
+            GridPawnUnit gridUnit = InCell.GetUnitOnCell();
             if (gridUnit)
             {
-                GameTeam CurrentTurnTeam = m_GameRules.GetCurrentTeam();
-                GameTeam UnitsTeam = gridUnit.GetTeam();
+                BattleTeam CurrentTurnTeam = m_GameRules.GetCurrentTeam();
+                BattleTeam UnitsTeam = gridUnit.GetTeam();
 
                 if (UnitsTeam == CurrentTurnTeam)
                 {
@@ -163,7 +163,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 }
                 else
                 {
-                    if (UnitsTeam == GameTeam.Hostile)
+                    if (UnitsTeam == BattleTeam.Hostile)
                     {
                         m_GameRules.HandleEnemySelected(gridUnit);
                     }

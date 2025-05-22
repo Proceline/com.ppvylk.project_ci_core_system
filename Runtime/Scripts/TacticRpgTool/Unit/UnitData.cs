@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     [System.Serializable]
     public struct UnitAbilityPlayerData
     {
-        public UnitAbility unitAbility;
+        public BasicUnitAbility unitAbility;
 
         public AnimationClip AssociatedAnimation;
 
@@ -15,11 +15,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public AudioClip AudioOnStart;
 
         public AudioClip AudioOnExecute;
-
-        public AnimationClip GetAnimation()
-        {
-            return AssociatedAnimation;
-        }
     }
 
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
@@ -30,14 +25,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         [SerializeField]
         public string m_UnitClass;
-
-        [Space(5)]
-        
-        [Header("Animations")]
-        public AnimationClip m_IdleAnimation;
-        public AnimationClip m_MovementAnimation;
-        public AnimationClip m_DamagedAnimation;
-        public AnimationClip m_HealAnimation;
 
         [Space(5)]
 

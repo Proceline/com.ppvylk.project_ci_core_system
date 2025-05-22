@@ -9,11 +9,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
     [CreateAssetMenu(fileName = "NewAbilityShape", menuName = "ProjectCI Tools/Ability/Shapes/Create AllEnemiesAbilityShape", order = 1)]
     public class AllEnemiesAbilityShape : AbilityShape
     {
-        public override List<LevelCellBase> GetCellList(GridUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, GameTeam m_EffectedTeam)
+        public override List<LevelCellBase> GetCellList(GridPawnUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked, BattleTeam m_EffectedTeam)
         {
-            GameTeam OtherTeam = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), GameTeam.Hostile );
+            BattleTeam OtherTeam = TacticBattleManager.GetTeamAffinity( InCaster.GetTeam(), BattleTeam.Hostile );
 
-            List<GridUnit> EnemyUnits = TacticBattleManager.GetUnitsOnTeam( OtherTeam );
+            List<GridPawnUnit> EnemyUnits = TacticBattleManager.GetUnitsOnTeam( OtherTeam );
 
             List<LevelCellBase> cells = new List<LevelCellBase>();
             foreach ( var unit in EnemyUnits )

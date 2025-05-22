@@ -5,7 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 {
-    public class TeamTurnChangeEvent : UnityEvent<GameTeam> { }
+    public class TeamTurnChangeEvent : UnityEvent<BattleTeam> { }
 
     [System.Serializable]
     public struct GameplayData
@@ -17,17 +17,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
     public abstract class BattleGameRules : ScriptableObject
     {
-        public GameTeam m_StartingTeam;
+        public BattleTeam m_StartingTeam;
 
         [SerializeField]
         GameplayData m_GameplayData;
 
-        GameTeam m_CurrentTeam;
-        int m_TurnNumber = 0;
+        protected BattleTeam m_CurrentTeam;
+        protected int m_TurnNumber = 0;
 
         public TeamTurnChangeEvent OnTeamTurnBegin = new TeamTurnChangeEvent();
 
-        public GameTeam GetCurrentTeam()
+        public BattleTeam GetCurrentTeam()
         {
             return m_CurrentTeam;
         }
@@ -40,7 +40,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         public void InitalizeRules()
         {
             m_TurnNumber = 0;
-            m_CurrentTeam = GameTeam.All;
+            m_CurrentTeam = BattleTeam.All;
             Init();
         }
 
@@ -51,26 +51,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 
         protected abstract void Init();
         
-        protected void StartGame()
-        {
-            m_CurrentTeam = m_StartingTeam;
-            m_TurnNumber = 0;
-            TacticBattleManager.HandleGameStarted();
-            BeginTeamTurn(m_CurrentTeam);
-        }
+        protected abstract void StartGame();
 
         public void EndTurn()
         {
             EndTeamTurn(m_CurrentTeam);
             
-            if(m_CurrentTeam == GameTeam.Friendly)
+            if(m_CurrentTeam == BattleTeam.Friendly)
             {
-                m_CurrentTeam = GameTeam.Hostile;
+                m_CurrentTeam = BattleTeam.Hostile;
                 m_TurnNumber++;
             }
-            else if (m_CurrentTeam == GameTeam.Hostile)
+            else if (m_CurrentTeam == BattleTeam.Hostile)
             {
-                m_CurrentTeam = GameTeam.Friendly;
+                m_CurrentTeam = BattleTeam.Friendly;
             }
 
             if (!TacticBattleManager.GetTeamList().Contains(m_CurrentTeam))
@@ -89,27 +83,27 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             
         }
 
-        public virtual GridUnit GetSelectedUnit()
+        public virtual GridPawnUnit GetSelectedUnit()
         {
             return null;
         }
 
-        public virtual void BeginTeamTurn(GameTeam InTeam)
+        public virtual void BeginTeamTurn(BattleTeam InTeam)
         {
             
         }
 
-        public virtual void EndTeamTurn(GameTeam InTeam)
+        public virtual void EndTeamTurn(BattleTeam InTeam)
         {
 
         }
 
-        public virtual void HandlePlayerSelected(GridUnit InPlayerUnit)
+        public virtual void HandlePlayerSelected(GridPawnUnit InPlayerUnit)
         {
 
         }
 
-        public virtual void HandleEnemySelected(GridUnit InEnemyUnit)
+        public virtual void HandleEnemySelected(GridPawnUnit InEnemyUnit)
         {
 
         }
@@ -124,7 +118,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             
         }
 
-        public virtual void HandleTeamWon(GameTeam InTeam)
+        public virtual void HandleTeamWon(BattleTeam InTeam)
         {
             
         }

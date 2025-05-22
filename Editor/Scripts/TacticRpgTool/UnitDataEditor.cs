@@ -36,7 +36,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             UnitData unitData = target as UnitData;
             if(unitData)
             {
-                EditorUtils.DrawClassPopup<GridUnit>(ref unitData.m_UnitClass);
+                EditorUtils.DrawClassPopup<GridPawnUnit>(ref unitData.m_UnitClass);
             }
         }
 

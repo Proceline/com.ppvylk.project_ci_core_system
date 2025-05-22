@@ -11,7 +11,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
-    public enum EffectedUnitType
+    public enum EffectedVictimType
     {
         All,
         Ground,
@@ -19,7 +19,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     }
 
     [CreateAssetMenu(fileName = "NewAbility", menuName = "ProjectCI Tools/Ability/Create New Ability", order = 1)]
-    public class UnitAbility : ScriptableObject
+    public class BasicUnitAbility : ScriptableObject
     {
         [SerializeField]
         string m_AbilityName;
@@ -37,10 +37,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         bool m_bAllowBlocked;
 
         [SerializeField]
-        GameTeam m_EffectedTeam;
+        BattleTeam m_EffectedTeam;
 
         [SerializeField]
-        EffectedUnitType m_EffectedType;
+        EffectedVictimType m_EffectedType;
 
         [SerializeField]
         AbilityShape m_AbilityShape;
@@ -62,6 +62,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         [SerializeField]
         Ailment[] m_Ailments;
+
+        [SerializeField]
+        private UnitAbilityAnimation m_Animation;
 
         void Reset()
         {
@@ -90,12 +93,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_bAllowBlocked;
         }
 
-        public GameTeam GetEffectedTeam()
+        public BattleTeam GetEffectedTeam()
         {
             return m_EffectedTeam;
         }
 
-        public EffectedUnitType GetEffectedUnitType()
+        public EffectedVictimType GetEffectedUnitType()
         {
             return m_EffectedType;
         }
@@ -143,7 +146,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #endregion
 
-        public List<LevelCellBase> Setup(GridUnit InCasterUnit)
+        public List<LevelCellBase> Setup(GridPawnUnit InCasterUnit)
         {
             if (!GetShape())
             {
@@ -152,7 +155,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
 
-            CellState AbilityState = (GetEffectedTeam() == GameTeam.Hostile) ? (CellState.eNegative) : (CellState.ePositive);
+            CellState AbilityState = (GetEffectedTeam() == BattleTeam.Hostile) ? (CellState.eNegative) : (CellState.ePositive);
 
             foreach (LevelCellBase cell in abilityCells)
             {
@@ -165,13 +168,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return abilityCells;
         }
 
-        public List<LevelCellBase> GetEffectedCells(GridUnit InCasterUnit, LevelCellBase InTarget)
+        public List<LevelCellBase> GetEffectedCells(GridPawnUnit InCasterUnit, LevelCellBase InTarget)
         {
             List<LevelCellBase> EffectCellList = new List<LevelCellBase>();
 
             if (GetEffectShape() != null)
             {
-                List<LevelCellBase> EffectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), GameTeam.All);
+                List<LevelCellBase> EffectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), BattleTeam.All);
                 EffectCellList.AddRange(EffectCells);
             }
             else
@@ -186,7 +189,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return EffectCellList;
         }
 
-        public List<LevelCellBase> GetAbilityCells(GridUnit InUnit)
+        public List<LevelCellBase> GetAbilityCells(GridPawnUnit InUnit)
         {
             if(!InUnit)
             {
@@ -195,26 +198,26 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             List<LevelCellBase> AbilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(), DoesAllowBlocked(), GetEffectedTeam());
 
-            if(GetEffectedUnitType() != EffectedUnitType.All)
+            if(GetEffectedUnitType() != EffectedVictimType.All)
             {
                 List<LevelCellBase> RemoveList = new List<LevelCellBase>();
                 foreach (LevelCellBase cell in AbilityCells)
                 {
                     if(cell)
                     {
-                        GridUnit unitOnCell = cell.GetUnitOnCell();
+                        GridPawnUnit unitOnCell = cell.GetUnitOnCell();
                         if(unitOnCell)
                         {
                             bool bIsFlying = unitOnCell.IsFlying();
 
-                            if(GetEffectedUnitType() == EffectedUnitType.Flying)
+                            if(GetEffectedUnitType() == EffectedVictimType.Flying)
                             {
                                 if( !bIsFlying )
                                 {
                                     RemoveList.Add(cell);
                                 }
                             }
-                            else if(GetEffectedUnitType() == EffectedUnitType.Ground)
+                            else if(GetEffectedUnitType() == EffectedVictimType.Ground)
                             {
                                 if( bIsFlying )
                                 {
@@ -238,7 +241,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return AbilityCells;
         }
 
-        public IEnumerator Execute(GridUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
+        public virtual IEnumerator Execute(GridPawnUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
         {
             if( GetShape() )
             {
@@ -261,11 +264,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                     UnitAbilityPlayerData SelectedPlayerData = InCasterUnit.GetUnitAbilityPlayerData(this);
 
-                    AnimationClip AbilityAnimation = SelectedPlayerData.AssociatedAnimation;
-                    if ( AbilityAnimation )
-                    {
-                        InCasterUnit.PlayAnimation( AbilityAnimation, true );
-                    }
+                    m_Animation?.PlayAnimation(InCasterUnit);
 
                     AudioClip startAudioClip = SelectedPlayerData.AudioOnStart;
                     if( startAudioClip )
@@ -274,7 +273,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
                     }
 
-                    yield return new WaitForSeconds( SelectedPlayerData.ExecuteAfterTime );
+                    float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
+                    yield return Awaitable.WaitForSecondsAsync(firstExecuteTime);
 
                     AudioClip executeAudioClip = SelectedPlayerData.AudioOnExecute;
                     if ( executeAudioClip )
@@ -288,28 +288,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         InternalHandleEffectedCell(InCasterUnit, EffectCell);
                     }
 
-                    if ( AbilityAnimation )
+                    if (m_Animation)
                     {
-                        float timeRemaining = ( AbilityAnimation.length - SelectedPlayerData.ExecuteAfterTime );
-                        timeRemaining = Mathf.Max( 0, timeRemaining );
+                        float timeRemaining = m_Animation.GetAnimationLength() - firstExecuteTime;
+                        timeRemaining = Mathf.Max(0, timeRemaining);
 
-                        yield return new WaitForSeconds( timeRemaining );
+                        yield return Awaitable.WaitForSecondsAsync(timeRemaining);
                     }
 
                     TacticBattleManager.RemoveActionBeingPerformed();
                 }
             }
 
-            if( OnComplete != null )
-            {
-                OnComplete.Invoke();
-            }
+            OnComplete?.Invoke();
         }
 
-        void InternalHandleEffectedCell(GridUnit InCasterUnit, LevelCellBase InEffectCell)
+        void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
         {
             GridObject targetObj = InEffectCell.GetObjectOnCell();
-            GridUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();
+            GridPawnUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();
 
             if (targetExecuteUnit)
             {
@@ -364,7 +361,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public float CalculateAbilityTime(GridUnit InUnit)
+        public float CalculateAbilityTime(GridPawnUnit InUnit)
         {
             UnitAbilityPlayerData SelectedPlayerData = InUnit.GetUnitAbilityPlayerData(this);
             return SelectedPlayerData.AssociatedAnimation ? SelectedPlayerData.AssociatedAnimation.length : 0;
