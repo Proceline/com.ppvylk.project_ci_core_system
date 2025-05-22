@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     [System.Serializable]
     public struct UnitAbilityPlayerData
     {
-        public BasicUnitAbility unitAbility;
+        public UnitAbilityCore unitAbility;
 
         public AnimationClip AssociatedAnimation;
 

@@ -19,7 +19,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     }
 
     [CreateAssetMenu(fileName = "NewAbility", menuName = "ProjectCI Tools/Ability/Create New Ability", order = 1)]
-    public class BasicUnitAbility : ScriptableObject
+    public class UnitAbilityCore : ScriptableObject
     {
         [SerializeField]
         string m_AbilityName;

@@ -7,7 +7,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
     {
         public float DeleteAfterTime;
 
-        public virtual void Setup(BasicUnitAbility InAbility, GridPawnUnit InCaster, LevelCellBase InTarget)
+        public virtual void Setup(UnitAbilityCore InAbility, GridPawnUnit InCaster, LevelCellBase InTarget)
         {
             Destroy(gameObject, DeleteAfterTime);
         }

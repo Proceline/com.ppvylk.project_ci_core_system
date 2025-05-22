@@ -26,7 +26,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         UnitData m_UnitData;
 
         UnitBattleState m_CurrentState;
-        BasicUnitAbility m_CurrentAbility;
+        UnitAbilityCore m_CurrentAbility;
 
         int m_CurrentMovementPoints;
         int m_CurrentAbilityPoints;
@@ -236,7 +236,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_CurrentAbilityPoints;
         }
 
-        public UnitAbilityPlayerData GetUnitAbilityPlayerData(BasicUnitAbility InAbility)
+        public UnitAbilityPlayerData GetUnitAbilityPlayerData(UnitAbilityCore InAbility)
         {
             UnitAbilityPlayerData SelectedPlayerData = new UnitAbilityPlayerData();
 
@@ -295,7 +295,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             if (GetCurrentState() == UnitBattleState.UsingAbility)
             {
-                BasicUnitAbility ability = GetCurrentAbility();
+                UnitAbilityCore ability = GetCurrentAbility();
                 if (ability)
                 {
                     List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
@@ -327,7 +327,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return new List<UnitAbilityPlayerData>(m_UnitData.m_Abilities);
         }
 
-        public BasicUnitAbility GetCurrentAbility()
+        public UnitAbilityCore GetCurrentAbility()
         {
             return m_CurrentAbility;
         }
@@ -340,7 +340,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void SetupAbility(BasicUnitAbility InAbility)
+        public void SetupAbility(UnitAbilityCore InAbility)
         {
             if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
@@ -378,7 +378,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void ExecuteAbility(BasicUnitAbility InAbility, LevelCellBase InCell)
+        public void ExecuteAbility(UnitAbilityCore InAbility, LevelCellBase InCell)
         {
             if (!IsMoving())
             {

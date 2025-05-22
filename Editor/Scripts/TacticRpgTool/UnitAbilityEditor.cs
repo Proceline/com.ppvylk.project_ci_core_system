@@ -7,7 +7,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(BasicUnitAbility))]
+    [CustomEditor(typeof(UnitAbilityCore))]
     [CanEditMultipleObjects]
     public class UnitAbilityEditor : Editor
     {

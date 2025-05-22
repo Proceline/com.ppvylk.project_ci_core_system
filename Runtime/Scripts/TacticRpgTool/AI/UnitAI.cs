@@ -50,7 +50,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             // Do ability.
                             if (abilityIndex >= 0)
                             {
-                                BasicUnitAbility selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
+                                UnitAbilityCore selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
                                 if (selectedAbility)
                                 {
                                     List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
@@ -180,7 +180,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             if ( InAbilityIndex != -1 )
             {
-                BasicUnitAbility SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
+                UnitAbilityCore SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
                 List<LevelCellBase> CellsAroundUnitToAttack = SelectedAbility.GetShape().GetCellList(InTarget, InTarget.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
 
                 //If you can attack from where you are, do so.

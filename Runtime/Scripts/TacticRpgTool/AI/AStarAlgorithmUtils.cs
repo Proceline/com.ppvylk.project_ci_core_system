@@ -329,7 +329,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             OnComplete.Invoke();
         }
         
-        public static IEnumerator ExecuteAbility(GridPawnUnit InCaster, LevelCellBase InTarget, BasicUnitAbility InAbility)
+        public static IEnumerator ExecuteAbility(GridPawnUnit InCaster, LevelCellBase InTarget, UnitAbilityCore InAbility)
         {
             if(InCaster)
             {
