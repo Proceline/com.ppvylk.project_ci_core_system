@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(HexagonGrid))]
+    [CustomEditor(typeof(HexagonPresetGrid))]
     [CanEditMultipleObjects]
     public class HexagonLevelGridEditor : Editor
     {

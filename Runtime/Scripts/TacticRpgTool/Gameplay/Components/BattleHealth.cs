@@ -76,6 +76,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components
             m_MaxMagicalArmor = m_MagicalArmor;
         }
 
+        public virtual void ReceiveDamageValue(int damage)
+        {
+            
+        }
+
         public void Damage(int InDamage)
         {
             OnHit.Invoke();

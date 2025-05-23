@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 {
-    public class HexagonGrid : LevelGridBase
+    public class HexagonPresetGrid : LevelGridBase
     {
         protected override void SetupAdjacencies(LevelCellBase InCell)
         {

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
     [CreateAssetMenu(fileName = "NewSpawnObjectParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create SpawnObjectAbilityParam", order = 1)]
-    public class SpawnObjParam : AbilityParam
+    public class SpawnObjParam : AbilityParamBase
     {
         public GameObject m_Object;
         public Vector3 m_Offset;

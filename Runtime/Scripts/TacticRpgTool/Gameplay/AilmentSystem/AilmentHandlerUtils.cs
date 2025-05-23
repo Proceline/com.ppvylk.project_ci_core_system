@@ -148,7 +148,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 
         static void HandleAilmentExecution(GridPawnUnit InUnit, AilmentExecutionInfo InAilmentExecution)
         {
-            foreach (AbilityParam abilityParam in InAilmentExecution.m_Params)
+            foreach (AbilityParamBase abilityParam in InAilmentExecution.m_Params)
             {
                 abilityParam.ApplyTo(null, InUnit);
             }
@@ -174,7 +174,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             GridPawnUnit unitOnCell = InCell.GetUnitOnCell();
             if(unitOnCell)
             {
-                foreach (AbilityParam abilityParam in InAilmentExecution.m_Params)
+                foreach (AbilityParamBase abilityParam in InAilmentExecution.m_Params)
                 {
                     abilityParam.ApplyTo(null, unitOnCell);
                 }

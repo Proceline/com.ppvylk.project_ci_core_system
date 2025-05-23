@@ -5,7 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
     [CreateAssetMenu(fileName = "NewPushParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create PushAbilityParam", order = 1)]
-    public class PushAbilityParam : AbilityParam
+    public class PushAbilityParam : AbilityParamBase
     {
         public int m_Distance;
 

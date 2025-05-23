@@ -58,7 +58,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         AbilityParticle[] m_SpawnOnTarget;
 
         [SerializeField]
-        AbilityParam[] m_Params;
+        AbilityParamBase[] m_Params;
 
         [SerializeField]
         Ailment[] m_Ailments;
@@ -134,9 +134,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return new List<AbilityParticle>(m_SpawnOnTarget);
         }
 
-        public List<AbilityParam> GetParameters()
+        public List<AbilityParamBase> GetParameters()
         {
-            return new List<AbilityParam>(m_Params);
+            return new List<AbilityParamBase>(m_Params);
         }
 
         public List<Ailment> GetAilments()
@@ -333,7 +333,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
             }
 
-            foreach (AbilityParam param in m_Params)
+            foreach (AbilityParamBase param in m_Params)
             {
                 if (targetObj)
                 {

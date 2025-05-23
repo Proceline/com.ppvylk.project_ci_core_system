@@ -8,7 +8,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
     public struct AilmentExecutionInfo
     {
         public AbilityParticle[] m_SpawnOnReciever;
-        public AbilityParam[] m_Params;
+        public AbilityParamBase[] m_Params;
         public AudioClip m_AudioClip;
     }
 

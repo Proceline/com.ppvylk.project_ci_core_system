@@ -3,7 +3,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
-    public class AbilityParam : ScriptableObject
+    public abstract class AbilityParamBase : ScriptableObject
     {
         public virtual void ApplyTo(GridPawnUnit InCaster, GridObject InObject)
         {
