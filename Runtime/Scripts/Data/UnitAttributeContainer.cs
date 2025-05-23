@@ -8,28 +8,15 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
     {
         private UnitDiscreteResource _health;
         private UnitDiscreteResource _stamina;
-        
+
+        public UnitDiscreteResource Health => _health;
+        public UnitDiscreteResource Stamina => _stamina;
 
         // Base attributes
         private Dictionary<AttributeType, int> _baseAttributes = new Dictionary<AttributeType, int>();
 
         // Accumulated modifiers for each attribute type
         private Dictionary<AttributeType, AttributeModifiers> _attributeModifiers = new Dictionary<AttributeType, AttributeModifiers>();
-
-        public void ReceiveDamageValue(int damage)
-        {
-            _health.ModifyValue(-damage);
-        }
-
-        public void ReceiveHealValue(int heal)
-        {
-            _health.ModifyValue(heal);
-        }
-
-        public void AdjustStaminaValue(int stamina)
-        {
-            _stamina.ModifyValue(stamina);
-        }
 
         // Get final attribute value (including all modifiers)
         public int GetAttributeValue(AttributeType type)

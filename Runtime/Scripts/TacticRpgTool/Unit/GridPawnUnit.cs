@@ -36,7 +36,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         bool m_bIsAttacking = false;
         bool m_bActivated = false;
 
-        bool m_bIsDead = false;
+        protected bool m_bIsDead = false;
 
         UnityEvent OnMovementComplete = new UnityEvent();
 
@@ -46,19 +46,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreMovementAnimRequired;
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
-
-        public override void Initalize()
-        {
-            base.Initalize();
-
-            BattleHealth healthComp = gameObject.AddComponent<BattleHealth>();
-            if (healthComp)
-            {
-                healthComp.OnHealthDepleted.AddListener(Kill);
-                healthComp.OnHit.AddListener(HandleHit);
-                healthComp.OnHeal.AddListener(HandleHeal);
-            }
-        }
 
         public override void PostInitalize()
         {
@@ -136,17 +123,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region Setters
 
-        public void SetUnitData(UnitData InUnitData)
+        public virtual void SetUnitData(UnitData InUnitData)
         {
             m_UnitData = InUnitData;
-
-            BattleHealth health = GetComponent<BattleHealth>();
-            if(health)
-            {
-                health.SetHealth(m_UnitData.m_Health);
-                health.SetArmor(m_UnitData.m_Armor);
-                health.SetMagicArmor(m_UnitData.m_MagicalArmor);
-            }
         }
 
         public void SetActivated(bool bInNewActivateState)
@@ -696,53 +675,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             OnMovementComplete.Invoke();
         }
 
-        public void Kill()
-        {
-            CleanUp();
-
-            if ( m_CurrentCell )
-            {
-                m_CurrentCell.SetObjectOnCell(null);
-                m_CurrentCell = null;
-            }
-
-            m_bIsDead = true;
-
-            SetVisible( false );
-
-            CheckCellVisibility();
-
-            HandleDeath();
-
-            AudioClip clip = GetUnitData().m_DeathSound;
-            if (clip)
-            {
-                AudioPlayData audioData = new AudioPlayData(clip);
-                AudioHandler.PlayAudio(audioData, gameObject.transform.position);
-            }
-
-            if (TacticBattleManager.IsActionBeingPerformed())
-            {
-                TacticBattleManager.BindToOnFinishedPerformedActions(DestroyObj);
-            }
-            else
-            {
-                DestroyObj();
-            }
-        }
-
         protected virtual void HandleDeath()
         {
             TacticBattleManager.HandleUnitDeath(this);
         }
 
-        void DestroyObj()
+        protected virtual void DestroyObj()
         {
             TacticBattleManager.UnBindFromOnFinishedPerformedActions(DestroyObj);
             Destroy(gameObject);
         }
 
-        protected virtual void HandleHit()
+        public virtual void HandleHit()
         {
             bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
             if ( !IsMoving() || bShowHitAnimationOnMove )
@@ -753,7 +697,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             PlayDamagedAudio();
         }
 
-        protected virtual void HandleHeal()
+        public virtual void HandleHeal()
         {
             OnPreHealAnimRequired?.Invoke();
 
