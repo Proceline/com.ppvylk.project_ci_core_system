@@ -9,8 +9,10 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
         private UnitDiscreteResource _health;
         private UnitDiscreteResource _stamina;
 
-        public UnitDiscreteResource Health => _health;
-        public UnitDiscreteResource Stamina => _stamina;
+        public UnitDiscreteResource Health 
+            => _health ?? (_health = new UnitDiscreteResource(0, 0));
+        public UnitDiscreteResource Stamina 
+            => _stamina ?? (_stamina = new UnitDiscreteResource(0, 0));
 
         // Base attributes
         private Dictionary<AttributeType, int> _baseAttributes = new Dictionary<AttributeType, int>();
