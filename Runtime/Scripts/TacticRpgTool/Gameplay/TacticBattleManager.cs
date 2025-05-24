@@ -396,7 +396,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return null;
         }
 
-        public static GridPawnUnit SpawnUnit(UnitData InUnitData, BattleTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+        public static GridPawnUnit SpawnUnit<T>(GameObject prefab, SoUnitData unitData, BattleTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+            where T : GridPawnUnit
         {
             LevelCellBase cell = sInstance.LevelGrid[InIndex];
 
@@ -405,20 +406,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 cell.SetVisible(true);
             }
 
-            GridPawnUnit SpawnedGridUnit;
-
-            if (InUnitData.m_UnitClass == "")
-            {
-                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent<GridPawnUnit>();
-            }
-            else
-            {
-                System.Type classType = GameUtils.FindType(InUnitData.m_UnitClass);
-                SpawnedGridUnit = Instantiate(InUnitData.m_Model).AddComponent(classType) as GridPawnUnit;
-            }
+            GridPawnUnit SpawnedGridUnit = Instantiate(prefab).AddComponent<T>();
 
             SpawnedGridUnit.Initalize();
-            SpawnedGridUnit.SetUnitData(InUnitData);
+            SpawnedGridUnit.SetUnitData(unitData);
             SpawnedGridUnit.SetTeam(InTeam);
             SpawnedGridUnit.SetGrid(sInstance.LevelGrid);
             SpawnedGridUnit.SetCurrentCell(cell);

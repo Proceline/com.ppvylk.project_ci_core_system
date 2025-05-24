@@ -4,14 +4,15 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
-    [CreateAssetMenu(fileName = "NewSpawnUnitParam", menuName = "ProjectCI Tools/Ability/Parameters/ Create SpawnUnitParam", order = 1)]
-    public class SpawnUnitParam : AbilityParamBase
+    public abstract class SpawnUnitParam<T> : AbilityParamBase where T : GridPawnUnit
     {
-        public UnitData m_UnitToSpawn;
+        public SoUnitData m_UnitToSpawn;
+        public GameObject m_UnitPrefab;
 
         public override void ApplyTo(GridPawnUnit InCaster, LevelCellBase InCell)
         {
-            GridPawnUnit SpawnedUnit = TacticBattleManager.SpawnUnit(m_UnitToSpawn, InCaster.GetTeam(), InCell.GetIndex());
+            GridPawnUnit SpawnedUnit = TacticBattleManager.SpawnUnit<T>(m_UnitPrefab, 
+                m_UnitToSpawn, InCaster.GetTeam(), InCell.GetIndex());
             SpawnedUnit.HandleTurnStarted();
         }
 

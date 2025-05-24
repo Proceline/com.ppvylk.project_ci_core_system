@@ -39,7 +39,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         int InternalGetDistance(PathFindingNode InPathNode)
         {
             int count = 0;
-            if(InPathNode.Parent != null)
+            if (InPathNode.Parent != null)
             {
                 count += InternalGetDistance(InPathNode.Parent);
             }

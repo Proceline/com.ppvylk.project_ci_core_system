@@ -28,7 +28,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         }
     }
 
-
     public struct AIRadiusInfo
     {
         public LevelCellBase StartCell;
@@ -49,7 +48,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         }
     }
 
-    public static class AStarAlgorithmUtils
+    public class AStarAlgorithmUtils : Object
     {
         static float m_CellWaitTime = 0.0f;
         static float m_MovementSpeed = 9.0f;
@@ -86,7 +85,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
                 if (CurrNode.Cell == InPathInfo.TargetCell)
                 {
-                    //Found node
+                    // Found node
                     PathFindingNode reverseNode = CurrNode;
                     while (reverseNode != null)
                     {
@@ -111,7 +110,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         continue;
                     }
 
-                    if(NewPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
+                    if (NewPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
                     {
                         continue;
                     }
@@ -121,9 +120,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         continue;
                     }
 
-                    if(InPathInfo.AllowedCells != null)
+                    if (InPathInfo.AllowedCells != null)
                     {
-                        if(!InPathInfo.AllowedCells.Contains(NewPathFindNode.Cell))
+                        if (!InPathInfo.AllowedCells.Contains(NewPathFindNode.Cell))
                         {
                             continue;
                         }
@@ -207,9 +206,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         continue;
                     }
 
-                    if(InRadiusInfo.bStopAtBlockedCell)
+                    if (InRadiusInfo.bStopAtBlockedCell)
                     {
-                        if( !AllowCellInRadius(NewPathFindNode.Cell, InRadiusInfo) )
+                        if (!AllowCellInRadius(NewPathFindNode.Cell, InRadiusInfo))
                         {
                             continue;
                         }
@@ -233,12 +232,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 }
             }
 
-            if(!InRadiusInfo.bStopAtBlockedCell)
+            if (!InRadiusInfo.bStopAtBlockedCell)
             {
                 List<LevelCellBase> CellsToRemove = new List<LevelCellBase>();
                 foreach (LevelCellBase cell in outPath)
                 {
-                    if( !AllowCellInRadius(cell, InRadiusInfo) )
+                    if (!AllowCellInRadius(cell, InRadiusInfo))
                     {
                         CellsToRemove.Add(cell);
                     }
@@ -283,7 +282,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     return false;
                 }
 
-                if(InRadiusInfo.Caster != null)
+                if (InRadiusInfo.Caster != null)
                 {
                     BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
                     if (ObjAffinity == BattleTeam.Friendly && InRadiusInfo.EffectedTeam == BattleTeam.Hostile)
@@ -318,7 +317,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 if (AIUnit && !AIUnit.IsDead())
                 {
                     UnitAIComponent AIComponent = AIUnit.GetComponent<UnitAIComponent>();
-                    if(AIComponent)
+                    if (AIComponent)
                     {
                         IEnumerator RunOnUnitEnum = AIComponent.GetAIData().RunOnUnit(AIUnit);
                         yield return TacticBattleManager.Get().StartCoroutine(RunOnUnitEnum);
@@ -328,10 +327,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             OnComplete.Invoke();
         }
-        
+
         public static IEnumerator ExecuteAbility(GridPawnUnit InCaster, LevelCellBase InTarget, UnitAbilityCore InAbility)
         {
-            if(InCaster)
+            if (InCaster)
             {
                 InCaster.ExecuteAbility(InAbility, InTarget);
                 yield return new WaitForSeconds(InAbility.CalculateAbilityTime(InCaster));
@@ -349,32 +348,35 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return new PathFindingNode(InCurrent, InParent, gCost, hCost);
         }
+
         static int AStarCalculateG(LevelCellBase InCurrent, PathFindingNode InParent, AIPathInfo InPathInfo)
         {
             int weight = 0;
-            if(InPathInfo.bTakeWeightIntoAccount)
+            if (InPathInfo.bTakeWeightIntoAccount)
             {
                 weight = InCurrent.GetWeightInfo().Weight;
             }
 
             return 1 + (InParent != null ? InParent.G : 0) + weight;
         }
+
         static int AStarDistance(LevelCellBase InStart, LevelCellBase InDest)
         {
             return (int)(InStart.GetIndex() - InDest.GetIndex()).SqrMagnitude();
         }
+
         static PathFindingNode AStarGetLowestFScore(List<PathFindingNode> InSet)
         {
             PathFindingNode LowestF = null;
             foreach (PathFindingNode CurrItem in InSet)
             {
-                if(LowestF == null)
+                if (LowestF == null)
                 {
                     LowestF = CurrItem;
                     continue;
                 }
 
-                if(CurrItem.GetFScore() < LowestF.GetFScore())
+                if (CurrItem.GetFScore() < LowestF.GetFScore())
                 {
                     LowestF = CurrItem;
                 }
@@ -382,12 +384,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return LowestF;
         }
+
         static List<PathFindingNode> AStarUpdateList(List<PathFindingNode> InSet, PathFindingNode InReplaceNode)
         {
             List<PathFindingNode> UpdatedSet = InSet;
 
             int Index = UpdatedSet.IndexOf(InReplaceNode);
-            if(Index != -1)
+            if (Index != -1)
             {
                 UpdatedSet[Index] = InReplaceNode;
             }
@@ -403,6 +406,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         {
             return 1 + (InParent != null ? InParent.G : 0);
         }
+
         static List<PathFindingNode> DijUpdateList(List<PathFindingNode> InSet, PathFindingNode InReplaceNode)
         {
             List<PathFindingNode> UpdatedSet = InSet;
@@ -415,6 +419,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return UpdatedSet;
         }
+
         static PathFindingNode DijGetLowestGScore(List<PathFindingNode> InSet)
         {
             PathFindingNode LowestG = null;

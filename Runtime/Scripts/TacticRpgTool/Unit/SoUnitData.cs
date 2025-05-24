@@ -18,10 +18,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     }
 
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
-    public class UnitData : ScriptableObject
+    public class SoUnitData : ScriptableObject
     {
         public string m_UnitName;
-        public GameObject m_Model;
 
         [SerializeField]
         public string m_UnitClass;

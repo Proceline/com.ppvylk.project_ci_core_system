@@ -23,7 +23,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
     public class GridPawnUnit : GridObject
     {
-        UnitData m_UnitData;
+        SoUnitData m_UnitData;
 
         UnitBattleState m_CurrentState;
         UnitAbilityCore m_CurrentAbility;
@@ -123,7 +123,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region Setters
 
-        public virtual void SetUnitData(UnitData InUnitData)
+        public virtual void SetUnitData(SoUnitData InUnitData)
         {
             m_UnitData = InUnitData;
         }
@@ -149,7 +149,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region Getters
 
-        public UnitData GetUnitData()
+        public SoUnitData GetUnitData()
         {
             return m_UnitData;
         }

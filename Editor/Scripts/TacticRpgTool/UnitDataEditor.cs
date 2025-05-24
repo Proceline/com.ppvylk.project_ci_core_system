@@ -7,7 +7,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(UnitData))]
+    [CustomEditor(typeof(SoUnitData))]
     [CanEditMultipleObjects]
     public class UnitDataEditor : Editor
     {
@@ -33,7 +33,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
         void DrawUnitClassPopup()
         {
-            UnitData unitData = target as UnitData;
+            SoUnitData unitData = target as SoUnitData;
             if(unitData)
             {
                 EditorUtils.DrawClassPopup<GridPawnUnit>(ref unitData.m_UnitClass);

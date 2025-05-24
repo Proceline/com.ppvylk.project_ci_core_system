@@ -11,98 +11,47 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
     public static class GridBattleUtils
     {
         /// <summary>
-        /// Scan ground with raycasts in a hexagon grid pattern
+        /// 生成六边形格点的RaycastHit信息（不生成Cell，仅采集地面碰撞点）
         /// </summary>
-        /// <param name="center">Center position of the scan area</param>
-        /// <param name="hexWidth">Width of each hexagon cell</param>
-        /// <param name="hexHeight">Height of each hexagon cell</param>
-        /// <param name="radiusWidth">Width of the hexagon grid</param>
-        /// <param name="radiusHeight">Height of the hexagon grid</param>
-        /// <param name="maxDistance">Maximum raycast distance</param>
-        /// <param name="layerMask">Layer mask for raycast</param>
-        /// <param name="useEllipseBoundary">Use ellipse boundary instead of square boundary</param>
-        /// <returns>Dictionary with grid positions as keys and hit points as values</returns>
-        public static Dictionary<Vector2, Vector3> ScanHexagonGroundGrid(
+        /// <param name="center">扫描中心点</param>
+        /// <param name="cellSize">单个六边形格子的尺寸（x=宽，z=高）</param>
+        /// <param name="gridSize">网格尺寸（x=列数，y=行数）</param>
+        /// <param name="maxDistance">射线最大距离</param>
+        /// <param name="layerMask">射线检测层</param>
+        /// <returns>字典，key为格子坐标(x, y)，value为RaycastHit</returns>
+        public static Dictionary<Vector2Int, RaycastHit> ScanHexGridRaycastHits(
             Vector3 center,
-            float hexWidth,
-            float hexHeight,
-            int radiusWidth,
-            int radiusHeight,
+            Vector3 cellSize,
+            Vector2Int gridSize,
             float maxDistance = 100f,
-            LayerMask layerMask = default,
-            bool useEllipseBoundary = false)
+            LayerMask layerMask = default)
         {
-            Dictionary<Vector2, Vector3> hitPoints = new Dictionary<Vector2, Vector3>();
+            Dictionary<Vector2Int, RaycastHit> hitResults = new Dictionary<Vector2Int, RaycastHit>();
 
-            for (int q = -radiusWidth; q <= radiusWidth; q++)
+            for (int y = 0; y < gridSize.y; y++)
             {
-                for (int r = -radiusHeight; r <= radiusHeight; r++)
+                float offset = 0;
+                if (y % 2 == 0)
                 {
-                    // 椭圆形边界判断（默认不用）
-                    if (useEllipseBoundary)
-                    {
-                        float normQ = (float)q / radiusWidth;
-                        float normR = (float)r / radiusHeight;
-                        if (normQ * normQ + normR * normR > 1f)
-                            continue;
-                    }
+                    offset = cellSize.x * 0.5f;
+                }
 
-                    Vector3 pos = HexToWorld(center, q, r, hexWidth, hexHeight);
-                    Ray ray = new Ray(pos, Vector3.down);
-#if UNITY_EDITOR
-                    Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.magenta, 2f);
-#endif
+                float finalY = y * cellSize.z * 0.75f;
+
+                for (int x = 0; x < gridSize.x; x++)
+                {
+                    float finalX = x * cellSize.x + offset;
+                    Vector3 worldPos = center + new Vector3(finalX, 0.0f, -finalY);
+
+                    Ray ray = new Ray(worldPos, Vector3.down);
                     if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
                     {
-                        hitPoints[new Vector2(q, r)] = hit.point;
+                        hitResults[new Vector2Int(x, y)] = hit;
                     }
                 }
             }
-            return hitPoints;
-        }
 
-        /// <summary>
-        /// 六边形轴坐标转世界坐标
-        /// </summary>
-        private static Vector3 HexToWorld(Vector3 center, int q, int r, float hexWidth, float hexHeight)
-        {
-            float x = hexWidth * (q + r / 2f);
-            float z = hexHeight * r * 0.75f;
-            return center + new Vector3(x, 0, z);
-        }
-
-        /// <summary>
-        /// Creates hexagon cell objects based on the hit points returned by ScanHexagonGroundGrid.
-        /// </summary>
-        /// <param name="hitPoints">Dictionary with grid positions as keys and hit points as values</param>
-        /// <param name="hexWidth">Width of each hexagon cell</param>
-        /// <param name="hexHeight">Height of each hexagon cell</param>
-        /// <param name="parent">Optional parent transform for the created cells</param>
-        /// <param name="prefab">Optional prefab to instantiate for each cell</param>
-        /// <returns>List of created hexagon cell GameObjects</returns>
-        public static List<GameObject> CreateHexagonCellsFromHits(Dictionary<Vector2, Vector3> hitPoints, float hexWidth, float hexHeight, Transform parent = null, GameObject prefab = null)
-        {
-            List<GameObject> cells = new List<GameObject>();
-            foreach (var hit in hitPoints)
-            {
-                GameObject cell;
-                if (prefab != null)
-                {
-                    cell = Object.Instantiate(prefab, hit.Value, Quaternion.identity);
-                }
-                else
-                {
-                    cell = new GameObject($"HexCell_{hit.Key.x}_{hit.Key.y}");
-                    cell.transform.position = hit.Value;
-                    cell.transform.localScale = new Vector3(hexWidth, 0.1f, hexHeight);
-                }
-                if (parent != null)
-                {
-                    cell.transform.SetParent(parent);
-                }
-                cells.Add(cell);
-            }
-            return cells;
+            return hitResults;
         }
 
         /// <summary>
@@ -137,13 +86,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 return null;
             }
 
-            // 2. 扫描地形获取碰撞点
-            var hitPoints = ScanHexagonGroundGrid(
+            var hitPoints = ScanHexGridRaycastHits(
                 scanCenter,
-                hexWidth,
-                hexHeight,
-                gridSize.x,
-                gridSize.y,
+                new Vector3(hexWidth, 0, hexHeight),
+                gridSize,
                 100f,
                 groundLayer
             );
@@ -160,7 +106,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             // 5. 为每个碰撞点创建网格
             foreach (var hit in hitPoints)
             {
-                var cell =levelGrid.GenerateCell(hit.Value, hit.Key);
+                var cell = levelGrid.GenerateCell(hit.Value.point, hit.Key);
                 cell.Reset();
             }
 
@@ -173,7 +119,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         private static GridPawnUnit SetupBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
-            UnitData InUnitData,
+            SoUnitData InUnitData,
             BattleTeam InTeam,
             LevelCellBase cell) where T : GridPawnUnit
         {
@@ -194,7 +140,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         public static GridPawnUnit ChangeUnitToBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
-            UnitData InUnitData,
+            SoUnitData InUnitData,
             BattleTeam InTeam,
             float searchRadius,
             LayerMask cellLayer,
