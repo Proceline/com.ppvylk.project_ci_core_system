@@ -50,7 +50,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             // Do ability.
                             if (abilityIndex >= 0)
                             {
-                                UnitAbilityCore selectedAbility = InAIUnit.GetAbilities()[abilityIndex].unitAbility;
+                                UnitAbilityCore selectedAbility = InAIUnit.GetAbilities()[abilityIndex];
                                 if (selectedAbility)
                                 {
                                     List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
@@ -143,14 +143,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             if (InAIUnit)
             {
                 int allowedAP = InAIUnit.GetCurrentAbilityPoints();
-                List<UnitAbilityPlayerData> abilities = InAIUnit.GetAbilities();
+                List<UnitAbilityCore> abilities = InAIUnit.GetAbilities();
                 if (abilities.Count > 0)
                 {
                     for (int i = 0; i < abilities.Count; i++)
                     {
-                        if (abilities[i].unitAbility && abilities[i].unitAbility.GetEffectedTeam() == BattleTeam.Hostile)
+                        if (abilities[i] && abilities[i].GetEffectedTeam() == BattleTeam.Hostile)
                         {
-                            if (abilities[i].unitAbility.GetActionPointCost() <= allowedAP)
+                            if (abilities[i].GetActionPointCost() <= allowedAP)
                             {
                                 return i;
                             }
@@ -169,7 +169,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 return InAIUnit.GetCell();
             }
 
-            List<UnitAbilityPlayerData> AIUnitAbilities = InAIUnit.GetAbilities();
+            List<UnitAbilityCore> AIUnitAbilities = InAIUnit.GetAbilities();
             if (AIUnitAbilities.Count < 0)
             {
                 return InAIUnit.GetCell();
@@ -180,7 +180,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             if ( InAbilityIndex != -1 )
             {
-                UnitAbilityCore SelectedAbility = AIUnitAbilities[InAbilityIndex].unitAbility;
+                UnitAbilityCore SelectedAbility = AIUnitAbilities[InAbilityIndex];
                 List<LevelCellBase> CellsAroundUnitToAttack = SelectedAbility.GetShape().GetCellList(InTarget, InTarget.GetCell(), SelectedAbility.GetRadius(), SelectedAbility.DoesAllowBlocked(), SelectedAbility.GetEffectedTeam());
 
                 //If you can attack from where you are, do so.

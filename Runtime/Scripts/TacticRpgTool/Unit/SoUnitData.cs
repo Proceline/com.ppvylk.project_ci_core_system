@@ -3,20 +3,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
-    [System.Serializable]
-    public struct UnitAbilityPlayerData
-    {
-        public UnitAbilityCore unitAbility;
-
-        public AnimationClip AssociatedAnimation;
-
-        public float ExecuteAfterTime;
-
-        public AudioClip AudioOnStart;
-
-        public AudioClip AudioOnExecute;
-    }
-
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
     public class SoUnitData : ScriptableObject
     {
@@ -46,9 +32,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [Space(5)]
 
         public AbilityShape m_MovementShape;
-
-        [Header("Ability")]
-        public UnitAbilityPlayerData[] m_Abilities;
 
         [Space(5)]
 

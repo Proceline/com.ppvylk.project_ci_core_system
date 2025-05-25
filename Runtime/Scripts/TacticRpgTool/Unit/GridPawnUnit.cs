@@ -42,6 +42,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
 
+        private List<UnitAbilityCore> _loadedAbilities = new List<UnitAbilityCore>();
+
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
         public event Action OnPreHitAnimRequired;
@@ -126,6 +128,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public virtual void SetUnitData(SoUnitData InUnitData)
         {
             m_UnitData = InUnitData;
+        }
+
+        public void SetAbilities(List<UnitAbilityCore> InAbilities)
+        {
+            _loadedAbilities = InAbilities;
         }
 
         public void SetActivated(bool bInNewActivateState)
@@ -215,22 +222,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_CurrentAbilityPoints;
         }
 
-        public UnitAbilityPlayerData GetUnitAbilityPlayerData(UnitAbilityCore InAbility)
-        {
-            UnitAbilityPlayerData SelectedPlayerData = new UnitAbilityPlayerData();
-
-            foreach (UnitAbilityPlayerData abilityData in GetUnitData().m_Abilities)
-            {
-                if (abilityData.unitAbility == InAbility)
-                {
-                    SelectedPlayerData = abilityData;
-                    break;
-                }
-            }
-
-            return SelectedPlayerData;
-        }
-
         public Vector3 GetCellAllignPos(LevelCellBase InCell)
         {
             if(InCell)
@@ -268,6 +259,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region AbilityStuff
 
+        public List<UnitAbilityCore> GetAbilities() => _loadedAbilities;
+
         public List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
@@ -301,11 +294,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return outCells;
         }
 
-        public List<UnitAbilityPlayerData> GetAbilities()
-        {
-            return new List<UnitAbilityPlayerData>(m_UnitData.m_Abilities);
-        }
-
         public UnitAbilityCore GetCurrentAbility()
         {
             return m_CurrentAbility;
@@ -313,9 +301,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void SetupAbility(int abilityIndex)
         {
-            if(abilityIndex < m_UnitData.m_Abilities.Length)
+            if(abilityIndex < _loadedAbilities.Count)
             {
-                SetupAbility(m_UnitData.m_Abilities[abilityIndex].unitAbility);
+                SetupAbility(_loadedAbilities[abilityIndex]);
             }
         }
 

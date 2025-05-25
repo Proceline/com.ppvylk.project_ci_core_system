@@ -121,11 +121,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LevelGridBase InGrid,
             SoUnitData InUnitData,
             BattleTeam InTeam,
+            List<UnitAbilityCore> InAbilities,
             LevelCellBase cell) where T : GridPawnUnit
         {
             GridPawnUnit SpawnedGridUnit = originPawn.AddComponent<T>();
             SpawnedGridUnit.Initalize();
             SpawnedGridUnit.SetUnitData(InUnitData);
+            SpawnedGridUnit.SetAbilities(InAbilities);
             SpawnedGridUnit.SetTeam(InTeam);
             SpawnedGridUnit.SetGrid(InGrid);
             SpawnedGridUnit.SetCurrentCell(cell);
@@ -142,6 +144,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LevelGridBase InGrid,
             SoUnitData InUnitData,
             BattleTeam InTeam,
+            List<UnitAbilityCore> InAbilities,
             float searchRadius,
             LayerMask cellLayer,
             CompassDir InStartDirection = CompassDir.S)
@@ -164,7 +167,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 cell.SetVisible(true);
             }
 
-            GridPawnUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
+            GridPawnUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, InAbilities, cell);
 
             LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
             if (DirCell)

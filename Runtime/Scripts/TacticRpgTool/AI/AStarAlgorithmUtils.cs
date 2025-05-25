@@ -333,7 +333,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             if (InCaster)
             {
                 InCaster.ExecuteAbility(InAbility, InTarget);
-                yield return new WaitForSeconds(InAbility.CalculateAbilityTime(InCaster));
+                yield return new WaitForSeconds(InAbility.CalculateAbilityTime(InCaster, InTarget));
             }
         }
 

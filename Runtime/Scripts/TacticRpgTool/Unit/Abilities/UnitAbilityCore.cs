@@ -66,6 +66,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [SerializeField]
         private UnitAbilityAnimation m_Animation;
 
+        public AudioClip audioOnStart;
+
+        public AudioClip audioOnExecute;
+
         void Reset()
         {
             m_bAllowBlocked = false;
@@ -261,25 +265,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     TacticBattleManager.AddActionBeingPerformed();
 
                     InCasterUnit.RemoveAbilityPoints(m_ActionPointCost);
-
-                    UnitAbilityPlayerData SelectedPlayerData = InCasterUnit.GetUnitAbilityPlayerData(this);
-
                     m_Animation?.PlayAnimation(InCasterUnit);
 
-                    AudioClip startAudioClip = SelectedPlayerData.AudioOnStart;
-                    if( startAudioClip )
+                    if(audioOnStart != null)
                     {
-                        AudioPlayData audioData = new AudioPlayData(startAudioClip);
+                        AudioPlayData audioData = new AudioPlayData(audioOnStart);
                         AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
                     }
 
                     float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
                     yield return Awaitable.WaitForSecondsAsync(firstExecuteTime);
 
-                    AudioClip executeAudioClip = SelectedPlayerData.AudioOnExecute;
-                    if ( executeAudioClip )
+                    if (audioOnExecute != null)
                     {
-                        AudioPlayData audioData = new AudioPlayData(executeAudioClip);
+                        AudioPlayData audioData = new AudioPlayData(audioOnExecute);
                         AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
                     }
 
@@ -361,10 +360,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public float CalculateAbilityTime(GridPawnUnit InUnit)
+        public float CalculateAbilityTime(GridPawnUnit InUnit, LevelCellBase InTarget)
         {
-            UnitAbilityPlayerData SelectedPlayerData = InUnit.GetUnitAbilityPlayerData(this);
-            return SelectedPlayerData.AssociatedAnimation ? SelectedPlayerData.AssociatedAnimation.length : 0;
+            return m_Animation ? m_Animation.GetAnimationLength() : 0.5f;
         }
     }
 }
