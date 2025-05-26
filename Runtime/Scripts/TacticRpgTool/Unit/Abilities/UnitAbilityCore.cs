@@ -250,7 +250,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return AbilityCells;
         }
 
-        public virtual IEnumerator Execute(GridPawnUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
+        public async Awaitable Execute(GridPawnUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
         {
             if( GetShape() )
             {
@@ -279,7 +279,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     }
 
                     float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
-                    yield return Awaitable.WaitForSecondsAsync(firstExecuteTime);
+                    await Awaitable.WaitForSecondsAsync(firstExecuteTime);
 
                     if (audioOnExecute != null)
                     {
@@ -297,7 +297,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         float timeRemaining = m_Animation.GetAnimationLength() - firstExecuteTime;
                         timeRemaining = Mathf.Max(0, timeRemaining);
 
-                        yield return Awaitable.WaitForSecondsAsync(timeRemaining);
+                        await Awaitable.WaitForSecondsAsync(timeRemaining);
                     }
 
                     TacticBattleManager.RemoveActionBeingPerformed();
@@ -307,7 +307,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             OnComplete?.Invoke();
         }
 
-        void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
+        private void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
         {
             GridObject targetObj = InEffectCell.GetObjectOnCell();
             GridPawnUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();

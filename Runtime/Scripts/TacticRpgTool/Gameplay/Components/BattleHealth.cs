@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components
@@ -6,13 +7,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components
     public abstract class BattleHealth : MonoBehaviour
     {
         [HideInInspector]
-        public UnityEvent OnDamageReceived = new UnityEvent();
-
-        [HideInInspector]
-        public UnityEvent OnHealReceived = new UnityEvent();
+        public UnityEvent OnHitPreReceived = new UnityEvent();
         
         [HideInInspector]
-        public UnityEvent OnHealthDepleted = new UnityEvent();
+        public UnityEvent OnDefensePreReceived = new UnityEvent();
+        
+        [HideInInspector]
+        public UnityEvent OnDodgePreReceived = new UnityEvent();
+
+        [HideInInspector]
+        public UnityEvent OnHealPreReceived = new UnityEvent();
+        
+        [HideInInspector]
+        public UnityEvent OnHealthPreDepleted = new UnityEvent();
+
+        public event Action<int> OnPostHitReceived;
+        public event Action<int> OnPostDefenseReceived;
+        public event Action<int> OnPostDodgeReceived;
+        public event Action<int> OnPostHealReceived;
 
         public abstract int GetHealth();
 
@@ -24,14 +36,44 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components
 
         public abstract void SetMaxHealth(int InMaxHealth);
 
-        public virtual void Damage(int InDamage)
+        public virtual void ReceiveHitDamage(int InDamage)
         {
-            OnDamageReceived?.Invoke();
+            OnHitPreReceived?.Invoke();
+        }
+
+        public virtual void ReactToDefense(int InDefense)
+        {
+            OnDefensePreReceived?.Invoke();
+        }
+
+        public virtual void ReactToDodge(int InDodge)
+        {
+            OnDodgePreReceived?.Invoke();
         }
 
         public virtual void Heal(int InHeal)
         {
-            OnHealReceived?.Invoke();
+            OnHealPreReceived?.Invoke();
+        }
+
+        protected void CallPostHitReceived(int InDamage)
+        {
+            OnPostHitReceived?.Invoke(InDamage);
+        }
+
+        protected void CallPostDefenseReceived(int InDefense)
+        {
+            OnPostDefenseReceived?.Invoke(InDefense);
+        }
+
+        protected void CallPostDodgeReceived(int InDodge)
+        {
+            OnPostDodgeReceived?.Invoke(InDodge);
+        }
+
+        protected void CallPostHealReceived(int InHeal)
+        {
+            OnPostHealReceived?.Invoke(InHeal);
         }
     }
 }

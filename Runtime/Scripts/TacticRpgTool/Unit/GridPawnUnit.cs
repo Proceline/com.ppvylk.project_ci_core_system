@@ -49,6 +49,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
 
+        public virtual UnitAbilityCore GetEquippedAbility()
+        {
+            if (m_CurrentAbility)
+            {
+                return m_CurrentAbility;
+            }
+
+            return _loadedAbilities.Count > 0 ? _loadedAbilities[0] : null;
+        }
+
         public override void PostInitalize()
         {
             GetCell().HandleVisibilityChanged();
@@ -333,7 +343,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void ExecuteAbility(LevelCellBase InCell)
         {
-            if( m_CurrentAbility )
+            if (m_CurrentAbility)
             {
                 ExecuteAbility(m_CurrentAbility, InCell);
                 m_CurrentAbility = null;
@@ -341,6 +351,22 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             else
             {
                 CleanUp();
+                HandleAbilityFinished();
+            }
+        }
+
+        public async Awaitable ExecuteAbilityCoroutine(LevelCellBase InCell)
+        {
+            CleanUp();
+            UnitAbilityCore equippedAbility = GetEquippedAbility();
+            if (equippedAbility && !IsMoving())
+            {
+                UnityEvent OnAbilityComplete = new UnityEvent();
+                OnAbilityComplete.AddListener(HandleAbilityFinished);
+                await equippedAbility.Execute(this, InCell, OnAbilityComplete);
+            }
+            else
+            {
                 HandleAbilityFinished();
             }
         }
@@ -638,7 +664,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             m_CurrentAbilityPoints = m_UnitData.m_AbilityPoints;
         }
 
-        void HandleAbilityFinished()
+        private void HandleAbilityFinished()
         {
             m_bIsAttacking = false;
 
@@ -670,10 +696,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             Destroy(gameObject);
         }
 
-        public virtual void HandleHit()
+        protected void HandleHit()
         {
             bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
-            if ( !IsMoving() || bShowHitAnimationOnMove )
+            if (!IsMoving() || bShowHitAnimationOnMove)
             {
                 OnPreHitAnimRequired?.Invoke();
             }

@@ -56,7 +56,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
                 BattleHealth hpComp = m_CurrUnit.GetComponent<BattleHealth>();
                 if ( hpComp )
                 {
-                    hpComp.OnHealthDepleted.RemoveListener( HandleUnitDeath );
+                    hpComp.OnHealthPreDepleted.RemoveListener( HandleUnitDeath );
                 }
             }
 
@@ -67,7 +67,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
                 BattleHealth hpComp = m_CurrUnit.GetComponent<BattleHealth>();
                 if ( hpComp )
                 {
-                    hpComp.OnHealthDepleted.AddListener( HandleUnitDeath );
+                    hpComp.OnHealthPreDepleted.AddListener( HandleUnitDeath );
                 }
             }
 

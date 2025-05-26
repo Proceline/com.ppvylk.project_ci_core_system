@@ -29,11 +29,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             // Do nothing
         }
 
-        public virtual void OnClicked()
-        {
-            // Do nothing
-        }
-
         public virtual void OnHover()
         {
             // Do nothing
