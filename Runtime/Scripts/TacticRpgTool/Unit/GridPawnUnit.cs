@@ -11,6 +11,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 using System;
+using ProjectCI.CoreSystem.Runtime.Attributes;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
@@ -24,6 +25,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     public class GridPawnUnit : GridObject
     {
         SoUnitData m_UnitData;
+        private UnitAttributeContainer _runtimeAttributes;
 
         UnitBattleState m_CurrentState;
         UnitAbilityCore m_CurrentAbility;
@@ -48,6 +50,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreMovementAnimRequired;
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
+
+        public UnitAttributeContainer RuntimeAttributes 
+        { 
+            get => _runtimeAttributes; 
+            protected set => _runtimeAttributes = value; 
+        }
 
         public virtual UnitAbilityCore GetEquippedAbility()
         {
