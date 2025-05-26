@@ -38,7 +38,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         protected bool m_bIsDead = false;
 
-        UnityEvent OnMovementComplete = new UnityEvent();
+        UnityEvent OnMovementPostComplete = new UnityEvent();
 
         List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
 
@@ -111,14 +111,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region Events
 
-        public void BindToOnMovementComplete(UnityAction InAction)
+        public void BindToOnMovementPostCompleted(UnityAction InAction)
         {
-            OnMovementComplete.AddListener(InAction);
+            OnMovementPostComplete.AddListener(InAction);
         }
 
-        public void UnBindFromOnMovementComplete(UnityAction InAction)
+        public void UnBindFromOnMovementPostCompleted(UnityAction InAction)
         {
-            OnMovementComplete.RemoveListener(InAction);
+            OnMovementPostComplete.RemoveListener(InAction);
         }
 
         #endregion
@@ -410,12 +410,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             TacticBattleManager.Get().UpdateHoverCells();
         }
 
-        public bool ExecuteMovement(LevelCellBase TargetCell, UnityEvent InOnMovementComplete)
+        public bool ExecuteMovement(LevelCellBase TargetCell)
         {
             if (IsMoving())
             {
                 return false;
             }
+            
+            UnityEvent onMovementPreCompleted = new UnityEvent();
 
             if (!m_UnitData.m_MovementShape || !TargetCell)
             {
@@ -433,19 +435,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            InOnMovementComplete.AddListener(HandleMovementFinished);
-            TraverseTo(TargetCell, InOnMovementComplete, abilityCells);
+            onMovementPreCompleted.AddListener(HandleTraversePreFinished);
+            TraverseTo(TargetCell, onMovementPreCompleted, abilityCells);
 
             TacticBattleManager.CheckWinConditions();
 
             CleanUp();
             return true;
-        }
-
-        public bool ExecuteMovement(LevelCellBase TargetCell)
-        {
-            UnityEvent OnMovementComplete = new UnityEvent();
-            return ExecuteMovement(TargetCell, OnMovementComplete);
         }
 
         public async void TraverseTo(LevelCellBase InTargetCell, 
@@ -653,14 +649,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        void HandleMovementFinished()
+        private void HandleTraversePreFinished()
         {
             if ( TacticBattleManager.IsPlaying() && !IsDead() )
             {
                 SetupMovement();
             }
 
-            OnMovementComplete.Invoke();
+            OnMovementPostComplete.Invoke();
         }
 
         protected virtual void HandleDeath()

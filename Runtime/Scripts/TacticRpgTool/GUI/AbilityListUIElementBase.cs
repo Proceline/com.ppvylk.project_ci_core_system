@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
 {
@@ -12,10 +13,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
     public class AbilityListUIElementBase : MonoBehaviour
     {
         [NonSerialized]
-        private GridPawnUnit m_SelectedUnit;
+        protected GridPawnUnit m_SelectedUnit;
 
         [SerializeField]
-        private Canvas uiContainer;
+        protected Canvas uiContainer;
 
         [SerializeField]
         private Transform listContainer;
@@ -34,7 +35,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             UpdateRotation();
         }
 
-        public void InitializeUI(Camera InUICamera)
+        public virtual void InitializeUI(Camera InUICamera)
         {
             UpdateRotation();
             m_UICamera = InUICamera;
@@ -57,20 +58,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             TacticBattleManager.Get().OnUnitSelected.RemoveListener(HandleUnitSelected);
         }
 
-        public void HandleUnitSelected(GridPawnUnit InUnit)
+        private void HandleUnitSelected(GridPawnUnit InUnit)
         {
             if(InUnit)
             {
-                uiContainer.gameObject.SetActive(true);
                 m_SelectedUnit = InUnit;
                 SetupAbilityList();
+                HandleUnitPostSelected(true);
             }
             else
             {
                 ClearAbilityList();
+                HandleUnitPostSelected(false);
                 m_SelectedUnit = null;
-                uiContainer.gameObject.SetActive(false);
             }
+        }
+
+        protected virtual void HandleUnitPostSelected(bool bIsSelected)
+        {
+            // Do nothing
         }
 
         private void SetupAbilityList()
@@ -96,9 +102,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
 
                 if (ability)
                 {
-                    abilityUI.gameObject.SetActive(true);
-                    abilityUI.SetOwner(this);
-                    abilityUI.SetAbility(ability, i);
+                    SetupAbilitySlot(abilityUI, ability, i);
                 }
                 else
                 {
@@ -112,17 +116,30 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             }
         }
 
+        protected virtual void SetupAbilitySlot(SlotDataUIElementBase slot, 
+            UnitAbilityCore ability, int InIndex)
+        {
+            slot.gameObject.SetActive(true);
+            slot.SetOwner(this);
+            slot.SetAbility(ability, InIndex);
+        }
+
         private void ClearAbilityList()
         {
             foreach (SlotDataUIElementBase abilityUI in m_UIAbilities)
             {
                 if (abilityUI)
                 {
-                    abilityUI.SetOwner(this);
-                    abilityUI.ClearAbility();
-                    abilityUI.gameObject.SetActive(false);
+                    ClearAbilitySlot(abilityUI);
                 }
             }
+        }
+
+        protected virtual void ClearAbilitySlot(SlotDataUIElementBase slot)
+        {
+            slot.SetOwner(this);
+            slot.ClearAbility();
+            slot.gameObject.SetActive(false);
         }
 
         public void HandleAbilitySelected(int InIndex)
