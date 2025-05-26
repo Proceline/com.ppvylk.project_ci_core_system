@@ -2,6 +2,7 @@
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
+using UnityEngine.InputSystem;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 {
@@ -37,11 +38,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             return m_TurnNumber;
         }
 
-        public void InitalizeRules()
+        public virtual void InitalizeRules()
         {
             m_TurnNumber = 0;
             m_CurrentTeam = BattleTeam.All;
-            Init();
+            StartGame();
         }
 
         public GameplayData GetGameplayData()
@@ -49,8 +50,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             return m_GameplayData;
         }
 
-        protected abstract void Init();
-        
         protected abstract void StartGame();
 
         public void EndTurn()
@@ -122,5 +121,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         {
             
         }
+
+        public abstract void CancelActionExtension(InputAction.CallbackContext context);
+
     }
 }

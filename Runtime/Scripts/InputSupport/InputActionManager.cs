@@ -20,6 +20,7 @@ namespace ProjectCI.CoreSystem.Runtime.InputSupport
         [SerializeField] private InputActionReference m_SkillAction;        // 技能
         [SerializeField] private InputActionReference m_EndTurnAction;      // 结束回合
 
+
         [Header("UI")]
         [SerializeField] private InputActionReference m_MenuAction;         // 打开菜单
         [SerializeField] private InputActionReference m_UnitInfoAction;     // 查看单位信息

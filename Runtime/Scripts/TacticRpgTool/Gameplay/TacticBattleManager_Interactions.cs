@@ -15,12 +15,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         {
             m_InputActionManager.BindConfirmAction(HandleConfirmAction);
             m_InputActionManager.BindCancelAction(HandleCancelAction);
+            if (m_GameRules)
+            {
+                m_InputActionManager.BindCancelAction(m_GameRules.CancelActionExtension);
+            }
         }
 
         private void UnregisterControlActions()
         {
             m_InputActionManager.UnbindConfirmAction(HandleConfirmAction);
             m_InputActionManager.UnbindCancelAction(HandleCancelAction);
+            if (m_GameRules)
+            {
+                m_InputActionManager.UnbindCancelAction(m_GameRules.CancelActionExtension);
+            }
         }
 
         private void HandleConfirmAction(InputAction.CallbackContext context)
