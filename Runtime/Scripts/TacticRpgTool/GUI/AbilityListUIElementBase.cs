@@ -21,10 +21,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
         private Transform listContainer;
 
         [SerializeField]
-        private AbilityDataUIElementBase abilityUIElementPrefab;
+        private SlotDataUIElementBase abilityUIElementPrefab;
 
-        private readonly List<AbilityDataUIElementBase> m_UIAbilities = 
-            new List<AbilityDataUIElementBase>();
+        private readonly List<SlotDataUIElementBase> m_UIAbilities = 
+            new List<SlotDataUIElementBase>();
 
         [NonSerialized]
         private Camera m_UICamera;
@@ -114,7 +114,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
 
         private void ClearAbilityList()
         {
-            foreach (AbilityDataUIElementBase abilityUI in m_UIAbilities)
+            foreach (SlotDataUIElementBase abilityUI in m_UIAbilities)
             {
                 if (abilityUI)
                 {

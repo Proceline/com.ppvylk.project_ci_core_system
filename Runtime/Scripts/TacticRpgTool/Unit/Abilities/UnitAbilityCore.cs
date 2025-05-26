@@ -70,6 +70,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public AudioClip audioOnExecute;
 
+        [SerializeField]
+        private int m_StaminaCost;
+
+        public int StaminaCost => m_StaminaCost;
+
         void Reset()
         {
             m_bAllowBlocked = false;
