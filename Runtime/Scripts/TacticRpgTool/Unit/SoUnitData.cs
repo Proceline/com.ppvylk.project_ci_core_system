@@ -1,8 +1,17 @@
 ﻿using UnityEngine;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
+using ProjectCI.CoreSystem.Runtime.Attributes;
+using System;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
+    [Serializable]
+    public struct AttributeValuePair
+    {
+        public AttributeType m_AttributeType;
+        public int m_Value;
+    }
+
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
     public class SoUnitData : ScriptableObject
     {
@@ -10,6 +19,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         [SerializeField]
         public string m_UnitClass;
+
+        [SerializeField]
+        public AttributeValuePair[] originalAttributes;
 
         [Space(5)]
 
@@ -47,8 +59,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         [Header("Health")]
         public int m_Health;
-        public int m_Armor;
-        public int m_MagicalArmor;
 
         void Reset()
         {
