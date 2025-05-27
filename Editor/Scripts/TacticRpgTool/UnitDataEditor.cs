@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using System.Linq;
+using ProjectCI.CoreSystem.Runtime.Attributes;
 
 namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
@@ -14,10 +15,32 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
     {
         private SerializedProperty attributesProperty;
         private bool showAttributes = true;
+        private int selectedAttributeTypeIndex = 0;
+        private AttributeTypeDefinition attributeTypeDefinition;
+        private string[] attributeTypeNames = new string[0];
 
         private void OnEnable()
         {
             attributesProperty = serializedObject.FindProperty("originalAttributes");
+            LoadAttributeTypeDefinition();
+        }
+
+        private void LoadAttributeTypeDefinition()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:AttributeTypeDefinition");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                attributeTypeDefinition = AssetDatabase.LoadAssetAtPath<AttributeTypeDefinition>(path);
+                if (attributeTypeDefinition != null)
+                {
+                    attributeTypeNames = attributeTypeDefinition.AttributeTypeNames.ToArray();
+                }
+            }
+            else
+            {
+                attributeTypeNames = new string[] { "None" };
+            }
         }
 
         void DrawUnitClassPopup()
@@ -36,27 +59,60 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             
-            // Draw current attributes
+            // Draw each element in one line, fill the box
             if (attributesProperty != null)
             {
-                EditorGUILayout.PropertyField(attributesProperty, true);
+                for (int i = 0; i < attributesProperty.arraySize; i++)
+                {
+                    var element = attributesProperty.GetArrayElementAtIndex(i);
+                    var typeProp = element.FindPropertyRelative("m_AttributeType");
+                    var valueProp = element.FindPropertyRelative("m_Value");
+                    var gainValueProp = element.FindPropertyRelative("m_GainValue");
+
+                    // 获取类型索引
+                    int typeIndex = -1;
+                    if (typeProp != null)
+                    {
+                        var typeValueProp = typeProp.FindPropertyRelative("value");
+                        if (typeValueProp != null && typeValueProp.propertyType == SerializedPropertyType.Integer)
+                        {
+                            typeIndex = typeValueProp.intValue;
+                        }
+                    }
+
+                    EditorGUILayout.BeginHorizontal();
+                    // Attribute type display (read-only, auto width)
+                    string typeName = (typeIndex >= 0 && typeIndex < attributeTypeNames.Length)
+                        ? attributeTypeNames[typeIndex]
+                        : "Unknown";
+                    EditorGUILayout.LabelField(typeName, GUILayout.ExpandWidth(true));
+                    // Value field (editable, auto width)
+                    if (valueProp != null)
+                    {
+                        valueProp.intValue = EditorGUILayout.IntField(valueProp.intValue, GUILayout.ExpandWidth(true));
+                    }
+                    // GainValue field (editable, auto width)
+                    if (gainValueProp != null)
+                    {
+                        gainValueProp.intValue = EditorGUILayout.IntField(gainValueProp.intValue, GUILayout.ExpandWidth(true));
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
             }
 
             EditorGUILayout.Space(10);
 
-            // Add/Remove buttons
+            // Add/Remove buttons with attribute type selector
             EditorGUILayout.BeginHorizontal();
-            
+            selectedAttributeTypeIndex = EditorGUILayout.Popup(selectedAttributeTypeIndex, attributeTypeNames, GUILayout.Width(150));
             if (GUILayout.Button("Add New Attribute"))
             {
                 AddNewAttribute();
             }
-            
-            if (GUILayout.Button("Remove Last Attribute"))
+            if (GUILayout.Button("Remove Selected Attribute"))
             {
-                RemoveLastAttribute();
+                RemoveSelectedAttribute();
             }
-            
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndVertical();
@@ -64,57 +120,50 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
         private void AddNewAttribute()
         {
-            // Get all SoUnitData assets
-            var allUnitData = AssetDatabase.FindAssets("t:SoUnitData")
-                .Select(guid => AssetDatabase.LoadAssetAtPath<SoUnitData>(AssetDatabase.GUIDToAssetPath(guid)))
-                .Where(data => data != null)
-                .ToList();
-
-            // Add new attribute to all assets
-            foreach (var unitData in allUnitData)
+            // 只操作当前对象
+            var prop = attributesProperty;
+            prop.arraySize++;
+            var newElement = prop.GetArrayElementAtIndex(prop.arraySize - 1);
+            // Initialize new attribute with selected type
+            var typeProp = newElement.FindPropertyRelative("m_AttributeType");
+            var valueProp = newElement.FindPropertyRelative("m_Value");
+            var gainValueProp = newElement.FindPropertyRelative("m_GainValue");
+            if (typeProp != null)
             {
-                var so = new SerializedObject(unitData);
-                var prop = so.FindProperty("originalAttributes");
-                
-                prop.arraySize++;
-                var newElement = prop.GetArrayElementAtIndex(prop.arraySize - 1);
-                
-                // Initialize new attribute with default values
-                var typeProp = newElement.FindPropertyRelative("type");
-                var valueProp = newElement.FindPropertyRelative("value");
-                
-                if (typeProp != null) typeProp.enumValueIndex = 0;
-                if (valueProp != null) valueProp.floatValue = 0f;
-                
-                so.ApplyModifiedProperties();
+                var typeValueProp = typeProp.FindPropertyRelative("value");
+                if (typeValueProp != null && typeValueProp.propertyType == SerializedPropertyType.Integer)
+                    typeValueProp.intValue = selectedAttributeTypeIndex;
             }
-
-            // Refresh the current editor
-            serializedObject.Update();
+            if (valueProp != null) valueProp.intValue = 0;
+            if (gainValueProp != null) gainValueProp.intValue = 0;
+            serializedObject.ApplyModifiedProperties();
         }
 
-        private void RemoveLastAttribute()
+        private void RemoveSelectedAttribute()
         {
-            // Get all SoUnitData assets
-            var allUnitData = AssetDatabase.FindAssets("t:SoUnitData")
-                .Select(guid => AssetDatabase.LoadAssetAtPath<SoUnitData>(AssetDatabase.GUIDToAssetPath(guid)))
-                .Where(data => data != null)
-                .ToList();
-
-            // Remove last attribute from all assets
-            foreach (var unitData in allUnitData)
+            // 只操作当前对象
+            var prop = attributesProperty;
+            // 查找第一个匹配的类型并删除
+            for (int i = 0; i < prop.arraySize; i++)
             {
-                var so = new SerializedObject(unitData);
-                var prop = so.FindProperty("originalAttributes");
-                
-                if (prop.arraySize > 0)
+                var element = prop.GetArrayElementAtIndex(i);
+                var typeProp = element.FindPropertyRelative("m_AttributeType");
+                int typeIndex = -1;
+                if (typeProp != null)
                 {
-                    prop.arraySize--;
-                    so.ApplyModifiedProperties();
+                    var typeValueProp = typeProp.FindPropertyRelative("value");
+                    if (typeValueProp != null && typeValueProp.propertyType == SerializedPropertyType.Integer)
+                    {
+                        typeIndex = typeValueProp.intValue;
+                    }
+                }
+                if (typeIndex == selectedAttributeTypeIndex)
+                {
+                    prop.DeleteArrayElementAtIndex(i);
+                    serializedObject.ApplyModifiedProperties();
+                    break; // 只删第一个
                 }
             }
-
-            // Refresh the current editor
             serializedObject.Update();
         }
 

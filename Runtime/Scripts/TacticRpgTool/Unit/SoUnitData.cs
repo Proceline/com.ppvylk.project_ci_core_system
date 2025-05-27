@@ -10,6 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     {
         public AttributeType m_AttributeType;
         public int m_Value;
+        public int m_GainValue;
     }
 
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "ProjectCI Tools/Create UnitData", order = 1)]
