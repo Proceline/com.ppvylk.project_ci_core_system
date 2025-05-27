@@ -10,7 +10,7 @@ namespace ProjectCI.CoreSystem.Runtime.Interfaces
         /// <summary>
         /// Gets the unique identifier of the object
         /// </summary>
-        Guid ID { get; }
+        string ID { get; }
 
         /// <summary>
         /// Generates a new unique identifier for the object

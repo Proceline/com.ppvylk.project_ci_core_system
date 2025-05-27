@@ -26,6 +26,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     {
         SoUnitData m_UnitData;
         private UnitAttributeContainer _runtimeAttributes;
+        private UnitAttributeContainer _simulatedAttributes;
 
         UnitBattleState m_CurrentState;
         UnitAbilityCore m_CurrentAbility;
@@ -51,10 +52,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
 
+        public string ID => name;
+
         public UnitAttributeContainer RuntimeAttributes 
         { 
             get => _runtimeAttributes; 
             protected set => _runtimeAttributes = value; 
+        }
+
+        public UnitAttributeContainer SimulatedAttributes 
+        { 
+            get => _simulatedAttributes; 
+            protected set => _simulatedAttributes = value; 
         }
 
         public virtual UnitAbilityCore GetEquippedAbility()
@@ -704,7 +713,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             Destroy(gameObject);
         }
 
-        protected void HandleHit()
+        protected void PlayHitVisualResult()
         {
             bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
             if (!IsMoving() || bShowHitAnimationOnMove)
@@ -715,7 +724,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             PlayDamagedAudio();
         }
 
-        public virtual void HandleHeal()
+        protected void PlayHealVisualResult()
         {
             OnPreHealAnimRequired?.Invoke();
 

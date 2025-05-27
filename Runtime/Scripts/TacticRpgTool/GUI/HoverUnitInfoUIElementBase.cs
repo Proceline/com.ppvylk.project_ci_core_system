@@ -16,17 +16,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
         public Text m_UnitName;
 
         [Space(5)]
-
-        public Text m_HealthText;
-        public Text m_ArmorText;
-        public Text m_MagicArmorText;
         public Text m_APText;
 
         [Space(5)]
-
-        public Slider m_HealthSlider;
-        public Slider m_ArmorSlider;
-        public Slider m_MagicArmorSlider;
         public Slider m_APSlider;
 
         GridPawnUnit m_CurrUnit = null;
@@ -95,13 +87,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
 
                 float APPercentage = ( (float)CurrAbilityPoints ) / ( (float)TotalAbilityPoints );
                 m_APSlider.value = APPercentage;
-
-                BattleHealth healthComp = m_CurrUnit.GetComponent<BattleHealth>();
-                if(healthComp)
-                {
-                    m_HealthText.text = healthComp.GetHealth().ToString();
-                    m_HealthSlider.value = healthComp.GetHealthPercentage();
-                }
             }
             else
             {

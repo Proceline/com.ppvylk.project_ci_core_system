@@ -2,6 +2,7 @@
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.Commands;
+using ProjectCI.CoreSystem.Runtime.Attributes;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
@@ -17,7 +18,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 
         }
 
-        public virtual void Execute(GridPawnUnit InCaster, GridPawnUnit InTarget, ref List<CommandResult> results)
+        public virtual void Execute(string abilityId, UnitAttributeContainer FromContainer, string FromUnitId,
+            UnitAttributeContainer ToContainer, string ToUnitId, LevelCellBase ToCell, List<CommandResult> results)
         {
             // Do nothing by default
         }

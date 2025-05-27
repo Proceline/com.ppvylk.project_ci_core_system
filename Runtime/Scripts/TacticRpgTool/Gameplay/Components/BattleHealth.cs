@@ -21,59 +21,30 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components
         [HideInInspector]
         public UnityEvent OnHealthPreDepleted = new UnityEvent();
 
-        public event Action<int> OnPostHitReceived;
-        public event Action<int> OnPostDefenseReceived;
-        public event Action<int> OnPostDodgeReceived;
-        public event Action<int> OnPostHealReceived;
-
-        public abstract int GetHealth();
-
-        public abstract int GetMaxHealth();
-
-        public abstract float GetHealthPercentage();
-
         public abstract void SetHealth(int InHealth);
 
         public abstract void SetMaxHealth(int InMaxHealth);
 
-        public virtual void ReceiveHitDamage(int InDamage)
+        public abstract void ReceiveHealthDamage(int InDamage);
+
+        public virtual void ReceiveHitDamage()
         {
             OnHitPreReceived?.Invoke();
         }
 
-        public virtual void ReactToDefense(int InDefense)
+        public virtual void ReactToDefense()
         {
             OnDefensePreReceived?.Invoke();
         }
 
-        public virtual void ReactToDodge(int InDodge)
+        public virtual void ReactToDodge()
         {
             OnDodgePreReceived?.Invoke();
         }
 
-        public virtual void Heal(int InHeal)
+        public virtual void Heal()
         {
             OnHealPreReceived?.Invoke();
-        }
-
-        protected void CallPostHitReceived(int InDamage)
-        {
-            OnPostHitReceived?.Invoke(InDamage);
-        }
-
-        protected void CallPostDefenseReceived(int InDefense)
-        {
-            OnPostDefenseReceived?.Invoke(InDefense);
-        }
-
-        protected void CallPostDodgeReceived(int InDodge)
-        {
-            OnPostDodgeReceived?.Invoke(InDodge);
-        }
-
-        protected void CallPostHealReceived(int InHeal)
-        {
-            OnPostHealReceived?.Invoke(InHeal);
         }
     }
 }

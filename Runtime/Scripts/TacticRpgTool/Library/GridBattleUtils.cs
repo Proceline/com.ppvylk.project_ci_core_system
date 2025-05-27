@@ -5,6 +5,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -116,7 +117,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             return levelGrid;
         }
 
-        private static GridPawnUnit SetupBattleUnit<T>(
+        private static T SetupBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
             SoUnitData InUnitData,
@@ -124,7 +125,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             List<UnitAbilityCore> InAbilities,
             LevelCellBase cell) where T : GridPawnUnit
         {
-            GridPawnUnit SpawnedGridUnit = originPawn.AddComponent<T>();
+            T SpawnedGridUnit = originPawn.AddComponent<T>();
             SpawnedGridUnit.Initalize();
             SpawnedGridUnit.SetUnitData(InUnitData);
             SpawnedGridUnit.SetAbilities(InAbilities);
@@ -136,10 +137,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             return SpawnedGridUnit;
         }
 
+        public static T AddResourceContainerToUnit<T>(GridPawnUnit InUnit, GameObject resourceContainerPrefab)
+            where T : BattleHealth
+        {
+            return InUnit.gameObject.AddComponent<T>();
+        }
+
         /// <summary>
         /// 自动根据originPawn的位置查找最近未被占用的cell并生成战斗单位
         /// </summary>
-        public static GridPawnUnit ChangeUnitToBattleUnit<T>(
+        public static T ChangeUnitToBattleUnit<T>(
             GameObject originPawn,
             LevelGridBase InGrid,
             SoUnitData InUnitData,
@@ -167,7 +174,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 cell.SetVisible(true);
             }
 
-            GridPawnUnit SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, InAbilities, cell);
+            T SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, InAbilities, cell);
 
             LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
             if (DirCell)

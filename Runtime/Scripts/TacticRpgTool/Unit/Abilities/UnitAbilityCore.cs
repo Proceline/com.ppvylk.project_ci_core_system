@@ -8,6 +8,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
+using System;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
@@ -85,6 +86,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public string GetAbilityName()
         {
             return m_AbilityName;
+        }
+
+        // TODO: This should be unique for each ability
+        public string GetAbilityId(string unitId)
+        {
+            return unitId + "_" + name;
         }
 
         public Texture2D GetIcon()
@@ -307,6 +314,51 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             OnComplete?.Invoke();
         }
 
+        public async Awaitable ApplyResult(GridPawnUnit InCasterUnit, LevelCellBase target,
+            List<Action<GridPawnUnit, LevelCellBase>> InReacts, UnityEvent OnNonLogicalComplete = null)
+        {
+            if(GetShape())
+            {
+                InCasterUnit.LookAtCell(target);
+                TacticBattleManager.AddActionBeingPerformed();
+                
+                InCasterUnit.RemoveAbilityPoints(m_ActionPointCost);
+                m_Animation?.PlayAnimation(InCasterUnit);
+
+                if(audioOnStart != null)
+                {
+                    AudioPlayData audioData = new AudioPlayData(audioOnStart);
+                    AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
+                }
+
+                float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
+                await Awaitable.WaitForSecondsAsync(firstExecuteTime);
+
+                if (audioOnExecute != null)
+                {
+                    AudioPlayData audioData = new AudioPlayData(audioOnExecute);
+                    AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
+                }
+
+                foreach (Action<GridPawnUnit, LevelCellBase> react in InReacts)
+                {
+                    react?.Invoke(InCasterUnit, target);
+                }
+
+                if (m_Animation)
+                {
+                    float timeRemaining = m_Animation.GetAnimationLength() - firstExecuteTime;
+                    timeRemaining = Mathf.Max(0, timeRemaining);
+
+                    await Awaitable.WaitForSecondsAsync(timeRemaining);
+                }
+
+                TacticBattleManager.RemoveActionBeingPerformed();
+            }
+
+            OnNonLogicalComplete?.Invoke();
+        }
+
         private void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
         {
             GridObject targetObj = InEffectCell.GetObjectOnCell();
@@ -347,6 +399,57 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 param.ApplyTo(InCasterUnit, InEffectCell);
             }
 
+            foreach (Ailment ailment in m_Ailments)
+            {
+                if (ailment)
+                {
+                    if (targetExecuteUnit)
+                    {
+                        targetExecuteUnit.GetAilmentContainer().AddAilment(InCasterUnit, ailment);
+                    }
+
+                    CellAilment cellAilment = ailment as CellAilment;
+                    if (cellAilment)
+                    {
+                        InEffectCell.GetAilmentContainer().AddAilment(InCasterUnit, cellAilment, InEffectCell);
+                    }
+                }
+            }
+        }
+
+        public void ApplyVisualEffects(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
+        {
+            GridObject targetObj = InEffectCell.GetObjectOnCell();
+            GridPawnUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();
+
+            if (targetExecuteUnit)
+            {
+                targetExecuteUnit.LookAtCell(InCasterUnit.GetCell());
+            }
+
+            // Visual effects on caster
+            foreach (AbilityParticle abilityParticle in m_SpawnOnCaster)
+            {
+                Vector3 pos = InCasterUnit.GetCell().GetAllignPos(InCasterUnit);
+                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
+                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+            }
+
+            // Visual effects on target
+            foreach (AbilityParticle abilityParticle in m_SpawnOnTarget)
+            {
+                Vector3 pos = InEffectCell.gameObject.transform.position;
+
+                if (targetObj)
+                {
+                    pos = InEffectCell.GetAllignPos(targetObj);
+                }
+
+                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
+                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+            }
+
+            // TODO: Should be handled as visual effects
             foreach (Ailment ailment in m_Ailments)
             {
                 if (ailment)
