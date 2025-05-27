@@ -24,10 +24,7 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public string CommandType; // e.g. "Damage", "Heal"
         public int Value; // e.g. damage or heal amount
         public string ExtraInfo; // Optional, for custom info
-
-        public abstract Awaitable AnalyzeResult(GridPawnUnit owner, UnitAbilityCore ability,
-            LevelCellBase target,
-            List<Action<GridPawnUnit, LevelCellBase>> reactions);
+        
         public abstract void AddReaction(UnitAbilityCore ability, List<Action<GridPawnUnit, LevelCellBase>> reactions);
     }
 } 

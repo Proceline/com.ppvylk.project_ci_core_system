@@ -358,36 +358,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void ExecuteAbility(LevelCellBase InCell)
-        {
-            if (m_CurrentAbility)
-            {
-                ExecuteAbility(m_CurrentAbility, InCell);
-                m_CurrentAbility = null;
-            }
-            else
-            {
-                CleanUp();
-                HandleAbilityFinished();
-            }
-        }
-
-        public async Awaitable ExecuteAbilityCoroutine(LevelCellBase InCell)
-        {
-            CleanUp();
-            UnitAbilityCore equippedAbility = GetEquippedAbility();
-            if (equippedAbility && !IsMoving())
-            {
-                UnityEvent OnAbilityComplete = new UnityEvent();
-                OnAbilityComplete.AddListener(HandleAbilityFinished);
-                await equippedAbility.Execute(this, InCell, OnAbilityComplete);
-            }
-            else
-            {
-                HandleAbilityFinished();
-            }
-        }
-
+        // TODO: Deprecated
         public void ExecuteAbility(UnitAbilityCore InAbility, LevelCellBase InCell)
         {
             if (!IsMoving())
@@ -403,6 +374,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             CleanUp();
+        }
+
+        public async Awaitable ShowResult(UnitAbilityCore ability, LevelCellBase target,
+            List<Action<GridPawnUnit, LevelCellBase>> reactions)
+        {
+            m_bIsAttacking = true;
+            UnityEvent OnAbilityComplete = new UnityEvent();
+            OnAbilityComplete.AddListener(HandleAbilityFinished);
+
+            await ability.ApplyResult(this, target, reactions, OnAbilityComplete);
         }
 
         public void RemoveAbilityPoints(int InAbilityPoints)
@@ -507,9 +488,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 OnPreMovementAnimRequired?.Invoke();
 
                 TacticBattleManager.AddActionBeingPerformed();
-
                 List<LevelCellBase> cellPath = GetPathTo(InTargetCell, InAllowedCells);
-
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
                 int MovementCount = 0;
@@ -533,16 +512,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         }
                     }
 
-                    float TimeTo = 0;
+                    float timeSpent = 0;
                     Vector3 EndPos = cell.GetAllignPos(this);
-                    while (TimeTo < 1.5f)
+
+                    LookAtCell(cell);
+
+                    while (timeSpent < 1f && StartPos != EndPos)
                     {
-                        TimeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
-                        gameObject.transform.position = Vector3.MoveTowards(StartPos, EndPos, TimeTo);
-
-                        LookAtCell(cell);
-
-                        await Awaitable.WaitForSecondsAsync(0.00001f);
+                        await Awaitable.NextFrameAsync();
+                        timeSpent += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
+                        gameObject.transform.position = Vector3.Lerp(StartPos, EndPos, timeSpent);
                     }
 
                     gameObject.transform.position = EndPos;
@@ -556,7 +535,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         PlayTravelAudio();
                     }
 
-                    if ( IsDead() )
+                    if (IsDead())
                     {
                         break;
                     }

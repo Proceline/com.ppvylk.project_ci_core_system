@@ -18,13 +18,6 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         [NonSerialized]
         private UnitAbilityCore _runtimeAbility;
 
-        public override async Awaitable AnalyzeResult(GridPawnUnit owner, UnitAbilityCore ability,
-            LevelCellBase target,
-            List<Action<GridPawnUnit, LevelCellBase>> reactions)
-        {
-            await ability.ApplyResult(owner, target, reactions);
-        }
-
         public override void AddReaction(UnitAbilityCore ability, List<Action<GridPawnUnit, LevelCellBase>> reactions)
         {
             if (reactions == null)

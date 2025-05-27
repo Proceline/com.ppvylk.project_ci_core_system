@@ -51,7 +51,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
     public class AStarAlgorithmUtils : Object
     {
         static float m_CellWaitTime = 0.0f;
-        static float m_MovementSpeed = 9.0f;
+        public static float m_MovementSpeed = 3.0f;
 
         public static float GetWaitTime()
         {
