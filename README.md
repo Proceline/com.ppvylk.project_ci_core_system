@@ -1,4 +1,4 @@
-# My Unity Package
+# Project CI Core Functions
 
 This is a Unity package created to demonstrate how to structure and distribute a Git-based Unity package.
 
@@ -13,7 +13,7 @@ This is a Unity package created to demonstrate how to structure and distribute a
 Add the following line to your `Packages/manifest.json`:
 
 ```json
-"com.yourcompany.mypackage": "https://github.com/yourusername/MyUnityPackage.git"
+"com.yourcompany.mypackage": "https://github.com/Proceline/com.ppvylk.project_ci_core_system.git"
 ```
 
 ## License
