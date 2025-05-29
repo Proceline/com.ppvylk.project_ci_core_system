@@ -15,15 +15,17 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
             => _stamina ?? (_stamina = new UnitDiscreteResource(0, 0));
 
         // Base attributes
-        private Dictionary<AttributeType, int> _baseAttributes = new Dictionary<AttributeType, int>();
+        private Dictionary<AttributeType, int> _generalAttributes = new();
+        protected Dictionary<AttributeType, int> GeneralAttributes => _generalAttributes;
 
         // Accumulated modifiers for each attribute type
         private Dictionary<AttributeType, AttributeModifiers> _attributeModifiers = new Dictionary<AttributeType, AttributeModifiers>();
+        protected Dictionary<AttributeType, AttributeModifiers> AttributeModifiers => _attributeModifiers;
 
         // Get final attribute value (including all modifiers)
-        public int GetAttributeValue(AttributeType type)
+        public virtual int GetAttributeValue(AttributeType type)
         {
-            int baseValue = _baseAttributes.TryGetValue(type, out int value) ? value : 0;
+            int baseValue = _generalAttributes.TryGetValue(type, out int value) ? value : 0;
             
             if (_attributeModifiers.TryGetValue(type, out var modifiers))
             {
@@ -34,13 +36,13 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
         }
 
         // Set base attribute value
-        public void SetBaseAttribute(AttributeType type, int value)
+        public void SetGeneralAttribute(AttributeType type, int value)
         {
-            _baseAttributes[type] = value;
+            _generalAttributes[type] = value;
         }
 
         // Add attribute modifier
-        public void AddModifier(AttributeType type, AttributeModifier modifier)
+        public virtual void AddModifier(AttributeType type, AttributeModifier modifier)
         {
             if (!_attributeModifiers.ContainsKey(type))
             {
@@ -51,7 +53,7 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
         }
 
         // Clear all modifiers for a specific attribute type
-        public void ClearModifiers(AttributeType type)
+        public virtual void ClearModifiers(AttributeType type)
         {
             if (_attributeModifiers.ContainsKey(type))
             {
