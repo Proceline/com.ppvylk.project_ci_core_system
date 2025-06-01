@@ -1,6 +1,6 @@
 {
   "name": "com.ppvylk.project_ci_core_system",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "Project CI Core System",
   "description": "Including battle logic and others.",
   "unity": "6000.0",
