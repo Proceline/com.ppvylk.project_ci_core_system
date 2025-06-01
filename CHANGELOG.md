@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2025-05-31
+- Update the attribute container base
+
 ## [1.0.1] - 2025-05-29
 - Upgrade
 
