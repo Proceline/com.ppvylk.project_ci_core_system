@@ -1,6 +1,6 @@
 using System;
 
-namespace com.ppvylk.project_ci_core_system.ServiceLocator
+namespace ProjectCI.CoreSystem.Runtime.Services
 {
     /// <summary>
     /// Static class that provides global access to services

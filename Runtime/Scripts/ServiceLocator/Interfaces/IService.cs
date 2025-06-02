@@ -1,6 +1,6 @@
 using System;
 
-namespace com.ppvylk.project_ci_core_system.ServiceLocator
+namespace ProjectCI.CoreSystem.Runtime.Services
 {
     /// <summary>
     /// Base interface for all services
