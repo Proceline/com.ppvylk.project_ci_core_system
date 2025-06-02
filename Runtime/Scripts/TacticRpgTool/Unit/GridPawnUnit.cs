@@ -31,8 +31,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         UnitBattleState m_CurrentState;
         UnitAbilityCore m_CurrentAbility;
 
-        int m_CurrentMovementPoints;
-        int m_CurrentAbilityPoints;
+        protected int m_CurrentMovementPoints;
+        protected int m_CurrentAbilityPoints;
 
         bool m_bIsTarget = false;
         bool m_bIsMoving = false;
@@ -239,7 +239,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_bIsDead;
         }
 
-        public int GetCurrentMovementPoints()
+        public virtual int GetCurrentMovementPoints()
         {
             return m_CurrentMovementPoints;
         }
@@ -656,7 +656,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual void HandleTurnStarted()
         {
-            m_CurrentMovementPoints = m_UnitData.m_MovementPoints;
+            m_CurrentMovementPoints = 5;
             m_CurrentAbilityPoints = m_UnitData.m_AbilityPoints;
         }
 

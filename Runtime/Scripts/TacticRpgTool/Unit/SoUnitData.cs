@@ -53,13 +53,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [Space(5)]
 
         [Header("Points")]
-        public int m_MovementPoints;
         public int m_AbilityPoints;
-
-        [Space(5)]
-
-        [Header("Health")]
-        public int m_Health;
 
         void Reset()
         {
