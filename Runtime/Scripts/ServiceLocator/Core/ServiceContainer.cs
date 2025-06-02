@@ -26,7 +26,7 @@ namespace ProjectCI.CoreSystem.Runtime.Services
                 return false;
             }
 
-            var type = typeof(T);
+            var type = service.GetType();
             lock (_lock)
             {
                 if (_services.ContainsKey(type))
