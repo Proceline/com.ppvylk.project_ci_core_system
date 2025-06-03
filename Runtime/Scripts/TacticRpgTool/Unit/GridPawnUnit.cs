@@ -41,7 +41,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         protected bool m_bIsDead = false;
 
-        private UnityEvent OnMovementPostComplete = new UnityEvent();
+        protected UnityEvent OnMovementPostComplete = new UnityEvent();
 
         List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
 
