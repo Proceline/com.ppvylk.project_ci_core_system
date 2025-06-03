@@ -18,7 +18,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 
         }
 
-        public virtual void Execute(string abilityId, UnitAttributeContainer FromContainer, string FromUnitId,
+        public virtual void Execute(string resultId, string abilityId, UnitAttributeContainer FromContainer, string FromUnitId,
             UnitAttributeContainer ToContainer, string ToUnitId, LevelCellBase ToCell, List<CommandResult> results)
         {
             // Do nothing by default
