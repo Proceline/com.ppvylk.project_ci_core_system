@@ -41,7 +41,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         protected bool m_bIsDead = false;
 
-        UnityEvent OnMovementPostComplete = new UnityEvent();
+        private UnityEvent OnMovementPostComplete = new UnityEvent();
 
         List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
 
@@ -399,12 +399,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region MovementStuff
 
-        public List<LevelCellBase> GetAllowedMovementCells()
+        public virtual List<LevelCellBase> GetAllowedMovementCells()
         {
             return m_UnitData.m_MovementShape.GetCellList(this, GetCell(), m_CurrentMovementPoints, m_UnitData.m_bIsFlying);
         }
 
-        public void SetupMovement()
+        public virtual void SetupMovement()
         {
             if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
@@ -660,20 +660,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             m_CurrentAbilityPoints = m_UnitData.m_AbilityPoints;
         }
 
-        private void HandleAbilityFinished()
+        protected virtual void HandleAbilityFinished()
         {
             m_bIsAttacking = false;
 
             BattleTeam team = TacticBattleManager.GetUnitTeam(this);
-            if( TacticBattleManager.IsTeamHuman(team) && TacticBattleManager.IsPlaying() && !IsDead() )
+            if(TacticBattleManager.IsTeamHuman(team) && TacticBattleManager.IsPlaying() && !IsDead() )
             {
                 SetupMovement();
             }
         }
 
-        private void HandleTraversePreFinished()
+        protected virtual void HandleTraversePreFinished()
         {
-            if ( TacticBattleManager.IsPlaying() && !IsDead() )
+            if (TacticBattleManager.IsPlaying() && !IsDead())
             {
                 SetupMovement();
             }
