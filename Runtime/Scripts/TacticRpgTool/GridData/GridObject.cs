@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ProjectCI.CoreSystem.Runtime.Interfaces;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using UnityEngine;
@@ -14,8 +15,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         All
     }
 
-    public class GridObject : MonoBehaviour
+    public class GridObject : MonoBehaviour, IIdentifier
     {
+        public string ID { get; protected set; } = string.Empty;
+
         BattleTeam m_Team;
 
         Renderer m_ObjectRenderer;
@@ -29,6 +32,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         protected LevelCellBase m_CurrentCell;
 
         bool m_bVisible = true;
+
+        public virtual void GenerateNewID()
+        {
+            // Do nothing
+        }
 
         public virtual void Initalize()
         {

@@ -9,6 +9,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using System;
+using ProjectCI.CoreSystem.Runtime.Interfaces;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
@@ -20,8 +21,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     }
 
     [CreateAssetMenu(fileName = "NewAbility", menuName = "ProjectCI Tools/Ability/Create New Ability", order = 1)]
-    public class UnitAbilityCore : ScriptableObject
+    public class UnitAbilityCore : ScriptableObject, IIdentifier
     {
+        public string ID { get; private set; } = string.Empty;
+
         [SerializeField]
         string m_AbilityName;
 
@@ -71,10 +74,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public AudioClip audioOnExecute;
 
-        [SerializeField]
-        private int m_StaminaCost;
-
-        public int StaminaCost => m_StaminaCost;
+        public int[] additionalParameters;
 
         void Reset()
         {
@@ -88,10 +88,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_AbilityName;
         }
 
-        // TODO: This should be unique for each ability
-        public string GetAbilityId(string unitId)
+        public void GenerateNewID()
         {
-            return unitId + "_" + name;
+            ID = Guid.NewGuid().ToString();
         }
 
         public Texture2D GetIcon()
