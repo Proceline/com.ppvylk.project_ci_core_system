@@ -24,7 +24,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         AbilityConfirming
     }
 
-    public class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
+    public abstract class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
     {
         SoUnitData m_UnitData;
         private UnitAttributeContainer _runtimeAttributes;
@@ -198,26 +198,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return ailmentHandler;
         }
 
-        public virtual UnitBattleState GetCurrentState()
-        {
-            // Do nothing, to be overridden
-            throw new NotImplementedException();
-        }
+        public abstract UnitBattleState GetCurrentState();
 
-        public virtual void AddState(UnitBattleState state)
-        {
-            // Do nothing, to be overridden
-        }
+        public abstract void AddState(UnitBattleState state);
 
-        public virtual void RemoveState(UnitBattleState state)
-        {
-            // Do nothing, to be overridden
-        }
+        public abstract void RemoveState(UnitBattleState state);
 
-        public virtual void ClearStates()
-        {
-            // Do nothing, to be overridden
-        }
+        public abstract void ClearStates();
 
         public bool IsMoving()
         {
