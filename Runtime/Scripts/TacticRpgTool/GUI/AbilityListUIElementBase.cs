@@ -41,7 +41,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             m_UICamera = InUICamera;
             uiContainer.worldCamera = m_UICamera;
             ClearAbilityList();
-            TacticBattleManager.Get().OnUnitSelected.AddListener(HandleUnitSelected);
             uiContainer.gameObject.SetActive(false);
         }
 
@@ -53,12 +52,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             }
         }
 
-        private void OnDestroy()
-        {
-            TacticBattleManager.Get().OnUnitSelected.RemoveListener(HandleUnitSelected);
-        }
-
-        private void HandleUnitSelected(GridPawnUnit InUnit)
+        protected void HandleUnitSelected(GridPawnUnit InUnit)
         {
             if(InUnit)
             {
