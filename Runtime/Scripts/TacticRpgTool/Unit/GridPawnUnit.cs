@@ -10,6 +10,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 using System;
 using ProjectCI.CoreSystem.Runtime.Attributes;
+using ProjectCI.CoreSystem.Runtime.States.Interfaces;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
@@ -23,13 +24,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         AbilityConfirming
     }
 
-    public class GridPawnUnit : GridObject
+    public class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
     {
         SoUnitData m_UnitData;
         private UnitAttributeContainer _runtimeAttributes;
         private UnitAttributeContainer _simulatedAttributes;
 
-        UnitBattleState m_CurrentState;
         UnitAbilityCore m_CurrentAbility;
 
         protected int m_CurrentMovementPoints;
@@ -87,7 +87,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         
         public void CleanUp()
         {
-            m_CurrentState = UnitBattleState.Idle;
+            ClearStates();
 
             foreach (LevelCellBase cell in m_EditedCells)
             {
@@ -198,9 +198,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return ailmentHandler;
         }
 
-        public UnitBattleState GetCurrentState()
+        public virtual UnitBattleState GetCurrentState()
         {
-            return m_CurrentState;
+            // Do nothing, to be overridden
+            throw new NotImplementedException();
+        }
+
+        public virtual void AddState(UnitBattleState state)
+        {
+            // Do nothing, to be overridden
+        }
+
+        public virtual void RemoveState(UnitBattleState state)
+        {
+            // Do nothing, to be overridden
+        }
+
+        public virtual void ClearStates()
+        {
+            // Do nothing, to be overridden
         }
 
         public bool IsMoving()
@@ -290,8 +306,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
+            var currentState = GetCurrentState();
 
-            if (GetCurrentState() == UnitBattleState.UsingAbility)
+            if (currentState == UnitBattleState.AbilityTargeting 
+                || currentState == UnitBattleState.AbilityConfirming 
+                || currentState == UnitBattleState.UsingAbility)
             {
                 UnitAbilityCore ability = GetCurrentAbility();
                 if (ability)
@@ -333,7 +352,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public void SetupAbility(UnitAbilityCore InAbility)
+        public virtual void SetupAbility(UnitAbilityCore InAbility)
         {
             if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
@@ -347,7 +366,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     CleanUp();
 
                     m_CurrentAbility = InAbility;
-                    m_CurrentState = UnitBattleState.UsingAbility;
+                    AddState(UnitBattleState.UsingAbility);
 
                     List<LevelCellBase> EditedAbilityCells = m_CurrentAbility.Setup(this);
                     m_EditedCells.AddRange(EditedAbilityCells);
@@ -399,7 +418,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return;
             }
 
-            m_CurrentState = UnitBattleState.Moving;
+            AddState(UnitBattleState.Moving);
             List<LevelCellBase> abilityCells = GetAllowedMovementCells();
 
             foreach (LevelCellBase cell in abilityCells)
