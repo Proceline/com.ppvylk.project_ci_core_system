@@ -17,7 +17,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     {
         Idle,
         Moving,
-        UsingAbility
+        MovingProgress,
+        UsingAbility,
+        AbilityTargeting,
+        AbilityConfirming
     }
 
     public class GridPawnUnit : GridObject
@@ -352,24 +355,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     TacticBattleManager.Get().UpdateHoverCells();
                 }
             }
-        }
-
-        // TODO: Deprecated
-        public void ExecuteAbility(UnitAbilityCore InAbility, LevelCellBase InCell)
-        {
-            if (!IsMoving())
-            {
-                if (InAbility)
-                {
-                    m_bIsAttacking = true;
-
-                    UnityEvent OnAbilityComplete = new UnityEvent();
-                    OnAbilityComplete.AddListener(HandleAbilityFinished);
-                    StartCoroutine(InAbility.Execute(this, InCell, OnAbilityComplete));
-                }
-            }
-
-            CleanUp();
         }
 
         public async Awaitable ShowResult(UnitAbilityCore ability, LevelCellBase target,

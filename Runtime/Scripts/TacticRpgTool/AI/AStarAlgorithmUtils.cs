@@ -328,15 +328,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             OnComplete.Invoke();
         }
 
-        public static IEnumerator ExecuteAbility(GridPawnUnit InCaster, LevelCellBase InTarget, UnitAbilityCore InAbility)
-        {
-            if (InCaster)
-            {
-                InCaster.ExecuteAbility(InAbility, InTarget);
-                yield return new WaitForSeconds(InAbility.CalculateAbilityTime(InCaster, InTarget));
-            }
-        }
-
         #endregion
 
         #region AStarComponents

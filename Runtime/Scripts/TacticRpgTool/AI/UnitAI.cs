@@ -57,7 +57,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                                     if (abilityCells.Contains(target.GetCell()))
                                     {
                                         // TODO: Remove this
-                                        TacticBattleManager.Get().StartCoroutine(AStarAlgorithmUtils.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
+                                        // TacticBattleManager.Get().StartCoroutine(AStarAlgorithmUtils.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
                                     }
                                 }
                             }
