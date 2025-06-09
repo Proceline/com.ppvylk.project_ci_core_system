@@ -107,9 +107,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         public GameTeamEvent OnTeamWon;
 
         [HideInInspector]
-        public GridUnitEvent OnUnitSelected;
-
-        [HideInInspector]
         public GridUnitEvent OnUnitHover = new GridUnitEvent();
 
         List<GridObject> SpawnedCellObjects = new List<GridObject>();
