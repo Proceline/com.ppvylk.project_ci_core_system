@@ -85,10 +85,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             SetupMovement();
         }
         
-        public void CleanUp()
+        protected void CleanUp()
         {
             ClearStates();
+            ResetCells();
+        }
 
+        private void ResetCells()
+        {
             foreach (LevelCellBase cell in m_EditedCells)
             {
                 if (cell)
@@ -344,15 +348,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             if (ability && ability.GetActionPointCost() <= m_CurrentAbilityPoints)
             {
-                CleanUp();
+                ResetCells();
 
                 m_CurrentAbility = ability;
-                // AddState(UnitBattleState.UsingAbility);
 
                 List<LevelCellBase> editedAbilityCells = m_CurrentAbility.Setup(this);
                 m_EditedCells.AddRange(editedAbilityCells);
 
-                // TacticBattleManager.Get().UpdateHoverCells();
                 return true;
             }
 
@@ -394,7 +396,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return;
             }
 
-            CleanUp();
+            ResetCells();
 
             if (!m_UnitData.m_MovementShape)
             {
@@ -447,7 +449,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             TacticBattleManager.CheckWinConditions();
 
-            CleanUp();
+            ResetCells();
             return true;
         }
 
