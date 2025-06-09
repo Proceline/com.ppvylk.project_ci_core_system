@@ -1,5 +1,3 @@
-using System;
-
 namespace ProjectCI.CoreSystem.Runtime.Services
 {
     /// <summary>
@@ -56,6 +54,16 @@ namespace ProjectCI.CoreSystem.Runtime.Services
         public static void Reset()
         {
             _container.Reset();
+        }
+    }
+
+    public class ServiceLocator<T> where T : class, IService
+    {
+        private T _service;
+
+        public T Service
+        {
+            get { return _service ??= ServiceLocator.Get<T>(); }
         }
     }
 } 

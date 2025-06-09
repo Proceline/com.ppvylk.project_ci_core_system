@@ -84,29 +84,32 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                     if (selectedUnit)
                     {
                         UnitBattleState unitState = selectedUnit.GetCurrentState();
-                        if (unitState == UnitBattleState.UsingAbility)
+                        switch (unitState)
                         {
-                            CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
-                        }
-                        else if (unitState == UnitBattleState.Moving)
-                        {
-                            List<LevelCellBase> AllowedMovementCells = selectedUnit.GetAllowedMovementCells();
+                            case UnitBattleState.UsingAbility:
+                            case UnitBattleState.AbilityTargeting:
+                                CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
+                                break;
+                            case UnitBattleState.Moving:
+                                List<LevelCellBase> allowedMovementCells = selectedUnit.GetAllowedMovementCells();
 
-                            if (AllowedMovementCells.Contains(m_CurrentHoverCell))
-                            {
-                                List<LevelCellBase> PathToCursor = selectedUnit.GetPathTo(m_CurrentHoverCell, AllowedMovementCells);
-
-                                foreach (LevelCellBase pathCell in PathToCursor)
+                                if (allowedMovementCells.Contains(m_CurrentHoverCell))
                                 {
-                                    if (pathCell)
+                                    List<LevelCellBase> pathToCursor =
+                                        selectedUnit.GetPathTo(m_CurrentHoverCell, allowedMovementCells);
+
+                                    foreach (LevelCellBase pathCell in pathToCursor)
                                     {
-                                        if (AllowedMovementCells.Contains(pathCell))
+                                        if (pathCell)
                                         {
-                                            CurrentHoverCells.Add(pathCell);
+                                            if (allowedMovementCells.Contains(pathCell))
+                                            {
+                                                CurrentHoverCells.Add(pathCell);
+                                            }
                                         }
                                     }
                                 }
-                            }
+                                break;
                         }
                     }
                 }

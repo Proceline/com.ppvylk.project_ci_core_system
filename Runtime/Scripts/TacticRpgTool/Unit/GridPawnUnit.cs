@@ -290,33 +290,29 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public List<UnitAbilityCore> GetAbilities() => _loadedAbilities;
 
-        public List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
+        internal List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
-            var currentState = GetCurrentState();
-
-            if (currentState == UnitBattleState.AbilityTargeting 
-                || currentState == UnitBattleState.AbilityConfirming 
-                || currentState == UnitBattleState.UsingAbility)
+            
+            UnitAbilityCore ability = GetCurrentAbility();
+            if (ability)
             {
-                UnitAbilityCore ability = GetCurrentAbility();
-                if (ability)
+                List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
+                List<LevelCellBase> effectedCells = ability.GetEffectedCells(this, InCell);
+
+                if (abilityCells.Contains(InCell))
                 {
-                    List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
-                    List<LevelCellBase> effectedCells = ability.GetEffectedCells(this, InCell);
-
-                    if (abilityCells.Contains(InCell))
+                    foreach (LevelCellBase currCell in effectedCells)
                     {
-                        foreach (LevelCellBase currCell in effectedCells)
+                        if (currCell)
                         {
-                            if (currCell)
-                            {
-                                BattleTeam EffectedTeam = (currCell == InCell) ? ability.GetEffectedTeam() : BattleTeam.All;
+                            BattleTeam effectedTeam =
+                                (currCell == InCell) ? ability.GetEffectedTeam() : BattleTeam.All;
 
-                                if (TacticBattleManager.CanCasterEffectTarget(GetCell(), currCell, EffectedTeam, ability.DoesAllowBlocked()))
-                                {
-                                    outCells.Add(currCell);
-                                }
+                            if (TacticBattleManager.CanCasterEffectTarget(GetCell(), currCell, effectedTeam,
+                                    ability.DoesAllowBlocked()))
+                            {
+                                outCells.Add(currCell);
                             }
                         }
                     }
@@ -339,28 +335,28 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public virtual void SetupAbility(UnitAbilityCore InAbility)
+        protected virtual bool SetupAbility(UnitAbilityCore ability)
         {
             if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
             {
-                return;
+                return false;
             }
 
-            if (InAbility)
+            if (ability && ability.GetActionPointCost() <= m_CurrentAbilityPoints)
             {
-                if (InAbility.GetActionPointCost() <= m_CurrentAbilityPoints)
-                {
-                    CleanUp();
+                CleanUp();
 
-                    m_CurrentAbility = InAbility;
-                    AddState(UnitBattleState.UsingAbility);
+                m_CurrentAbility = ability;
+                // AddState(UnitBattleState.UsingAbility);
 
-                    List<LevelCellBase> EditedAbilityCells = m_CurrentAbility.Setup(this);
-                    m_EditedCells.AddRange(EditedAbilityCells);
+                List<LevelCellBase> editedAbilityCells = m_CurrentAbility.Setup(this);
+                m_EditedCells.AddRange(editedAbilityCells);
 
-                    TacticBattleManager.Get().UpdateHoverCells();
-                }
+                // TacticBattleManager.Get().UpdateHoverCells();
+                return true;
             }
+
+            return false;
         }
 
         public async Awaitable ShowResult(UnitAbilityCore ability, LevelCellBase target,
