@@ -6,7 +6,7 @@ namespace ProjectCI.CoreSystem.Runtime.States.Interfaces
     {
         T GetCurrentState();
         void AddState(T state);
-        void RemoveState(T state);
+        void RemoveLastState();
         void ClearStates();
     }
 }

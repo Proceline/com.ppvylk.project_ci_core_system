@@ -202,7 +202,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public abstract void AddState(UnitBattleState state);
 
-        public abstract void RemoveState(UnitBattleState state);
+        public abstract void RemoveLastState();
 
         public abstract void ClearStates();
 
