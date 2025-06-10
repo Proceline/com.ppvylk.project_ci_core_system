@@ -642,12 +642,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         protected virtual void HandleAbilityFinished()
         {
             m_bIsAttacking = false;
-
-            BattleTeam team = TacticBattleManager.GetUnitTeam(this);
-            if(TacticBattleManager.IsTeamHuman(team) && TacticBattleManager.IsPlaying() && !IsDead() )
-            {
-                SetupMovement();
-            }
         }
 
         protected virtual void HandleTraversePreFinished()
