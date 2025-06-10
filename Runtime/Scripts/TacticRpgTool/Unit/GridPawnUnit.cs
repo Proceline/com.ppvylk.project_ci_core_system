@@ -79,12 +79,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             GetCell().HandleVisibilityChanged();
         }
-
-        public virtual void SelectUnit()
-        {
-            SetupMovement();
-        }
-
+        
         protected void ResetCells()
         {
             foreach (LevelCellBase cell in m_EditedCells)
@@ -413,33 +408,30 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             TacticBattleManager.Get().UpdateHoverCells();
         }
 
-        public bool ExecuteMovement(LevelCellBase TargetCell)
+        public bool ExecuteMovement(LevelCellBase targetCell)
         {
             if (IsMoving())
             {
                 return false;
             }
-            
-            UnityEvent onMovementPreCompleted = new UnityEvent();
 
-            if (!m_UnitData.m_MovementShape || !TargetCell)
+            if (!m_UnitData.m_MovementShape || !targetCell)
             {
                 return false;
             }
 
-            if(!TargetCell.IsVisible())
+            if(!targetCell.IsVisible())
             {
                 return false;
             }
 
             List<LevelCellBase> abilityCells = GetAllowedMovementCells();
-            if (!abilityCells.Contains(TargetCell))
+            if (!abilityCells.Contains(targetCell))
             {
                 return false;
             }
 
-            onMovementPreCompleted.AddListener(HandleTraversePreFinished);
-            TraverseTo(TargetCell, onMovementPreCompleted, abilityCells);
+            TraverseTo(targetCell, OnMovementPostComplete, abilityCells);
 
             TacticBattleManager.CheckWinConditions();
 
@@ -642,16 +634,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         protected virtual void HandleAbilityFinished()
         {
             m_bIsAttacking = false;
-        }
-
-        protected virtual void HandleTraversePreFinished()
-        {
-            if (TacticBattleManager.IsPlaying() && !IsDead())
-            {
-                SetupMovement();
-            }
-
-            OnMovementPostComplete.Invoke();
         }
 
         protected virtual void HandleDeath()
