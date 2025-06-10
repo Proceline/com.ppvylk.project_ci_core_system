@@ -256,63 +256,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return AbilityCells;
         }
 
-        public async Awaitable Execute(GridPawnUnit InCasterUnit, LevelCellBase InTarget, UnityEvent OnComplete = null)
-        {
-            if( GetShape() )
-            {
-                List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
-                if (abilityCells.Contains(InTarget))
-                {
-                    InCasterUnit.LookAtCell(InTarget);
-
-                    List<LevelCellBase> EffectCellList = new List<LevelCellBase>();
-                    EffectCellList.AddRange( GetEffectedCells( InCasterUnit, InTarget ) );
-
-                    if(!EffectCellList.Contains(InTarget))
-                    {
-                        EffectCellList.Add( InTarget );
-                    }
-
-                    TacticBattleManager.AddActionBeingPerformed();
-
-                    InCasterUnit.RemoveAbilityPoints(m_ActionPointCost);
-                    m_Animation?.PlayAnimation(InCasterUnit);
-
-                    if(audioOnStart != null)
-                    {
-                        AudioPlayData audioData = new AudioPlayData(audioOnStart);
-                        AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
-                    }
-
-                    float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
-                    await Awaitable.WaitForSecondsAsync(firstExecuteTime);
-
-                    if (audioOnExecute != null)
-                    {
-                        AudioPlayData audioData = new AudioPlayData(audioOnExecute);
-                        AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
-                    }
-
-                    foreach ( LevelCellBase EffectCell in EffectCellList )
-                    {
-                        InternalHandleEffectedCell(InCasterUnit, EffectCell);
-                    }
-
-                    if (m_Animation)
-                    {
-                        float timeRemaining = m_Animation.GetAnimationLength() - firstExecuteTime;
-                        timeRemaining = Mathf.Max(0, timeRemaining);
-
-                        await Awaitable.WaitForSecondsAsync(timeRemaining);
-                    }
-
-                    TacticBattleManager.RemoveActionBeingPerformed();
-                }
-            }
-
-            OnComplete?.Invoke();
-        }
-
         public async Awaitable ApplyResult(GridPawnUnit InCasterUnit, LevelCellBase target,
             List<Action<GridPawnUnit, LevelCellBase>> InReacts, UnityEvent OnNonLogicalComplete = null)
         {
