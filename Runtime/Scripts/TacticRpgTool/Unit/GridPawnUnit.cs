@@ -84,14 +84,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             SetupMovement();
         }
-        
-        protected void CleanUp()
-        {
-            ClearStates();
-            ResetCells();
-        }
 
-        private void ResetCells()
+        protected void ResetCells()
         {
             foreach (LevelCellBase cell in m_EditedCells)
             {
