@@ -118,8 +118,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     BattleTeam currentTeam = InPathInfo.StartCell.IsObjectOnCell()
                         ? InPathInfo.StartCell.GetObjectOnCell().GetTeam()
                         : BattleTeam.None;
-                    if (newPathFindNode.Cell.IsNonTeamObjectOnCell(currentTeam) && InPathInfo.bIgnoreUnits &&
-                        newPathFindNode.Cell != InPathInfo.TargetCell)
+                    if (newPathFindNode.Cell != InPathInfo.TargetCell)
                     {
                         continue;
                     }
