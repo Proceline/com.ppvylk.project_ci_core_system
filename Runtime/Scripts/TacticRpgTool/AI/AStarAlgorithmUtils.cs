@@ -12,7 +12,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
     {
         public LevelCellBase StartCell;
         public LevelCellBase TargetCell;
-        public bool bIgnoreUnits;
+        public bool bNoDestinationUnits;
+        public bool bIgnoreUnitsOnPath;
         public bool bAllowBlocked;
         public bool bTakeWeightIntoAccount;
         public List<LevelCellBase> AllowedCells;
@@ -21,7 +22,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         {
             StartCell = InStart;
             TargetCell = InTarget;
-            bIgnoreUnits = true;
+            bNoDestinationUnits = true;
+            bIgnoreUnitsOnPath = true;
             AllowedCells = null;
             bAllowBlocked = false;
             bTakeWeightIntoAccount = false;
@@ -73,20 +75,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 return outPath;
             }
 
-            List<PathFindingNode> OpenSet = new List<PathFindingNode>();
-            List<PathFindingNode> ClosedSet = new List<PathFindingNode>();
-            PathFindingNode ParentNode = null;
+            List<PathFindingNode> openSet = new List<PathFindingNode>();
+            List<PathFindingNode> closedSet = new List<PathFindingNode>();
 
-            OpenSet.Add(AStarCalculatePathNode(ParentNode, InPathInfo.StartCell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
+            openSet.Add(AStarCalculatePathNode(null, InPathInfo.StartCell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
 
-            while (OpenSet.Count > 0)
+            while (openSet.Count > 0)
             {
-                PathFindingNode CurrNode = AStarGetLowestFScore(OpenSet);
+                PathFindingNode currNode = AStarGetLowestFScore(openSet);
 
-                if (CurrNode.Cell == InPathInfo.TargetCell)
+                if (currNode.Cell == InPathInfo.TargetCell)
                 {
                     // Found node
-                    PathFindingNode reverseNode = CurrNode;
+                    PathFindingNode reverseNode = currNode;
                     while (reverseNode != null)
                     {
                         outPath.Add(reverseNode.Cell);
@@ -97,55 +98,60 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     return outPath;
                 }
 
-                OpenSet.Remove(CurrNode);
-                ClosedSet.Add(CurrNode);
+                openSet.Remove(currNode);
+                closedSet.Add(currNode);
 
-                List<LevelCellBase> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
-                foreach (var cell in AdjCells)
+                List<LevelCellBase> adjCells = currNode.Cell.GetAllAdjacentCells();
+                foreach (var cell in adjCells)
                 {
-                    PathFindingNode NewPathFindNode = AStarCalculatePathNode(CurrNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
+                    PathFindingNode newPathFindNode = AStarCalculatePathNode(currNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
 
-                    if (ClosedSet.Contains(NewPathFindNode))
+                    if (closedSet.Contains(newPathFindNode))
                     {
                         continue;
                     }
 
-                    if (NewPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
+                    if (newPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
                     {
                         continue;
                     }
 
-                    if (NewPathFindNode.Cell.IsObjectOnCell() && InPathInfo.bIgnoreUnits && NewPathFindNode.Cell != InPathInfo.TargetCell)
+                    if (newPathFindNode.Cell.IsObjectOnCell())
                     {
-                        continue;
-                    }
-
-                    if (InPathInfo.AllowedCells != null)
-                    {
-                        if (!InPathInfo.AllowedCells.Contains(NewPathFindNode.Cell))
+                        if (InPathInfo.bNoDestinationUnits && newPathFindNode.Cell == InPathInfo.TargetCell)
+                        {
+                            continue;
+                        }
+                        if (!InPathInfo.bIgnoreUnitsOnPath && newPathFindNode.Cell != InPathInfo.TargetCell)
                         {
                             continue;
                         }
                     }
 
-                    if (!OpenSet.Contains(NewPathFindNode))
+                    if (InPathInfo.AllowedCells != null)
                     {
-                        OpenSet.Add(NewPathFindNode);
+                        if (!InPathInfo.AllowedCells.Contains(newPathFindNode.Cell))
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (!openSet.Contains(newPathFindNode))
+                    {
+                        openSet.Add(newPathFindNode);
                     }
                     else
                     {
-                        int tenativeGScore = AStarCalculateG(cell, CurrNode, InPathInfo);
+                        int tenativeGScore = AStarCalculateG(cell, currNode, InPathInfo);
 
-                        if (tenativeGScore < NewPathFindNode.G)
+                        if (tenativeGScore < newPathFindNode.G)
                         {
-                            NewPathFindNode.Parent = CurrNode;
-                            NewPathFindNode.G = tenativeGScore;
-                            OpenSet = AStarUpdateList(OpenSet, NewPathFindNode);
+                            newPathFindNode.Parent = currNode;
+                            newPathFindNode.G = tenativeGScore;
+                            openSet = AStarUpdateList(openSet, newPathFindNode);
                         }
                     }
                 }
-
-                ParentNode = CurrNode;
             }
 
             return outPath;
@@ -334,7 +340,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         #region AStarComponents
 
-        static PathFindingNode AStarCalculatePathNode(PathFindingNode InParent, LevelCellBase InCurrent, LevelCellBase InStart, LevelCellBase InTarget, AIPathInfo InPathInfo)
+        private static PathFindingNode AStarCalculatePathNode(PathFindingNode InParent, LevelCellBase InCurrent,
+            LevelCellBase InStart, LevelCellBase InTarget, AIPathInfo InPathInfo)
         {
             int gCost = AStarCalculateG(InCurrent, InParent, InPathInfo);
             int hCost = AStarDistance(InCurrent, InTarget);

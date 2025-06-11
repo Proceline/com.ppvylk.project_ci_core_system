@@ -122,7 +122,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     {
                         StartCell = InAIUnit.GetCell(),
                         TargetCell = currUnit.GetCell(),
-                        bIgnoreUnits = false,
+                        bNoDestinationUnits = false,
+                        bIgnoreUnitsOnPath = true,
                         bTakeWeightIntoAccount = true
                     };
 
@@ -212,7 +213,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     {
                         StartCell = levelCell,
                         TargetCell = InTarget.GetCell(),
-                        bIgnoreUnits = false,
+                        bNoDestinationUnits = false,
+                        bIgnoreUnitsOnPath = true,
                         bTakeWeightIntoAccount = true
                     };
 
@@ -237,7 +239,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     {
                         StartCell = levelCell,
                         TargetCell = InTarget.GetCell(),
-                        bIgnoreUnits = false,
+                        bNoDestinationUnits = false,
+                        bIgnoreUnitsOnPath = true,
                         bTakeWeightIntoAccount = true
                     };
 

@@ -427,13 +427,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            List<LevelCellBase> abilityCells = GetAllowedMovementCells();
-            if (!abilityCells.Contains(targetCell))
+            List<LevelCellBase> allowedMovementCells = GetAllowedMovementCells();
+            if (!allowedMovementCells.Contains(targetCell))
             {
                 return false;
             }
 
-            TraverseTo(targetCell, OnMovementPostComplete, abilityCells);
+            TraverseTo(targetCell, OnMovementPostComplete, allowedMovementCells);
 
             TacticBattleManager.CheckWinConditions();
 
@@ -441,10 +441,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return true;
         }
 
-        public async void TraverseTo(LevelCellBase InTargetCell, 
-            UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
+        private async void TraverseTo(LevelCellBase InTargetCell, 
+            UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
         {
-            await OnGridTraverseTo(InTargetCell, OnMovementComplete, InAllowedCells);
+            await OnGridTraverseTo(InTargetCell, onMovementComplete, InAllowedCells);
         }
 
         public async void ForceMoveTo(LevelCellBase InTargetCell)
@@ -452,7 +452,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             await ForceMoveToInternally(InTargetCell);
         }
 
-        public virtual async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent OnMovementComplete = null, List<LevelCellBase> InAllowedCells = null)
+        internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
         {
             if (InTargetCell)
             {
@@ -464,11 +464,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 List<LevelCellBase> cellPath = GetPathTo(InTargetCell, InAllowedCells);
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
-                int MovementCount = 0;
+                int movementCount = 0;
 
-                LevelCellBase FinalCell = InTargetCell;
+                LevelCellBase finalCell = InTargetCell;
 
-                LevelCellBase StartingCell = GetCell();
+                LevelCellBase startingCell = GetCell();
 
                 foreach (LevelCellBase cell in cellPath)
                 {
@@ -486,23 +486,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     }
 
                     float timeSpent = 0;
-                    Vector3 EndPos = cell.GetAllignPos(this);
+                    Vector3 endPos = cell.GetAllignPos(this);
 
                     LookAtCell(cell);
 
-                    while (timeSpent < 1f && StartPos != EndPos)
+                    while (timeSpent < 1f && StartPos != endPos)
                     {
                         await Awaitable.NextFrameAsync();
                         timeSpent += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
-                        gameObject.transform.position = Vector3.Lerp(StartPos, EndPos, timeSpent);
+                        gameObject.transform.position = Vector3.Lerp(StartPos, endPos, timeSpent);
                     }
 
-                    gameObject.transform.position = EndPos;
+                    gameObject.transform.position = endPos;
                     StartPos = cell.GetAllignPos(this);
 
                     await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
 
-                    if ( cell != StartingCell )
+                    if ( cell != startingCell )
                     {
                         AilmentHandlerUtils.HandleUnitOnCell(this, cell);
                         PlayTravelAudio();
@@ -513,16 +513,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         break;
                     }
 
-                    if(MovementCount++ >= m_CurrentMovementPoints)
+                    if(movementCount++ >= m_CurrentMovementPoints)
                     {
-                        FinalCell = cell;
+                        finalCell = cell;
                         break;
                     }
                 }
 
                 if ( !IsDead() )
                 {
-                    SetCurrentCell(FinalCell);
+                    SetCurrentCell(finalCell);
                     RemoveMovementPoints(cellPath.Count - 1);
 
                     OnPreStandIdleAnimRequired?.Invoke();
@@ -532,9 +532,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 m_bIsMoving = false;
 
-                if (OnMovementComplete != null)
+                if (onMovementComplete != null)
                 {
-                    OnMovementComplete.Invoke();
+                    onMovementComplete.Invoke();
                 }
             }
         }
@@ -545,11 +545,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             {
                 TacticBattleManager.AddActionBeingPerformed();
 
-                AIPathInfo pathInfo = new AIPathInfo();
-                pathInfo.StartCell = GetCell();
-                pathInfo.TargetCell = InTargetCell;
-                pathInfo.bIgnoreUnits = true;
-                pathInfo.bTakeWeightIntoAccount = false;
+                AIPathInfo pathInfo = new AIPathInfo
+                {
+                    StartCell = GetCell(),
+                    TargetCell = InTargetCell,
+                    bNoDestinationUnits = true,
+                    bIgnoreUnitsOnPath = true,
+                    bTakeWeightIntoAccount = false
+                };
 
                 List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
 
@@ -599,15 +602,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells = null)
+        /// <summary>
+        /// Used for Pathfinding Moving on Grid, no Teleport
+        /// </summary>
+        /// <param name="InTargetCell"></param>
+        /// <param name="InAllowedCells"></param>
+        /// <returns></returns>
+        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells)
         {
-            AIPathInfo pathInfo = new AIPathInfo();
-            pathInfo.StartCell = GetCell();
-            pathInfo.TargetCell = InTargetCell;
-            pathInfo.bIgnoreUnits = true;
-            pathInfo.bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam());
-            pathInfo.AllowedCells = InAllowedCells;
-            pathInfo.bAllowBlocked = m_UnitData.m_bIsFlying;
+            AIPathInfo pathInfo = new AIPathInfo
+            {
+                StartCell = GetCell(),
+                TargetCell = InTargetCell,
+                bNoDestinationUnits = true,
+                bIgnoreUnitsOnPath = true,
+                bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam()),
+                AllowedCells = InAllowedCells,
+                bAllowBlocked = m_UnitData.m_bIsFlying
+            };
 
             List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
 
