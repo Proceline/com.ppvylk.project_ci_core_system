@@ -53,6 +53,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
 
+        protected SoUnitData UnitData => m_UnitData;
+
         public UnitAttributeContainer RuntimeAttributes 
         { 
             get => _runtimeAttributes; 

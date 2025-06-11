@@ -196,8 +196,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 OpenSet.Remove(CurrNode);
                 ClosedSet.Add(CurrNode);
 
-                List<LevelCellBase> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
-                foreach (var cell in AdjCells)
+                List<LevelCellBase> adjCells = CurrNode.Cell.GetAllAdjacentCells();
+                foreach (var cell in adjCells)
                 {
                     PathFindingNode NewPathFindNode = new PathFindingNode(cell, CurrNode);
 
@@ -275,25 +275,27 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             }
 
             GridObject gridObj = InCell.GetObjectOnCell();
-            if (gridObj)
+            if (!gridObj)
             {
-                if (InRadiusInfo.EffectedTeam == BattleTeam.None)
+                return true;
+            }
+            
+            if (InRadiusInfo.EffectedTeam == BattleTeam.None)
+            {
+                return false;
+            }
+
+            if (InRadiusInfo.Caster != null)
+            {
+                BattleTeam objAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
+                if (objAffinity == BattleTeam.Friendly && InRadiusInfo.EffectedTeam == BattleTeam.Hostile)
                 {
                     return false;
                 }
 
-                if (InRadiusInfo.Caster != null)
+                if (objAffinity == BattleTeam.Hostile && InRadiusInfo.EffectedTeam == BattleTeam.Friendly)
                 {
-                    BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
-                    if (ObjAffinity == BattleTeam.Friendly && InRadiusInfo.EffectedTeam == BattleTeam.Hostile)
-                    {
-                        return false;
-                    }
-
-                    if (ObjAffinity == BattleTeam.Hostile && InRadiusInfo.EffectedTeam == BattleTeam.Friendly)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
