@@ -168,7 +168,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public bool IsObjectOnCell()
         {
-            return (m_ObjectOnCell != null);
+            return m_ObjectOnCell != null;
+        }
+
+        public bool IsNonTeamObjectOnCell(BattleTeam team)
+        {
+            return m_ObjectOnCell && m_ObjectOnCell.GetTeam() != team;
         }
 
         public bool IsCellAccesible()

@@ -75,9 +75,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             List<PathFindingNode> OpenSet = new List<PathFindingNode>();
             List<PathFindingNode> ClosedSet = new List<PathFindingNode>();
-            PathFindingNode ParentNode = null;
+            PathFindingNode parentNode = null;
 
-            OpenSet.Add(AStarCalculatePathNode(ParentNode, InPathInfo.StartCell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
+            OpenSet.Add(AStarCalculatePathNode(parentNode, InPathInfo.StartCell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
 
             while (OpenSet.Count > 0)
             {
@@ -100,52 +100,56 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 OpenSet.Remove(CurrNode);
                 ClosedSet.Add(CurrNode);
 
-                List<LevelCellBase> AdjCells = CurrNode.Cell.GetAllAdjacentCells();
-                foreach (var cell in AdjCells)
+                List<LevelCellBase> adjacentCells = CurrNode.Cell.GetAllAdjacentCells();
+                foreach (var cell in adjacentCells)
                 {
-                    PathFindingNode NewPathFindNode = AStarCalculatePathNode(CurrNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
+                    PathFindingNode newPathFindNode = AStarCalculatePathNode(CurrNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
 
-                    if (ClosedSet.Contains(NewPathFindNode))
+                    if (ClosedSet.Contains(newPathFindNode))
                     {
                         continue;
                     }
 
-                    if (NewPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
+                    if (newPathFindNode.Cell.IsBlocked() && !InPathInfo.bAllowBlocked)
                     {
                         continue;
                     }
 
-                    if (NewPathFindNode.Cell.IsObjectOnCell() && InPathInfo.bIgnoreUnits && NewPathFindNode.Cell != InPathInfo.TargetCell)
+                    BattleTeam currentTeam = InPathInfo.StartCell.IsObjectOnCell()
+                        ? InPathInfo.StartCell.GetObjectOnCell().GetTeam()
+                        : BattleTeam.None;
+                    if (newPathFindNode.Cell.IsNonTeamObjectOnCell(currentTeam) && InPathInfo.bIgnoreUnits &&
+                        newPathFindNode.Cell != InPathInfo.TargetCell)
                     {
                         continue;
                     }
 
                     if (InPathInfo.AllowedCells != null)
                     {
-                        if (!InPathInfo.AllowedCells.Contains(NewPathFindNode.Cell))
+                        if (!InPathInfo.AllowedCells.Contains(newPathFindNode.Cell))
                         {
                             continue;
                         }
                     }
 
-                    if (!OpenSet.Contains(NewPathFindNode))
+                    if (!OpenSet.Contains(newPathFindNode))
                     {
-                        OpenSet.Add(NewPathFindNode);
+                        OpenSet.Add(newPathFindNode);
                     }
                     else
                     {
                         int tenativeGScore = AStarCalculateG(cell, CurrNode, InPathInfo);
 
-                        if (tenativeGScore < NewPathFindNode.G)
+                        if (tenativeGScore < newPathFindNode.G)
                         {
-                            NewPathFindNode.Parent = CurrNode;
-                            NewPathFindNode.G = tenativeGScore;
-                            OpenSet = AStarUpdateList(OpenSet, NewPathFindNode);
+                            newPathFindNode.Parent = CurrNode;
+                            newPathFindNode.G = tenativeGScore;
+                            OpenSet = AStarUpdateList(OpenSet, newPathFindNode);
                         }
                     }
                 }
 
-                ParentNode = CurrNode;
+                parentNode = CurrNode;
             }
 
             return outPath;
