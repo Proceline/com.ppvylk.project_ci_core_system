@@ -126,14 +126,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LevelCellBase cell) where T : GridPawnUnit
         {
             T SpawnedGridUnit = originPawn.AddComponent<T>();
-            SpawnedGridUnit.Initalize();
+            SpawnedGridUnit.Initialize();
             SpawnedGridUnit.SetUnitData(InUnitData);
             SpawnedGridUnit.SetAbilities(InAbilities);
             SpawnedGridUnit.SetTeam(InTeam);
             SpawnedGridUnit.SetGrid(InGrid);
             SpawnedGridUnit.SetCurrentCell(cell);
             SpawnedGridUnit.AlignToGrid();
-            SpawnedGridUnit.PostInitalize();
+            SpawnedGridUnit.PostInitialize();
             return SpawnedGridUnit;
         }
 

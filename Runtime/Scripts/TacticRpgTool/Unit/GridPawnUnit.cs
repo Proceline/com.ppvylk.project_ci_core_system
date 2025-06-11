@@ -75,7 +75,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _loadedAbilities.Count > 0 ? _loadedAbilities[0] : null;
         }
 
-        public override void PostInitalize()
+        public override void PostInitialize()
         {
             GetCell().HandleVisibilityChanged();
         }

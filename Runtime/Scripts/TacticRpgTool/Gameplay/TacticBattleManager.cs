@@ -381,10 +381,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
                 SpawnedGridObject.gameObject.transform.position = InCell.gameObject.transform.position + HeightOffset + InOffset;
 
-                SpawnedGridObject.Initalize();
+                SpawnedGridObject.Initialize();
                 SpawnedGridObject.SetGrid( GetGrid() );
                 SpawnedGridObject.SetCurrentCell( InCell );
-                SpawnedGridObject.PostInitalize();
+                SpawnedGridObject.PostInitialize();
 
                 return SpawnedGridObject;
             }
@@ -404,13 +404,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             GridPawnUnit SpawnedGridUnit = Instantiate(prefab).AddComponent<T>();
 
-            SpawnedGridUnit.Initalize();
+            SpawnedGridUnit.Initialize();
             SpawnedGridUnit.SetUnitData(unitData);
             SpawnedGridUnit.SetTeam(InTeam);
             SpawnedGridUnit.SetGrid(sInstance.LevelGrid);
             SpawnedGridUnit.SetCurrentCell(cell);
             SpawnedGridUnit.AlignToGrid();
-            SpawnedGridUnit.PostInitalize();
+            SpawnedGridUnit.PostInitialize();
 
             LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
             if (DirCell)

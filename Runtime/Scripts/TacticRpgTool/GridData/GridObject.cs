@@ -38,12 +38,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             // Do nothing
         }
 
-        public virtual void Initalize()
+        public virtual void Initialize()
         {
             DestroyColliders();
         }
 
-        public virtual void PostInitalize()
+        public virtual void PostInitialize()
         {
             
         }
