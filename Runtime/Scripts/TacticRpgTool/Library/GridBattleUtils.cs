@@ -6,6 +6,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components;
+using UnityEngine.Events;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -65,6 +66,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// <param name="gridSize">网格大小</param>
         /// <param name="groundLayer">地面层</param>
         /// <param name="cellPalette">网格预制体配置</param>
+        /// <param name="hitHandler"></param>
         /// <returns>生成的LevelGrid对象</returns>
         public static T GenerateLevelGridFromGround<T>(
             Vector3 scanCenter,
@@ -72,7 +74,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             float hexHeight,
             Vector2Int gridSize,
             LayerMask groundLayer,
-            CellPalette cellPalette) where T : LevelGridBase
+            CellPalette cellPalette, UnityEvent<RaycastHit, Vector2Int, T> hitHandler) where T : LevelGridBase
         {
             // 1. 验证参数
             if (cellPalette == null)
@@ -107,8 +109,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             // 5. 为每个碰撞点创建网格
             foreach (var hit in hitPoints)
             {
-                var cell = levelGrid.GenerateCell(hit.Value.point, hit.Key);
-                cell.Reset();
+                if (hitHandler == null)
+                {
+                    var cell = levelGrid.GenerateCell(hit.Value.point, hit.Key);
+                    cell.Reset();
+                }
+                else
+                {
+                    hitHandler.Invoke(hit.Value, hit.Key, levelGrid);
+                }
             }
 
             // 6. 设置网格相邻关系
