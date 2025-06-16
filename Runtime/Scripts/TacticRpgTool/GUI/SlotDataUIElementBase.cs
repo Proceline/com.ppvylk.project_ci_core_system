@@ -1,11 +1,5 @@
-﻿using System.Collections.Generic;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams;
+﻿using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
 {
@@ -32,6 +26,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
         public virtual void OnHover()
         {
             // Do nothing
+        }
+        
+        protected internal virtual void ForceHighlight(bool enabled)
+        {
+            
         }
     }
 }

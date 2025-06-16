@@ -30,7 +30,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         private UnitAttributeContainer _runtimeAttributes;
         private UnitAttributeContainer _simulatedAttributes;
 
-        UnitAbilityCore m_CurrentAbility;
+        private UnitAbilityCore _currentAbility;
+        protected UnitAbilityCore CurrentAbility
+        {
+            get => _currentAbility;
+            set => _currentAbility = value;
+        }
 
         protected int m_CurrentMovementPoints;
         protected int m_CurrentAbilityPoints;
@@ -44,7 +49,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         protected UnityEvent OnMovementPostComplete = new UnityEvent();
 
-        List<LevelCellBase> m_EditedCells = new List<LevelCellBase>();
+        protected readonly List<LevelCellBase> EditedCells = new List<LevelCellBase>();
 
         private List<UnitAbilityCore> _loadedAbilities = new List<UnitAbilityCore>();
 
@@ -67,16 +72,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             protected set => _simulatedAttributes = value; 
         }
 
-        public virtual UnitAbilityCore GetEquippedAbility()
-        {
-            if (m_CurrentAbility)
-            {
-                return m_CurrentAbility;
-            }
-
-            return _loadedAbilities.Count > 0 ? _loadedAbilities[0] : null;
-        }
-
         public override void PostInitialize()
         {
             GetCell().HandleVisibilityChanged();
@@ -84,7 +79,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         
         protected void ResetCells()
         {
-            foreach (LevelCellBase cell in m_EditedCells)
+            foreach (LevelCellBase cell in EditedCells)
             {
                 if (cell)
                 {
@@ -92,7 +87,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 }
             }
 
-            m_EditedCells.Clear();
+            EditedCells.Clear();
         }
         
         public void LookAtCell(LevelCellBase InCell)
@@ -285,72 +280,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public List<UnitAbilityCore> GetAbilities() => _loadedAbilities;
 
-        internal List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
-        {
-            List<LevelCellBase> outCells = new List<LevelCellBase>();
-            
-            UnitAbilityCore ability = GetCurrentAbility();
-            if (ability)
-            {
-                List<LevelCellBase> abilityCells = ability.GetAbilityCells(this);
-                List<LevelCellBase> effectedCells = ability.GetEffectedCells(this, InCell);
-
-                if (abilityCells.Contains(InCell))
-                {
-                    foreach (LevelCellBase currCell in effectedCells)
-                    {
-                        if (currCell)
-                        {
-                            BattleTeam effectedTeam =
-                                (currCell == InCell) ? ability.GetEffectedTeam() : BattleTeam.All;
-
-                            if (TacticBattleManager.CanCasterEffectTarget(GetCell(), currCell, effectedTeam,
-                                    ability.DoesAllowBlocked()))
-                            {
-                                outCells.Add(currCell);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return outCells;
-        }
-
         public UnitAbilityCore GetCurrentAbility()
         {
-            return m_CurrentAbility;
+            return _currentAbility;
         }
 
-        public void SetupAbility(int abilityIndex)
-        {
-            if(abilityIndex < _loadedAbilities.Count)
-            {
-                SetupAbility(_loadedAbilities[abilityIndex]);
-            }
-        }
-
-        protected virtual bool SetupAbility(UnitAbilityCore ability)
-        {
-            if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
-            {
-                return false;
-            }
-
-            if (ability && ability.GetActionPointCost() <= m_CurrentAbilityPoints)
-            {
-                ResetCells();
-
-                m_CurrentAbility = ability;
-
-                List<LevelCellBase> editedAbilityCells = m_CurrentAbility.Setup(this);
-                m_EditedCells.AddRange(editedAbilityCells);
-
-                return true;
-            }
-
-            return false;
-        }
+        public abstract void SetupAbility(UnitAbilityCore ability);
 
         public async Awaitable ShowResult(UnitAbilityCore ability, LevelCellBase target,
             List<Action<GridPawnUnit, LevelCellBase>> reactions)
@@ -405,7 +340,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 }
             }
 
-            m_EditedCells.AddRange(abilityCells);
+            EditedCells.AddRange(abilityCells);
 
             TacticBattleManager.Get().UpdateHoverCells();
         }

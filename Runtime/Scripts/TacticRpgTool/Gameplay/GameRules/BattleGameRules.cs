@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
@@ -85,6 +86,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         public virtual GridPawnUnit GetSelectedUnit()
         {
             return null;
+        }
+        
+        public virtual List<LevelCellBase> GetAbilityHoverCells(LevelCellBase InCell)
+        {
+            return new();
         }
 
         public virtual void BeginTeamTurn(BattleTeam InTeam)

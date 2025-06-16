@@ -97,6 +97,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
                 if (ability)
                 {
                     SetupAbilitySlot(abilityUI, ability, i);
+                    abilityUI.ForceHighlight(ability == m_SelectedUnit.GetCurrentAbility());
                 }
                 else
                 {
@@ -134,14 +135,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GUI
             slot.SetOwner(this);
             slot.ClearAbility();
             slot.gameObject.SetActive(false);
-        }
-
-        public void HandleAbilitySelected(int InIndex)
-        {
-            if(m_SelectedUnit)
-            {
-                m_SelectedUnit.SetupAbility(InIndex);
-            }
         }
     }
 }

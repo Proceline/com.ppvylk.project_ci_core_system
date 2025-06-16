@@ -88,7 +88,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                         {
                             case UnitBattleState.UsingAbility:
                             case UnitBattleState.AbilityTargeting:
-                                CurrentHoverCells.AddRange(selectedUnit.GetAbilityHoverCells(m_CurrentHoverCell));
+                                CurrentHoverCells.AddRange(gameRules.GetAbilityHoverCells(m_CurrentHoverCell));
                                 break;
                             case UnitBattleState.Moving:
                                 List<LevelCellBase> allowedMovementCells = selectedUnit.GetAllowedMovementCells();

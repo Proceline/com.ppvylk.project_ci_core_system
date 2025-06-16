@@ -170,7 +170,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
 
-            CellState AbilityState = (GetEffectedTeam() == BattleTeam.Hostile) ? (CellState.eNegative) : (CellState.ePositive);
+            CellState AbilityState = GetEffectedTeam() == BattleTeam.Hostile ? CellState.eNegative : CellState.ePositive;
 
             foreach (LevelCellBase cell in abilityCells)
             {
