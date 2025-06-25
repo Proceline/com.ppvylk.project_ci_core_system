@@ -210,15 +210,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return outCells;
         }
 
-        public AilmentContainer GetAilmentContainer()
+        public StatusEffectContainer GetAilmentContainer()
         {
-            AilmentContainer ailmentHandler = GetComponent<AilmentContainer>();
-            if (!ailmentHandler)
+            StatusEffectContainer statusEffectHandler = GetComponent<StatusEffectContainer>();
+            if (!statusEffectHandler)
             {
-                ailmentHandler = gameObject.AddComponent<AilmentContainer>();
+                statusEffectHandler = gameObject.AddComponent<StatusEffectContainer>();
             }
 
-            return ailmentHandler;
+            return statusEffectHandler;
         }
 
         public CellInfo GetInfo()
@@ -252,15 +252,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
                 TotalWeightInfo += currWeightInfo.m_WeightInfo;
             }
 
-            List<Ailment> ailments = GetAilmentContainer().GetAilments();
-            foreach (Ailment currAilment in ailments)
+            List<StatusEffect> ailments = GetAilmentContainer().GetStatusEffectList();
+            foreach (StatusEffect currAilment in ailments)
             {
                 if(currAilment)
                 {
-                    CellAilment cellAilment = currAilment as CellAilment;
-                    if(cellAilment)
+                    CellStatusEffect cellStatusEffect = currAilment as CellStatusEffect;
+                    if(cellStatusEffect)
                     {
-                        TotalWeightInfo += cellAilment.m_WeightInfo;
+                        TotalWeightInfo += cellStatusEffect.m_WeightInfo;
                     }
                 }
             }

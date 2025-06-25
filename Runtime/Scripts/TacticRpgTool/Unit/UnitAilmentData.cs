@@ -1,25 +1,27 @@
+using UnityEngine.Serialization;
+
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 {
     [System.Serializable]
     public struct UnitAilmentData
     {
-        public Ailment m_ailment;
+        [FormerlySerializedAs("m_ailment")] public StatusEffect mStatusEffect;
         public int m_NumTurns;
 
-        public UnitAilmentData(Ailment InAilment, int InNumTurns = 0)
+        public UnitAilmentData(StatusEffect inStatusEffect, int InNumTurns = 0)
         {
-            m_ailment = InAilment;
+            mStatusEffect = inStatusEffect;
             m_NumTurns = InNumTurns;
         }
 
         public bool IsEqual(UnitAilmentData other)
         {
-            return m_ailment == other.m_ailment;
+            return mStatusEffect == other.mStatusEffect;
         }
 
-        public bool IsEqual(Ailment other)
+        public bool IsEqual(StatusEffect other)
         {
-            return m_ailment == other;
+            return mStatusEffect == other;
         }
     }
 } 

@@ -7,9 +7,9 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
 
-    [CustomEditor(typeof(Ailment))]
+    [CustomEditor(typeof(StatusEffect))]
     [CanEditMultipleObjects]
-    public class AilmentEditor : Editor
+    public class StatusEffectEditor : Editor
     {
         void DrawArrElem(PropertyReplaceInfo ReplaceInfo, SerializedProperty InArrayProp)
         {

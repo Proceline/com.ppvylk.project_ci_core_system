@@ -65,7 +65,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         AbilityParamBase[] m_Params;
 
         [SerializeField]
-        Ailment[] m_Ailments;
+        StatusEffect[] m_Ailments;
 
         [SerializeField]
         private UnitAbilityAnimation m_Animation;
@@ -154,9 +154,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return new List<AbilityParamBase>(m_Params);
         }
 
-        public List<Ailment> GetAilments()
+        public List<StatusEffect> GetAilments()
         {
-            return new List<Ailment>(m_Ailments);
+            return new List<StatusEffect>(m_Ailments);
         }
 
         #endregion
@@ -341,19 +341,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 param.ApplyTo(InCasterUnit, InEffectCell);
             }
 
-            foreach (Ailment ailment in m_Ailments)
+            foreach (StatusEffect ailment in m_Ailments)
             {
                 if (ailment)
                 {
                     if (targetExecuteUnit)
                     {
-                        targetExecuteUnit.GetAilmentContainer().AddAilment(InCasterUnit, ailment);
+                        targetExecuteUnit.GetAilmentContainer().AddStatusEffect(InCasterUnit, ailment);
                     }
 
-                    CellAilment cellAilment = ailment as CellAilment;
-                    if (cellAilment)
+                    CellStatusEffect cellStatusEffect = ailment as CellStatusEffect;
+                    if (cellStatusEffect)
                     {
-                        InEffectCell.GetAilmentContainer().AddAilment(InCasterUnit, cellAilment, InEffectCell);
+                        InEffectCell.GetAilmentContainer().AddStatusEffect(InCasterUnit, cellStatusEffect, InEffectCell);
                     }
                 }
             }
@@ -392,19 +392,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             // TODO: Should be handled as visual effects
-            foreach (Ailment ailment in m_Ailments)
+            foreach (StatusEffect ailment in m_Ailments)
             {
                 if (ailment)
                 {
                     if (targetExecuteUnit)
                     {
-                        targetExecuteUnit.GetAilmentContainer().AddAilment(InCasterUnit, ailment);
+                        targetExecuteUnit.GetAilmentContainer().AddStatusEffect(InCasterUnit, ailment);
                     }
 
-                    CellAilment cellAilment = ailment as CellAilment;
-                    if (cellAilment)
+                    CellStatusEffect cellStatusEffect = ailment as CellStatusEffect;
+                    if (cellStatusEffect)
                     {
-                        InEffectCell.GetAilmentContainer().AddAilment(InCasterUnit, cellAilment, InEffectCell);
+                        InEffectCell.GetAilmentContainer().AddStatusEffect(InCasterUnit, cellStatusEffect, InEffectCell);
                     }
                 }
             }

@@ -21,7 +21,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         MovingProgress,
         UsingAbility,
         AbilityTargeting,
-        AbilityConfirming
+        AbilityConfirming,
+        Finished
     }
 
     public abstract class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
@@ -177,15 +178,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_UnitData;
         }
 
-        public AilmentContainer GetAilmentContainer()
+        public StatusEffectContainer GetAilmentContainer()
         {
-            AilmentContainer ailmentHandler = GetComponent<AilmentContainer>();
-            if (!ailmentHandler)
+            StatusEffectContainer statusEffectHandler = GetComponent<StatusEffectContainer>();
+            if (!statusEffectHandler)
             {
-                ailmentHandler = gameObject.AddComponent<AilmentContainer>();
+                statusEffectHandler = gameObject.AddComponent<StatusEffectContainer>();
             }
 
-            return ailmentHandler;
+            return statusEffectHandler;
         }
 
         public abstract UnitBattleState GetCurrentState();
@@ -439,7 +440,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                     if ( cell != startingCell )
                     {
-                        AilmentHandlerUtils.HandleUnitOnCell(this, cell);
+                        StatusEffectUtils.HandleUnitOnCell(this, cell);
                         PlayTravelAudio();
                     }
 
@@ -529,7 +530,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                     if ( cell != StartingCell )
                     {
-                        AilmentHandlerUtils.HandleUnitOnCell(this, cell);
+                        StatusEffectUtils.HandleUnitOnCell(this, cell);
                     }
                 }
 

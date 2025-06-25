@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 {
     [CreateAssetMenu(fileName = "NewCellAilment", menuName = "ProjectCI Tools/Create New Cell Ailment", order = 1)]
-    public class CellAilment : Ailment
+    public class CellStatusEffect : StatusEffect
     {
         public AilmentExecutionInfo m_ExecuteOnUnitOver;
 

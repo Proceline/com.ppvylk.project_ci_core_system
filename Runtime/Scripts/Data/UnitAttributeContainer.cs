@@ -10,12 +10,12 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
         private UnitDiscreteResource _stamina;
 
         public UnitDiscreteResource Health 
-            => _health ?? (_health = new UnitDiscreteResource(0, 0));
+            => _health ??= new UnitDiscreteResource(0, 0);
         public UnitDiscreteResource Stamina 
-            => _stamina ?? (_stamina = new UnitDiscreteResource(0, 0));
+            => _stamina ??= new UnitDiscreteResource(0, 0);
 
         // Base attributes
-        private Dictionary<AttributeType, int> _generalAttributes = new();
+        private readonly Dictionary<AttributeType, int> _generalAttributes = new();
         protected Dictionary<AttributeType, int> GeneralAttributes => _generalAttributes;
 
         // Accumulated modifiers for each attribute type

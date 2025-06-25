@@ -12,13 +12,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         public AudioClip m_AudioClip;
     }
 
-    [CreateAssetMenu(fileName = "NewAilment", menuName = "ProjectCI Tools/Create New Ailment", order = 1)]
-    public class Ailment : ScriptableObject
+    [CreateAssetMenu(fileName = "New StatusEffect", menuName = "ProjectCI Tools/Create New Status Effect", order = 1)]
+    public class StatusEffect : ScriptableObject
     {
-        public string m_AilmentName;
+        public string effectName;
         public string m_Description;
 
-        public int m_NumEffectedTurns;
+        public int numEffectedTurns;
 
         public AilmentExecutionInfo m_ExecuteOnStartOfTurn;
         public AilmentExecutionInfo m_ExecuteOnEndOfTurn;

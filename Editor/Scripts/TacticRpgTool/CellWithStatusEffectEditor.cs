@@ -7,7 +7,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(CellAilment))]
+    [CustomEditor(typeof(CellStatusEffect))]
     [CanEditMultipleObjects]
     public class CellAilmentEditor : Editor
     {

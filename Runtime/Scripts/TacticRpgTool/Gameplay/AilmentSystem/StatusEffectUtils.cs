@@ -8,7 +8,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
 {
-    public static class AilmentHandlerUtils
+    public static class StatusEffectUtils
     {
         public static void HandleTurnStart(BattleTeam InTeam)
         {
@@ -17,8 +17,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 if(unit)
                 {
-                    List<Ailment> ailments = unit.GetAilmentContainer().GetAilments();
-                    foreach (Ailment currAilment in ailments)
+                    List<StatusEffect> ailments = unit.GetAilmentContainer().GetStatusEffectList();
+                    foreach (StatusEffect currAilment in ailments)
                     {
                         if(currAilment)
                         {
@@ -27,8 +27,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                         }
                     }
 
-                    unit.GetAilmentContainer().IncrementAllAilments();
-                    unit.GetAilmentContainer().CheckAilments();
+                    unit.GetAilmentContainer().IncrementAllStatusEffects();
+                    unit.GetAilmentContainer().CheckStatusEffects();
                 }
             }
 
@@ -39,39 +39,39 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                 {
                     GridPawnUnit unit = currLevelCell.GetUnitOnCell();
                     
-                    AilmentContainer ailmentContainer = currLevelCell.GetAilmentContainer();
-                    if (ailmentContainer)
+                    StatusEffectContainer statusEffectContainer = currLevelCell.GetAilmentContainer();
+                    if (statusEffectContainer)
                     {
-                        List<AilmentContainedData> ailments = ailmentContainer.GetAllAilmentContainerData();
+                        List<StatusEffectContainedData> ailments = statusEffectContainer.GetAllAilmentContainerData();
 
                         for (int i = 0; i < ailments.Count; i++)
                         {
-                            AilmentContainedData currAilment = ailments[i];
-                            if (currAilment.m_ailment)
+                            StatusEffectContainedData currStatusEffect = ailments[i];
+                            if (currStatusEffect.mStatusEffect)
                             {
-                                AilmentExecutionInfo StartExecution = currAilment.m_ailment.m_ExecuteOnStartOfTurn;
-                                HandleCellAilmentExecution(currAilment.m_AssociatedCell, StartExecution);
+                                AilmentExecutionInfo StartExecution = currStatusEffect.mStatusEffect.m_ExecuteOnStartOfTurn;
+                                HandleCellAilmentExecution(currStatusEffect.m_AssociatedCell, StartExecution);
 
-                                GridPawnUnit Caster = currAilment.m_CastedBy;
+                                GridPawnUnit Caster = currStatusEffect.m_CastedBy;
                                 if (Caster)//If there is a caster, then check if it's their turn to increment the ailment
                                 {
                                     bool bShouldIncrementAilment = InTeam == Caster.GetTeam();
                                     if (bShouldIncrementAilment)
                                     {
-                                        ailmentContainer.IncrementAilment(currAilment);
+                                        statusEffectContainer.IncrementStatusEffect(currStatusEffect);
                                     }
                                 }
                                 else//If there was no caster, check if it was friendly
                                 {
                                     if (InTeam == BattleTeam.Friendly)
                                     {
-                                        ailmentContainer.IncrementAilment(currAilment);
+                                        statusEffectContainer.IncrementStatusEffect(currStatusEffect);
                                     }
                                 }
                             }
                         }
                         
-                        ailmentContainer.CheckAilments();
+                        statusEffectContainer.CheckStatusEffects();
                     }
                 }
             }
@@ -84,8 +84,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 if (unit)
                 {
-                    List<Ailment> ailments = unit.GetAilmentContainer().GetAilments();
-                    foreach (Ailment currAilment in ailments)
+                    List<StatusEffect> ailments = unit.GetAilmentContainer().GetStatusEffectList();
+                    foreach (StatusEffect currAilment in ailments)
                     {
                         if (currAilment)
                         {
@@ -104,15 +104,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
                     GridPawnUnit unit = currLevelCell.GetUnitOnCell();
                     if(unit && unit.GetTeam() == InTeam)
                     {
-                        AilmentContainer ailmentContainer = currLevelCell.GetAilmentContainer();
-                        if (ailmentContainer)
+                        StatusEffectContainer statusEffectContainer = currLevelCell.GetAilmentContainer();
+                        if (statusEffectContainer)
                         {
-                            List<AilmentContainedData> ailments = ailmentContainer.GetAllAilmentContainerData();
-                            foreach (AilmentContainedData currAilment in ailments)
+                            List<StatusEffectContainedData> ailments = statusEffectContainer.GetAllAilmentContainerData();
+                            foreach (StatusEffectContainedData currAilment in ailments)
                             {
-                                if (currAilment.m_ailment)
+                                if (currAilment.mStatusEffect)
                                 {
-                                    AilmentExecutionInfo EndExecution = currAilment.m_ailment.m_ExecuteOnEndOfTurn;
+                                    AilmentExecutionInfo EndExecution = currAilment.mStatusEffect.m_ExecuteOnEndOfTurn;
                                     HandleCellAilmentExecution(currAilment.m_AssociatedCell, EndExecution);
                                 }
                             }
@@ -127,18 +127,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         {
             if (InCell && InUnit)
             {
-                AilmentContainer ailmentContainer = InCell.GetAilmentContainer();
-                if (ailmentContainer)
+                StatusEffectContainer statusEffectContainer = InCell.GetAilmentContainer();
+                if (statusEffectContainer)
                 {
-                    List<AilmentContainedData> ailments = ailmentContainer.GetAllAilmentContainerData();
-                    foreach (AilmentContainedData currAilment in ailments)
+                    List<StatusEffectContainedData> ailments = statusEffectContainer.GetAllAilmentContainerData();
+                    foreach (StatusEffectContainedData currAilment in ailments)
                     {
-                        if (currAilment.m_ailment)
+                        if (currAilment.mStatusEffect)
                         {
-                            CellAilment cellAilment = currAilment.m_ailment as CellAilment;
-                            if(cellAilment)
+                            CellStatusEffect cellStatusEffect = currAilment.mStatusEffect as CellStatusEffect;
+                            if(cellStatusEffect)
                             {
-                                HandleAilmentExecution(InUnit, cellAilment.m_ExecuteOnUnitOver);
+                                HandleAilmentExecution(InUnit, cellStatusEffect.m_ExecuteOnUnitOver);
                             }
                         }
                     }
