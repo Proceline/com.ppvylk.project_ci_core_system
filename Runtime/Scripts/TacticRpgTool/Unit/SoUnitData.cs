@@ -55,6 +55,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [Header("Points")]
         public int m_AbilityPoints;
 
+        public virtual void InitializeUnitDataToGridUnit(GridPawnUnit pawnUnit)
+        {
+            // Empty
+        }
+        
         void Reset()
         {
             m_bLookAtTargets = true;
