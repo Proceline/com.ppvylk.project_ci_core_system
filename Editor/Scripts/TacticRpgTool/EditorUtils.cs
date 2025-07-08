@@ -254,41 +254,90 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             return types;
         }
 
+        public static void DrawInterfacesPopup(object target, ref string outType, string label = "PossibleType")
+        {
+            Type targetType = target.GetType();
+            var allInterfaces = targetType.GetInterfaces();
+            Type parentType = targetType.BaseType;
+            List<string> optionList = new List<string> { targetType.AssemblyQualifiedName };
+            foreach (Type interfaceType in allInterfaces)
+            {
+                optionList.Add(interfaceType.AssemblyQualifiedName);
+            }
+
+            if (parentType != null && parentType != typeof(ScriptableObject) && parentType != typeof(MonoBehaviour))
+            {
+                optionList.Add(parentType.AssemblyQualifiedName);
+            }
+
+            string selectedTypeText = outType;
+
+            if (optionList.Count > 0)
+            {
+                string beforeType = selectedTypeText;
+                int popupIndex = optionList.FindIndex(inStr => inStr == beforeType);
+                popupIndex = EditorGUILayout.Popup(label, popupIndex, optionList.ToArray());
+                selectedTypeText = optionList[popupIndex];
+                outType = selectedTypeText;
+            }
+        }
         
+        public static void DrawInterfacesPopup(Rect position, object target, ref SerializedProperty valueProperty)
+        {
+            Type targetType = target.GetType();
+            var allInterfaces = targetType.GetInterfaces();
+            Type parentType = targetType.BaseType;
+            List<string> optionList = new List<string> { targetType.AssemblyQualifiedName };
+            foreach (Type interfaceType in allInterfaces)
+            {
+                optionList.Add(interfaceType.AssemblyQualifiedName);
+            }
+
+            if (parentType != null && parentType != typeof(ScriptableObject) && parentType != typeof(MonoBehaviour))
+            {
+                optionList.Add(parentType.AssemblyQualifiedName);
+            }
+
+            string selectedTypeText = valueProperty.stringValue;
+
+            if (optionList.Count > 0)
+            {
+                string beforeType = selectedTypeText;
+                int popupIndex = optionList.FindIndex(inStr => inStr == beforeType);
+                popupIndex = EditorGUI.Popup(position, popupIndex, optionList.ToArray());
+
+                if (popupIndex != -1 && popupIndex < optionList.Count 
+                    && selectedTypeText != optionList[popupIndex])
+                {
+                    valueProperty.stringValue = optionList[popupIndex];
+                }
+            }
+        }
 
         public static void DrawClassPopup<T>(ref string outType) where T : class
         {
-            List<System.Type> types = GetTypes<T>();
-            Dictionary<int, System.Type> IndexToType = new Dictionary<int, System.Type>();
+            List<Type> types = GetTypes<T>();
+            Dictionary<int, Type> indexToType = new Dictionary<int, Type>();
             List<string> optionList = new List<string>();
 
             int index = 0;
-            foreach (System.Type item in types)
+            foreach (Type item in types)
             {
-                IndexToType.Add(index++, item);
+                indexToType.Add(index++, item);
                 optionList.Add(item.Name);
             }
 
-            System.Type classType = null;
-
-            if (outType == "" || outType == null)
-            {
-                classType = types[0];
-            }
-            else
-            {
-                classType = GameUtils.FindType(outType);
-            }
+            var classType = string.IsNullOrEmpty(outType) ? types[0] : GameUtils.FindType(outType);
 
             if(classType != null)
             {
-                System.Type beforeType = classType;
+                var beforeType = classType;
 
-                int PopupIndex = optionList.FindIndex((string inStr) => { return inStr == beforeType.Name; });
+                int popupIndex = optionList.FindIndex((string inStr) => { return inStr == beforeType.Name; });
 
-                PopupIndex = EditorGUILayout.Popup("UnitClass", PopupIndex, optionList.ToArray());
+                popupIndex = EditorGUILayout.Popup("UnitClass", popupIndex, optionList.ToArray());
 
-                classType = IndexToType[PopupIndex];
+                classType = indexToType[popupIndex];
 
                 outType = classType.FullName;
             }
