@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: d50a4f4b7953e6b41a88c19b517acb12
-timeCreated: 1564376045
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Editor/HexagonLevelGridEditor.cs
-  uploadId: 389222
