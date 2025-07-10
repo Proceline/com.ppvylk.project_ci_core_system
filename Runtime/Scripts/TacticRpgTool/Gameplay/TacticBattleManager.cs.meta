@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: 686078385d6e23c4dbb30a07e7ea7cef
-timeCreated: 1565320315
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/GameManager.cs
-  uploadId: 389222
