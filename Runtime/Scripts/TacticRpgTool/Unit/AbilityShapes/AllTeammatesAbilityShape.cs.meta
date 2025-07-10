@@ -1,18 +1,2 @@
 fileFormatVersion: 2
 guid: 504ab75a2b19f534d8d6ecfd109d8882
-MonoImporter:
-  externalObjects: {}
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Unit/AbilityShapes/AllTeammatesAbilityShape.cs
-  uploadId: 389222

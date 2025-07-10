@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: daa96c694b97ec54ba99f6574b6c3246
-timeCreated: 1565845838
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/Components/Health.cs
-  uploadId: 389222

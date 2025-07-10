@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: 407ea0c688ad9374e9e3367b0a22b8de
-timeCreated: 1571455293
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Gameplay/WinConditions/DiscoverArea_WinCondition.cs
-  uploadId: 389222

@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: a3c513fba89a5444d9d1edf68f3acf29
-timeCreated: 1571177818
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/_General/CameraPanArea.cs
-  uploadId: 389222

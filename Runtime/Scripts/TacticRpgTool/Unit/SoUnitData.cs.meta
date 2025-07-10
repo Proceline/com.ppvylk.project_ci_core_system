@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: 70ea21104062b944b8bb569553a27a2d
-timeCreated: 1568697506
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Unit/UnitData.cs
-  uploadId: 389222

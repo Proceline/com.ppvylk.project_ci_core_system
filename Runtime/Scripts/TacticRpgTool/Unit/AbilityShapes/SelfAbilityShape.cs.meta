@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: 9fddcd5aaabc71a4da3a5524ee9894a6
-timeCreated: 1572740855
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/Unit/AbilityShapes/SelfAbilityShape.cs
-  uploadId: 389222
