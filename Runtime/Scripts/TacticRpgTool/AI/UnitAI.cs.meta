@@ -1,19 +1,2 @@
 fileFormatVersion: 2
 guid: 8c00ac811832c254ca774a0c9d7248e7
-timeCreated: 1567306979
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 156593
-  packageName: Turn-Based Strategy Toolkit
-  packageVersion: 1.0.2
-  assetPath: Assets/TurnBasedToolsAsset/Scripts/AI/UnitAI.cs
-  uploadId: 389222
