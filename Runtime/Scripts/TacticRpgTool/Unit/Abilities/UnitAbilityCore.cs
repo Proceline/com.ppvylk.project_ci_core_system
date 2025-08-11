@@ -10,6 +10,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using System;
 using ProjectCI.CoreSystem.Runtime.Interfaces;
+using UnityEngine.Serialization;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
@@ -67,12 +68,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [SerializeField]
         StatusEffect[] m_Ailments;
 
-        [SerializeField]
-        private UnitAbilityAnimation m_Animation;
-
-        public AudioClip audioOnStart;
-
-        public AudioClip audioOnExecute;
+        [SerializeField, HideInInspector]
+        protected UnitAbilityAnimation abilityAnimation;
 
         public int[] additionalParameters;
 
@@ -170,13 +167,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
 
-            CellState AbilityState = GetEffectedTeam() == BattleTeam.Hostile ? CellState.eNegative : CellState.ePositive;
+            CellState abilityState = GetEffectedTeam() == BattleTeam.Hostile ? CellState.eNegative : CellState.ePositive;
 
             foreach (LevelCellBase cell in abilityCells)
             {
                 if (cell)
                 {
-                    TacticBattleManager.SetCellState(cell, AbilityState);
+                    TacticBattleManager.SetCellState(cell, abilityState);
                 }
             }
 
@@ -185,111 +182,108 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public List<LevelCellBase> GetEffectedCells(GridPawnUnit InCasterUnit, LevelCellBase InTarget)
         {
-            List<LevelCellBase> EffectCellList = new List<LevelCellBase>();
+            List<LevelCellBase> effectCellList = new List<LevelCellBase>();
 
             if (GetEffectShape() != null)
             {
-                List<LevelCellBase> EffectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), BattleTeam.All);
-                EffectCellList.AddRange(EffectCells);
+                List<LevelCellBase> effectCells = GetEffectShape().GetCellList(InCasterUnit, InTarget, GetEffectRadius(), DoesAllowBlocked(), BattleTeam.All);
+                effectCellList.AddRange(effectCells);
             }
             else
             {
                 bool bEffectsTarget = TacticBattleManager.CanCasterEffectTarget(InCasterUnit.GetCell(), InTarget, GetEffectedTeam(), DoesAllowBlocked());
                 if(bEffectsTarget)
                 {
-                    EffectCellList.Add(InTarget);
+                    effectCellList.Add(InTarget);
                 }
             }
 
-            return EffectCellList;
+            return effectCellList;
         }
 
         public List<LevelCellBase> GetAbilityCells(GridPawnUnit InUnit)
         {
-            if(!InUnit)
+            if (!InUnit)
             {
                 return new List<LevelCellBase>();
             }
 
-            List<LevelCellBase> AbilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(), DoesAllowBlocked(), GetEffectedTeam());
+            List<LevelCellBase> abilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(),
+                DoesAllowBlocked(), GetEffectedTeam());
 
-            if(GetEffectedUnitType() != EffectedVictimType.All)
+            if (GetEffectedUnitType() != EffectedVictimType.All)
             {
-                List<LevelCellBase> RemoveList = new List<LevelCellBase>();
-                foreach (LevelCellBase cell in AbilityCells)
+                List<LevelCellBase> removeList = new List<LevelCellBase>();
+                foreach (LevelCellBase cell in abilityCells)
                 {
-                    if(cell)
+                    if (!cell)
                     {
-                        GridPawnUnit unitOnCell = cell.GetUnitOnCell();
-                        if(unitOnCell)
-                        {
-                            bool bIsFlying = unitOnCell.IsFlying();
+                        continue;
+                    }
 
-                            if(GetEffectedUnitType() == EffectedVictimType.Flying)
-                            {
-                                if( !bIsFlying )
-                                {
-                                    RemoveList.Add(cell);
-                                }
-                            }
-                            else if(GetEffectedUnitType() == EffectedVictimType.Ground)
-                            {
-                                if( bIsFlying )
-                                {
-                                    RemoveList.Add(cell);
-                                }
-                            }
-                        }
-                        else
+                    GridPawnUnit unitOnCell = cell.GetUnitOnCell();
+                    if (unitOnCell)
+                    {
+                        bool bIsFlying = unitOnCell.IsFlying();
+
+                        if (GetEffectedUnitType() == EffectedVictimType.Flying)
                         {
-                            RemoveList.Add(cell);
+                            if (!bIsFlying)
+                            {
+                                removeList.Add(cell);
+                            }
                         }
+                        else if (GetEffectedUnitType() == EffectedVictimType.Ground)
+                        {
+                            if (bIsFlying)
+                            {
+                                removeList.Add(cell);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        removeList.Add(cell);
                     }
                 }
 
-                foreach (LevelCellBase cell in RemoveList)
+                foreach (LevelCellBase cell in removeList)
                 {
-                    AbilityCells.Remove(cell);
+                    abilityCells.Remove(cell);
                 }
             }
 
-            return AbilityCells;
+            return abilityCells;
         }
 
-        public async Awaitable ApplyResult(GridPawnUnit InCasterUnit, LevelCellBase target,
-            List<Action<GridPawnUnit, LevelCellBase>> InReacts, UnityEvent OnNonLogicalComplete = null)
+        public async Awaitable ApplyResult(GridPawnUnit casterUnit, LevelCellBase target,
+            List<Action<GridPawnUnit, LevelCellBase>> InReacts, UnityEvent onNonLogicalComplete = null,
+            UnityEvent<GridPawnUnit> onCasterUnitStartAnim = null, UnityEvent<GridPawnUnit> onCasterUnitAfterExecute = null)
         {
             if(GetShape())
             {
-                InCasterUnit.LookAtCell(target);
+                casterUnit.LookAtCell(target);
                 TacticBattleManager.AddActionBeingPerformed();
                 
-                InCasterUnit.RemoveAbilityPoints(m_ActionPointCost);
-                m_Animation?.PlayAnimation(InCasterUnit);
+                abilityAnimation?.PlayAnimation(casterUnit);
+                onCasterUnitStartAnim?.Invoke(casterUnit);
 
-                if(audioOnStart != null)
-                {
-                    AudioPlayData audioData = new AudioPlayData(audioOnStart);
-                    AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
-                }
-
-                float firstExecuteTime = m_Animation.ExecuteAfterTime(0);
+                float firstExecuteTime = abilityAnimation ? abilityAnimation.ExecuteAfterTime(0) : 0.25f;
                 await Awaitable.WaitForSecondsAsync(firstExecuteTime);
 
-                if (audioOnExecute != null)
-                {
-                    AudioPlayData audioData = new AudioPlayData(audioOnExecute);
-                    AudioHandler.PlayAudio(audioData, InCasterUnit.gameObject.transform.position);
-                }
+                onCasterUnitAfterExecute?.Invoke(casterUnit);
+                // TODO: Handle Audio
+                // AudioPlayData audioData = new AudioPlayData(audioOnExecute);
+                // AudioHandler.PlayAudio(audioData, casterUnit.gameObject.transform.position);
 
                 foreach (Action<GridPawnUnit, LevelCellBase> react in InReacts)
                 {
-                    react?.Invoke(InCasterUnit, target);
+                    react?.Invoke(casterUnit, target);
                 }
 
-                if (m_Animation)
+                if (abilityAnimation)
                 {
-                    float timeRemaining = m_Animation.GetAnimationLength() - firstExecuteTime;
+                    float timeRemaining = abilityAnimation.GetAnimationLength() - firstExecuteTime;
                     timeRemaining = Mathf.Max(0, timeRemaining);
 
                     await Awaitable.WaitForSecondsAsync(timeRemaining);
@@ -298,7 +292,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 TacticBattleManager.RemoveActionBeingPerformed();
             }
 
-            OnNonLogicalComplete?.Invoke();
+            onNonLogicalComplete?.Invoke();
         }
 
         private void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
@@ -314,8 +308,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             foreach (AbilityParticle abilityParticle in m_SpawnOnCaster)
             {
                 Vector3 pos = InCasterUnit.GetCell().GetAllignPos(InCasterUnit);
-                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
-                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
+                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
             }
 
             foreach (AbilityParticle abilityParticle in m_SpawnOnTarget)
@@ -327,8 +321,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     pos = InEffectCell.GetAllignPos(targetObj);
                 }
 
-                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
-                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
+                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
             }
 
             foreach (AbilityParamBase param in m_Params)
@@ -373,8 +367,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             foreach (AbilityParticle abilityParticle in m_SpawnOnCaster)
             {
                 Vector3 pos = InCasterUnit.GetCell().GetAllignPos(InCasterUnit);
-                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
-                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
+                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
             }
 
             // Visual effects on target
@@ -387,8 +381,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     pos = InEffectCell.GetAllignPos(targetObj);
                 }
 
-                AbilityParticle CreatedAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
-                CreatedAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
+                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
+                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
             }
 
             // TODO: Should be handled as visual effects
@@ -408,11 +402,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     }
                 }
             }
-        }
-
-        public float CalculateAbilityTime(GridPawnUnit InUnit, LevelCellBase InTarget)
-        {
-            return m_Animation ? m_Animation.GetAnimationLength() : 0.5f;
         }
     }
 }

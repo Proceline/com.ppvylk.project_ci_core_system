@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
@@ -7,6 +8,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Components;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -131,13 +133,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LevelGridBase InGrid,
             SoUnitData InUnitData,
             BattleTeam InTeam,
-            List<UnitAbilityCore> InAbilities,
             LevelCellBase cell) where T : GridPawnUnit
         {
             T SpawnedGridUnit = originPawn.AddComponent<T>();
             SpawnedGridUnit.Initialize();
             SpawnedGridUnit.SetUnitData(InUnitData);
-            SpawnedGridUnit.SetAbilities(InAbilities);
             SpawnedGridUnit.SetTeam(InTeam);
             SpawnedGridUnit.SetGrid(InGrid);
             SpawnedGridUnit.SetCurrentCell(cell);
@@ -160,7 +160,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LevelGridBase InGrid,
             SoUnitData InUnitData,
             BattleTeam InTeam,
-            List<UnitAbilityCore> InAbilities,
+            Action<T> afterSpawnHandler,
             float searchRadius,
             LayerMask cellLayer,
             CompassDir InStartDirection = CompassDir.S)
@@ -183,17 +183,18 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 cell.SetVisible(true);
             }
 
-            T SpawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, InAbilities, cell);
+            T spawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
+            afterSpawnHandler?.Invoke(spawnedGridUnit);
 
-            LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
-            if (DirCell)
+            LevelCellBase dirCell = spawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
+            if (dirCell)
             {
-                SpawnedGridUnit.LookAtCell(DirCell);
+                spawnedGridUnit.LookAtCell(dirCell);
             }
 
-            TacticBattleManager.AddUnitToTeam(SpawnedGridUnit, InTeam);
+            TacticBattleManager.AddUnitToTeam(spawnedGridUnit, InTeam);
 
-            return SpawnedGridUnit;
+            return spawnedGridUnit;
         }
 
         /// <summary>

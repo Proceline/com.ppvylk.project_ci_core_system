@@ -45,21 +45,22 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                             }
                         }
 
-                        if ( !InAIUnit.IsDead() ) //Unit can die while walking around.
+                        if (!InAIUnit.IsDead() ) //Unit can die while walking around.
                         {
+                            // TODO: FIX THIS
                             // Do ability.
                             if (abilityIndex >= 0)
                             {
-                                UnitAbilityCore selectedAbility = InAIUnit.GetAbilities()[abilityIndex];
-                                if (selectedAbility)
-                                {
-                                    List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
-                                    if (abilityCells.Contains(target.GetCell()))
-                                    {
-                                        // TODO: Remove this
-                                        // TacticBattleManager.Get().StartCoroutine(AStarAlgorithmUtils.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
-                                    }
-                                }
+                                // UnitAbilityCore selectedAbility = InAIUnit.GetAbilities()[abilityIndex];
+                                // if (selectedAbility)
+                                // {
+                                //     List<LevelCellBase> abilityCells = selectedAbility.GetAbilityCells(InAIUnit);
+                                //     if (abilityCells.Contains(target.GetCell()))
+                                //     {
+                                //         // TODO: Remove this
+                                //         // TacticBattleManager.Get().StartCoroutine(AStarAlgorithmUtils.ExecuteAbility(InAIUnit, target.GetCell(), selectedAbility));
+                                //     }
+                                // }
                             }
                         }
                     }
@@ -141,23 +142,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         protected int CalculateAbilityIndex(GridPawnUnit InAIUnit)
         {
+            // TODO: FIX THIS
             if (InAIUnit)
             {
-                int allowedAP = InAIUnit.GetCurrentAbilityPoints();
-                List<UnitAbilityCore> abilities = InAIUnit.GetAbilities();
-                if (abilities.Count > 0)
-                {
-                    for (int i = 0; i < abilities.Count; i++)
-                    {
-                        if (abilities[i] && abilities[i].GetEffectedTeam() == BattleTeam.Hostile)
-                        {
-                            if (abilities[i].GetActionPointCost() <= allowedAP)
-                            {
-                                return i;
-                            }
-                        }
-                    }
-                }
+                // int allowedAP = InAIUnit.GetCurrentAbilityPoints();
+                // List<UnitAbilityCore> abilities = InAIUnit.GetAbilities();
+                // if (abilities.Count > 0)
+                // {
+                //     for (int i = 0; i < abilities.Count; i++)
+                //     {
+                //         if (abilities[i] && abilities[i].GetEffectedTeam() == BattleTeam.Hostile)
+                //         {
+                //             if (abilities[i].GetActionPointCost() <= allowedAP)
+                //             {
+                //                 return i;
+                //             }
+                //         }
+                //     }
+                // }
+                return 0;
             }
 
             return -1;
@@ -170,7 +173,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 return InAIUnit.GetCell();
             }
 
-            List<UnitAbilityCore> AIUnitAbilities = InAIUnit.GetAbilities();
+            // TODO: Solve abilities problems
+            List<UnitAbilityCore> AIUnitAbilities = new();//InAIUnit.GetAbilities();
             if (AIUnitAbilities.Count < 0)
             {
                 return InAIUnit.GetCell();

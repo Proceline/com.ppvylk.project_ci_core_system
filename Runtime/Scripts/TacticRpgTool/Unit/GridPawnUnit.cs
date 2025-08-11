@@ -31,28 +31,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         private UnitAttributeContainer _runtimeAttributes;
         private UnitAttributeContainer _simulatedAttributes;
 
-        private UnitAbilityCore _currentAbility;
-        protected UnitAbilityCore CurrentAbility
-        {
-            get => _currentAbility;
-            set => _currentAbility = value;
-        }
-
         protected int m_CurrentMovementPoints;
-        protected int m_CurrentAbilityPoints;
 
         bool m_bIsTarget = false;
         bool m_bIsMoving = false;
-        bool m_bIsAttacking = false;
         bool m_bActivated = false;
 
         protected bool m_bIsDead = false;
 
-        protected UnityEvent OnMovementPostComplete = new UnityEvent();
+        protected UnityEvent OnMovementPostComplete = new();
 
-        protected readonly List<LevelCellBase> EditedCells = new List<LevelCellBase>();
-
-        private List<UnitAbilityCore> _loadedAbilities = new List<UnitAbilityCore>();
+        protected readonly List<LevelCellBase> EditedCells = new();
 
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
@@ -147,11 +136,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             m_UnitData = InUnitData;
         }
 
-        public void SetAbilities(List<UnitAbilityCore> InAbilities)
-        {
-            _loadedAbilities = InAbilities;
-        }
-
         public void SetActivated(bool bInNewActivateState)
         {
             if(m_bActivated != bInNewActivateState)
@@ -202,11 +186,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_bIsMoving;
         }
 
-        public bool IsAttacking()
-        {
-            return m_bIsAttacking;
-        }
-
         public bool IsTarget()
         {
             return m_bIsTarget;
@@ -235,11 +214,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public virtual int GetCurrentMovementPoints()
         {
             return m_CurrentMovementPoints;
-        }
-
-        public int GetCurrentAbilityPoints()
-        {
-            return m_CurrentAbilityPoints;
         }
 
         public Vector3 GetCellAllignPos(LevelCellBase InCell)
@@ -277,38 +251,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         
         #endregion
 
-        #region AbilityStuff
-
-        public List<UnitAbilityCore> GetAbilities() => _loadedAbilities;
-
-        public UnitAbilityCore GetCurrentAbility()
-        {
-            return _currentAbility;
-        }
-
-        public abstract void SetupAbility(UnitAbilityCore ability);
-
-        public async Awaitable ShowResult(UnitAbilityCore ability, LevelCellBase target,
-            List<Action<GridPawnUnit, LevelCellBase>> reactions)
-        {
-            m_bIsAttacking = true;
-            UnityEvent OnAbilityComplete = new UnityEvent();
-            OnAbilityComplete.AddListener(HandleAbilityFinished);
-
-            await ability.ApplyResult(this, target, reactions, OnAbilityComplete);
-        }
-
-        public void RemoveAbilityPoints(int InAbilityPoints)
-        {
-            m_CurrentAbilityPoints -= InAbilityPoints;
-            if (m_CurrentAbilityPoints < 0)
-            {
-                m_CurrentAbilityPoints = 0;
-            }
-        }
-        
-        #endregion
-
         #region MovementStuff
 
         public virtual List<LevelCellBase> GetAllowedMovementCells()
@@ -331,9 +273,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             AddState(UnitBattleState.Moving);
-            List<LevelCellBase> abilityCells = GetAllowedMovementCells();
+            List<LevelCellBase> allowedMovementCells = GetAllowedMovementCells();
 
-            foreach (LevelCellBase cell in abilityCells)
+            foreach (LevelCellBase cell in allowedMovementCells)
             {
                 if (cell && cell.IsVisible())
                 {
@@ -341,7 +283,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 }
             }
 
-            EditedCells.AddRange(abilityCells);
+            EditedCells.AddRange(allowedMovementCells);
 
             TacticBattleManager.Get().UpdateHoverCells();
         }
@@ -578,12 +520,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public virtual void HandleTurnStarted()
         {
             m_CurrentMovementPoints = 5;
-            m_CurrentAbilityPoints = m_UnitData.m_AbilityPoints;
-        }
-
-        protected virtual void HandleAbilityFinished()
-        {
-            m_bIsAttacking = false;
         }
 
         protected virtual void HandleDeath()
