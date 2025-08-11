@@ -20,7 +20,7 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public string ResultId;
         public string AbilityId;
         public string OwnerId;
-        public Vector2 TargetCellIndex;
+        public Vector2Int TargetCellIndex;
         public string CommandType; // e.g. "Damage", "Heal"
         public int Value; // e.g. damage or heal amount
         public string ExtraInfo; // Optional, for custom info
