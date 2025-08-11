@@ -14,11 +14,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
         eEndFocused
     }
 
-    [System.Serializable]
+    [Serializable]
     public class TileReplacedEvent : UnityEvent<LevelCellBase>
     { }
 
-    public class LevelGridBase : MonoBehaviour
+    public abstract class LevelGridBase : MonoBehaviour
     {
         [SerializeField]
         protected GridCellMap m_CellMap;
@@ -36,25 +36,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         public Action<LevelCellBase, CellInteractionState> OnCellBeingInteracted;
 
-        public LevelCellBase this[Vector2 InIndex]
-        {
-            get
-            {
-                int xIndex = (int)InIndex.x;
-                int yIndex = (int)InIndex.y;
+        public LevelCellBase this[Vector2Int InIndex] => this[InIndex.x, InIndex.y];
 
-                return this[xIndex, yIndex];
-            }
-        }
-        
         public LevelCellBase this[int InX, int InY]
         {
             get
             {
-                Vector2 Index = new Vector2(InX, InY);
-                if (m_CellMap.ContainsKey(Index))
+                Vector2Int index = new Vector2Int(InX, InY);
+                if (m_CellMap.ContainsKey(index))
                 {
-                    return m_CellMap[Index];
+                    return m_CellMap[index];
                 }
                 else
                 {
@@ -91,12 +82,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         public List<LevelCellBase> GetAllCells()
         {
-            List<LevelCellBase> AllCells = new List<LevelCellBase>();
+            List<LevelCellBase> allCells = new List<LevelCellBase>();
             foreach (var pair in m_CellMap.Pairs)
             {
-                AllCells.Add(pair._Value);
+                allCells.Add(pair._Value);
             }
-            return AllCells;
+            return allCells;
         }
         public List<LevelCellBase> GetTeamStartPoints(BattleTeam InTeam)
         {
@@ -146,22 +137,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return m_CellPalette;
         }
 
-        public LevelCellBase ReplaceTileWith(Vector2 InIndex, GameObject InObject)
-        {
-            m_CellObjCursor = InObject;
-
-            LevelCellBase OldCell = this[InIndex];
-            Vector3 pos = OldCell.gameObject.transform.position;
-
-            RemoveCell(InIndex, true);
-            LevelCellBase NewCell = GenerateCell(pos, InIndex);
-            SetupAllCellAdjacencies();
-
-            OnTileReplaced.Invoke(NewCell);
-
-            return NewCell;
-        }
-        public LevelCellBase GenerateCellAdjacentTo(Vector2 InOriginalIndex, CompassDir InDirection)
+        public LevelCellBase GenerateCellAdjacentTo(Vector2Int InOriginalIndex, CompassDir InDirection)
         {
             LevelCellBase referenceCell = this[InOriginalIndex];
             LevelCellBase newCell = this[GetIndex(InOriginalIndex, InDirection)];
@@ -179,7 +155,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return null;
         }
 
-        public LevelCellBase GenerateCell(Vector3 InPos, Vector2 InIndex)
+        public LevelCellBase GenerateCell(Vector3 InPos, Vector2Int InIndex)
         {
             GameObject generatedCell = Instantiate(m_CellObjCursor, InPos, m_CellObjCursor.transform.rotation, gameObject.transform);
             generatedCell.name = "CELL: " + InIndex.x + ", " + InIndex.y;
@@ -234,30 +210,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         #region Virtual
 
-        protected virtual void SetupAdjacencies(LevelCellBase InCell)
-        {
-            Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
-        }
-        protected virtual Vector2 GetIndex(Vector2 InOriginalIndex, CompassDir InDirection)
-        {
-            Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
-            return Vector2.zero;
-        }
-        protected virtual Vector2 GetPosition(Vector2 OriginalIndex, CompassDir dir)
-        {
-            Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
-            return Vector2.zero;
-        }
-        protected virtual Vector2 GetOffsetFromDirection(CompassDir dir)
-        {
-            Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
-            return Vector2.zero;
-        }
-        protected virtual Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(LevelCellBase InCell)
-        {
-            Debug.Log("([TurnBasedTools]::ILevelGrid) Cannot use ILevelGrid as itself, you must use the HexagonGrid, or SquareGrid");
-            return new Dictionary<CompassDir, Vector2>();
-        }
+        protected abstract void SetupAdjacencies(LevelCellBase InCell);
+
+        protected abstract Vector2Int GetIndex(Vector2Int InOriginalIndex, CompassDir InDirection);
+
+        protected abstract Vector2 GetPosition(Vector2Int originalIndex, CompassDir dir);
+
+        protected abstract Vector2Int GetOffsetFromDirection(CompassDir dir);
+
+        protected abstract Dictionary<CompassDir, Vector2Int> GetRelativeIndicesMap(LevelCellBase InCell);
 
         #endregion
 

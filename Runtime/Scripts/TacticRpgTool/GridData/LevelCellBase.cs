@@ -8,6 +8,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
+using UnityEngine.Serialization;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 {
@@ -39,17 +40,13 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         }
     }
 
-    [ExecuteInEditMode]
-    public class LevelCellBase : MonoBehaviour
+    public abstract class LevelCellBase : MonoBehaviour
     {
         [SerializeField]
         CellInfo m_Info;
 
-        GridObject m_ObjectOnCell;
-
-        [SerializeField]
-        [HideInInspector]
-        Vector2 m_Index;
+        private GridObject _objectOnCell;
+        private Vector2Int _presetIndex;
 
         [SerializeField]
         LevelCellMap m_AdjacentCellsMap;
@@ -168,7 +165,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public bool IsObjectOnCell()
         {
-            return (m_ObjectOnCell != null);
+            return (_objectOnCell != null);
         }
 
         public bool IsCellAccesible()
@@ -311,14 +308,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public GridObject GetObjectOnCell()
         {
-            return m_ObjectOnCell;
+            return _objectOnCell;
         }
 
         public GridPawnUnit GetUnitOnCell()
         {
-            if (m_ObjectOnCell)
+            if (_objectOnCell)
             {
-                return m_ObjectOnCell as GridPawnUnit;
+                return _objectOnCell as GridPawnUnit;
             }
 
             return null;
@@ -326,7 +323,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public BattleTeam GetCellTeam()
         {
-            return m_ObjectOnCell ? m_ObjectOnCell.GetTeam() : BattleTeam.None;
+            return _objectOnCell ? _objectOnCell.GetTeam() : BattleTeam.None;
         }
 
         public string GetCellId()
@@ -334,9 +331,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return GetInfo().m_CellId;
         }
 
-        public Vector2 GetIndex()
+        public Vector2Int GetIndex()
         {
-            return m_Index;
+            return _presetIndex;
         }
 
         public CompassDir GetDirectionToAdjacentCell(LevelCellBase InTarget)
@@ -411,10 +408,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         #region Setters
 
-        public virtual void SetMaterial(CellState InCellState)
-        {
-            //Cannot use base ILevelCell
-        }
+        public abstract void SetMaterial(CellState InCellState);
 
         public void SetVisible(bool bInVisible)
         {
@@ -425,7 +419,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void SetObjectOnCell(GridObject InObject)
         {
-            m_ObjectOnCell = InObject;
+            _objectOnCell = InObject;
         }
 
         public void SetCellState(CellState InCellState)
@@ -433,9 +427,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             m_CellState = InCellState;
         }
 
-        public void SetIndex(Vector2 InIndex)
+        public void SetIndex(Vector2Int InIndex)
         {
-            m_Index = InIndex;
+            _presetIndex = InIndex;
         }
 
         #endregion

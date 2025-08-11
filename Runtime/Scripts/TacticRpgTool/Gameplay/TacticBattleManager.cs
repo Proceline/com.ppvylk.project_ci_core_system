@@ -392,7 +392,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return null;
         }
 
-        public static GridPawnUnit SpawnUnit<T>(GameObject prefab, SoUnitData unitData, BattleTeam InTeam, Vector2 InIndex, CompassDir InStartDirection = CompassDir.S)
+        public static GridPawnUnit SpawnUnit<T>(GameObject prefab, SoUnitData unitData, BattleTeam InTeam, Vector2Int InIndex, CompassDir InStartDirection = CompassDir.S)
             where T : GridPawnUnit
         {
             LevelCellBase cell = sInstance.LevelGrid[InIndex];

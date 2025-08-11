@@ -360,29 +360,27 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return 1 + (InParent != null ? InParent.G : 0) + weight;
         }
 
-        static int AStarDistance(LevelCellBase InStart, LevelCellBase InDest)
-        {
-            return (int)(InStart.GetIndex() - InDest.GetIndex()).SqrMagnitude();
-        }
+        private static int AStarDistance(LevelCellBase InStart, LevelCellBase InDest) =>
+            (InStart.GetIndex() - InDest.GetIndex()).sqrMagnitude;
 
-        static PathFindingNode AStarGetLowestFScore(List<PathFindingNode> InSet)
+        private static PathFindingNode AStarGetLowestFScore(List<PathFindingNode> InSet)
         {
-            PathFindingNode LowestF = null;
-            foreach (PathFindingNode CurrItem in InSet)
+            PathFindingNode lowestF = null;
+            foreach (PathFindingNode currentNode in InSet)
             {
-                if (LowestF == null)
+                if (lowestF == null)
                 {
-                    LowestF = CurrItem;
+                    lowestF = currentNode;
                     continue;
                 }
 
-                if (CurrItem.GetFScore() < LowestF.GetFScore())
+                if (currentNode.GetFScore() < lowestF.GetFScore())
                 {
-                    LowestF = CurrItem;
+                    lowestF = currentNode;
                 }
             }
 
-            return LowestF;
+            return lowestF;
         }
 
         static List<PathFindingNode> AStarUpdateList(List<PathFindingNode> InSet, PathFindingNode InReplaceNode)

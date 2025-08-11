@@ -16,10 +16,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
                 var adjacentVects = GetRelativeIndicesMap(InCell);
                 foreach (var currAdjVect in adjacentVects)
                 {
-                    Vector2 val = currAdjVect.Value;
+                    Vector2Int val = currAdjVect.Value;
                     if (bIsOdd && currAdjVect.Key != CompassDir.E && currAdjVect.Key != CompassDir.W)
                     {
-                        val -= new Vector2(1, 0);
+                        val -= new Vector2Int(1, 0);
                     }
 
                     LevelCellBase adjContender = this[val];
@@ -31,9 +31,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             }
         }
 
-        protected override Vector2 GetIndex(Vector2 InOriginalIndex, CompassDir InDirection)
+        protected override Vector2Int GetIndex(Vector2Int InOriginalIndex, CompassDir InDirection)
         {
-            Vector2 index = InOriginalIndex + GetOffsetFromDirection(InDirection);
+            Vector2Int index = InOriginalIndex + GetOffsetFromDirection(InDirection);
             if (index.y % 2 == 0 && InDirection != CompassDir.E && InDirection != CompassDir.W)
             {
                 index.x -= 1;
@@ -41,7 +41,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return index;
         }
 
-        protected override Vector2 GetPosition(Vector2 OriginalIndex, CompassDir dir)
+        protected override Vector2 GetPosition(Vector2Int OriginalIndex, CompassDir dir)
         {
             LevelCellBase OriginalCell = this[OriginalIndex];
 
@@ -86,49 +86,49 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             return new Vector2(finalX, finalY);
         }
 
-        protected override Vector2 GetOffsetFromDirection(CompassDir dir)
+        protected override Vector2Int GetOffsetFromDirection(CompassDir dir)
         {
-            Vector2 Offset = new Vector2();
+            Vector2Int Offset = new Vector2Int();
 
             switch (dir)
             {
                 case CompassDir.NE:
-                    Offset = new Vector2(1, -1);
+                    Offset = new Vector2Int(1, -1);
                     break;
                 case CompassDir.E:
-                    Offset = new Vector2(1, 0);
+                    Offset = new Vector2Int(1, 0);
                     break;
                 case CompassDir.SE:
-                    Offset = new Vector2(1, 1);
+                    Offset = new Vector2Int(1, 1);
                     break;
                 case CompassDir.SW:
-                    Offset = new Vector2(0, 1);
+                    Offset = new Vector2Int(0, 1);
                     break;
                 case CompassDir.W:
-                    Offset = new Vector2(-1, 0);
+                    Offset = new Vector2Int(-1, 0);
                     break;
                 case CompassDir.NW:
-                    Offset = new Vector2(0, -1);
+                    Offset = new Vector2Int(0, -1);
                     break;
             }
 
             return Offset;
         }
 
-        protected override Dictionary<CompassDir, Vector2> GetRelativeIndicesMap(LevelCellBase InCell)
+        protected override Dictionary<CompassDir, Vector2Int> GetRelativeIndicesMap(LevelCellBase InCell)
         {
-            Dictionary<CompassDir, Vector2> AdjacentVects = new Dictionary<CompassDir, Vector2>();
+            Dictionary<CompassDir, Vector2Int> AdjacentVects = new Dictionary<CompassDir, Vector2Int>();
 
             if (InCell)
             {
-                Vector2 cellIndex = InCell.GetIndex();
+                Vector2Int cellIndex = InCell.GetIndex();
 
-                AdjacentVects.Add(CompassDir.NE, cellIndex + new Vector2(1, -1));
-                AdjacentVects.Add(CompassDir.E, cellIndex + new Vector2(1, 0));
-                AdjacentVects.Add(CompassDir.SE, cellIndex + new Vector2(1, 1));
-                AdjacentVects.Add(CompassDir.SW, cellIndex + new Vector2(0, 1));
-                AdjacentVects.Add(CompassDir.W, cellIndex + new Vector2(-1, 0));
-                AdjacentVects.Add(CompassDir.NW, cellIndex + new Vector2(0, -1));
+                AdjacentVects.Add(CompassDir.NE, cellIndex + new Vector2Int(1, -1));
+                AdjacentVects.Add(CompassDir.E, cellIndex + new Vector2Int(1, 0));
+                AdjacentVects.Add(CompassDir.SE, cellIndex + new Vector2Int(1, 1));
+                AdjacentVects.Add(CompassDir.SW, cellIndex + new Vector2Int(0, 1));
+                AdjacentVects.Add(CompassDir.W, cellIndex + new Vector2Int(-1, 0));
+                AdjacentVects.Add(CompassDir.NW, cellIndex + new Vector2Int(0, -1));
             }
 
             return AdjacentVects;
