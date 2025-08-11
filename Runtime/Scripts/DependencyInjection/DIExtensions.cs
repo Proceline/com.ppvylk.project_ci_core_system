@@ -44,50 +44,5 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                 }
             }
         }
-
-        /// <summary>
-        /// Register a service with singleton lifetime if not already registered
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <typeparam name="TImplementation">Implementation type</typeparam>
-        /// <param name="container">The DI container</param>
-        public static void RegisterSingletonIfNotRegistered<TService, TImplementation>(this DIContainer container) 
-            where TImplementation : class, TService
-        {
-            if (!container.IsRegistered<TService>())
-            {
-                container.RegisterSingleton<TService, TImplementation>();
-            }
-        }
-
-        /// <summary>
-        /// Register a service with transient lifetime if not already registered
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <typeparam name="TImplementation">Implementation type</typeparam>
-        /// <param name="container">The DI container</param>
-        public static void RegisterTransientIfNotRegistered<TService, TImplementation>(this DIContainer container) 
-            where TImplementation : class, TService
-        {
-            if (!container.IsRegistered<TService>())
-            {
-                container.RegisterTransient<TService, TImplementation>();
-            }
-        }
-
-        /// <summary>
-        /// Try to resolve a service, returns null if not registered
-        /// </summary>
-        /// <typeparam name="TService">Service type to resolve</typeparam>
-        /// <param name="container">The DI container</param>
-        /// <returns>Resolved service or null if not registered</returns>
-        public static TService TryResolve<TService>(this DIContainer container) where TService : class
-        {
-            if (container.IsRegistered<TService>())
-            {
-                return container.Resolve<TService>();
-            }
-            return null;
-        }
     }
 } 

@@ -22,78 +22,8 @@ namespace ProjectCI.CoreSystem.DependencyInjection
             }
         }
 
-        private readonly Dictionary<Type, ServiceDescriptor> _services = new Dictionary<Type, ServiceDescriptor>();
-        private readonly Dictionary<Type, object> _singletonInstances = new Dictionary<Type, object>();
-
-        /// <summary>
-        /// Register a service with singleton lifetime
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <typeparam name="TImplementation">Implementation type</typeparam>
-        public void RegisterSingleton<TService, TImplementation>() where TImplementation : class, TService
-        {
-            Register<TService, TImplementation>(ServiceLifetime.Singleton);
-        }
-
-        /// <summary>
-        /// Register a service with singleton lifetime using factory
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <param name="factory">Factory function to create the service</param>
-        public void RegisterSingleton<TService>(Func<TService> factory) where TService : class
-        {
-            Register<TService>(factory, ServiceLifetime.Singleton);
-        }
-
-        /// <summary>
-        /// Register a service with transient lifetime
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <typeparam name="TImplementation">Implementation type</typeparam>
-        public void RegisterTransient<TService, TImplementation>() where TImplementation : class, TService
-        {
-            Register<TService, TImplementation>(ServiceLifetime.Transient);
-        }
-
-        /// <summary>
-        /// Register a service with transient lifetime using factory
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <param name="factory">Factory function to create the service</param>
-        public void RegisterTransient<TService>(Func<TService> factory) where TService : class
-        {
-            Register<TService>(factory, ServiceLifetime.Transient);
-        }
-
-        /// <summary>
-        /// Register an instance as singleton
-        /// </summary>
-        /// <typeparam name="TService">Service type</typeparam>
-        /// <param name="instance">Instance to register</param>
-        public void RegisterInstance<TService>(TService instance) where TService : class
-        {
-            var serviceType = typeof(TService);
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = serviceType,
-                Lifetime = ServiceLifetime.Singleton,
-                Instance = instance
-            };
-
-            _services[serviceType] = descriptor;
-            _singletonInstances[serviceType] = instance;
-        }
-
-        /// <summary>
-        /// Resolve a service
-        /// </summary>
-        /// <typeparam name="TService">Service type to resolve</typeparam>
-        /// <returns>Resolved service instance</returns>
-        public TService Resolve<TService>() where TService : class
-        {
-            return (TService)Resolve(typeof(TService));
-        }
+        private readonly Dictionary<Type, ServiceDescriptor> _services = new();
+        private readonly Dictionary<Type, object> _singletonInstances = new();
 
         /// <summary>
         /// Resolve a service by type
@@ -138,52 +68,6 @@ namespace ProjectCI.CoreSystem.DependencyInjection
         }
 
         /// <summary>
-        /// Register services from a ScriptableObject configuration
-        /// </summary>
-        /// <param name="configuration">The DI configuration to load</param>
-        public void LoadConfiguration(DIConfiguration configuration)
-        {
-            if (configuration != null)
-            {
-                configuration.RegisterServices(this);
-            }
-        }
-
-        /// <summary>
-        /// Register a service with singleton lifetime by type
-        /// </summary>
-        /// <param name="serviceType">Service type</param>
-        /// <param name="implementationType">Implementation type</param>
-        public void RegisterSingleton(Type serviceType, Type implementationType)
-        {
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = implementationType,
-                Lifetime = ServiceLifetime.Singleton
-            };
-
-            _services[serviceType] = descriptor;
-        }
-
-        /// <summary>
-        /// Register a service with transient lifetime by type
-        /// </summary>
-        /// <param name="serviceType">Service type</param>
-        /// <param name="implementationType">Implementation type</param>
-        public void RegisterTransient(Type serviceType, Type implementationType)
-        {
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = implementationType,
-                Lifetime = ServiceLifetime.Transient
-            };
-
-            _services[serviceType] = descriptor;
-        }
-
-        /// <summary>
         /// Register a service with singleton lifetime by type using factory
         /// </summary>
         /// <param name="serviceType">Service type</param>
@@ -196,64 +80,6 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                 ImplementationType = serviceType,
                 Lifetime = ServiceLifetime.Singleton,
                 Factory = factory
-            };
-
-            _services[serviceType] = descriptor;
-        }
-
-        /// <summary>
-        /// Register a service with transient lifetime by type using factory
-        /// </summary>
-        /// <param name="serviceType">Service type</param>
-        /// <param name="factory">Factory function to create the service</param>
-        public void RegisterTransient(Type serviceType, Func<object> factory)
-        {
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = serviceType,
-                Lifetime = ServiceLifetime.Transient,
-                Factory = factory
-            };
-
-            _services[serviceType] = descriptor;
-        }
-
-        /// <summary>
-        /// Check if a service is registered by type
-        /// </summary>
-        /// <param name="serviceType">Service type to check</param>
-        /// <returns>True if service is registered</returns>
-        public bool IsRegistered(Type serviceType)
-        {
-            return _services.ContainsKey(serviceType);
-        }
-
-        private void Register<TService, TImplementation>(ServiceLifetime lifetime) where TImplementation : class, TService
-        {
-            var serviceType = typeof(TService);
-            var implementationType = typeof(TImplementation);
-
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = implementationType,
-                Lifetime = lifetime
-            };
-
-            _services[serviceType] = descriptor;
-        }
-
-        private void Register<TService>(Func<TService> factory, ServiceLifetime lifetime) where TService : class
-        {
-            var serviceType = typeof(TService);
-
-            var descriptor = new ServiceDescriptor
-            {
-                ServiceType = serviceType,
-                ImplementationType = serviceType,
-                Lifetime = lifetime,
-                Factory = () => factory()
             };
 
             _services[serviceType] = descriptor;
@@ -288,25 +114,7 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                 return descriptor.Factory();
             }
 
-            var implementationType = descriptor.ImplementationType;
-            var constructors = implementationType.GetConstructors();
-
-            if (constructors.Length == 0)
-            {
-                return Activator.CreateInstance(implementationType);
-            }
-
-            // Use the constructor with the most parameters
-            var constructor = constructors[0];
-            var parameters = constructor.GetParameters();
-            var parameterInstances = new object[parameters.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                parameterInstances[i] = Resolve(parameters[i].ParameterType);
-            }
-
-            return Activator.CreateInstance(implementationType, parameterInstances);
+            throw new NullReferenceException("ERROR: No Instance neither Factory method (constructor)");
         }
     }
 } 
