@@ -27,7 +27,15 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                 {
                     var serviceType = injectAttribute.ServiceType ?? field.FieldType;
                     var service = container.Resolve(serviceType);
-                    field.SetValue(target, service);
+                    if (service is GameObject gameObject)
+                    {
+                        var component = gameObject.GetComponent(serviceType);
+                        field.SetValue(target, component);
+                    }
+                    else
+                    {
+                        field.SetValue(target, service);
+                    }
                 }
             }
 
@@ -40,7 +48,15 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                 {
                     var serviceType = injectAttribute.ServiceType ?? property.PropertyType;
                     var service = container.Resolve(serviceType);
-                    property.SetValue(target, service);
+                    if (service is GameObject gameObject)
+                    {
+                        var component = gameObject.GetComponent(serviceType);
+                        property.SetValue(target, component);
+                    }
+                    else
+                    {
+                        property.SetValue(target, service);
+                    }
                 }
             }
         }
