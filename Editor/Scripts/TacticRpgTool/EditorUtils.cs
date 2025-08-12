@@ -314,6 +314,39 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             }
         }
 
+        public static void DrawInterfacesPopup(Rect position, GameObject gameObject,
+            ref SerializedProperty valueProperty)
+        {
+            List<string> optionList = new();
+            var allComponents = gameObject.GetComponents<Component>();
+            foreach (var component in allComponents)
+            {
+                Type targetType = component.GetType();
+                var allInterfaces = targetType.GetInterfaces();
+                
+                optionList.Add(targetType.AssemblyQualifiedName);
+                foreach (Type interfaceType in allInterfaces)
+                {
+                    optionList.Add(interfaceType.AssemblyQualifiedName);
+                }
+            }
+            
+            string selectedTypeText = valueProperty.stringValue;
+
+            if (optionList.Count > 0)
+            {
+                string beforeType = selectedTypeText;
+                int popupIndex = optionList.FindIndex(inStr => inStr == beforeType);
+                popupIndex = EditorGUI.Popup(position, popupIndex, optionList.ToArray());
+
+                if (popupIndex != -1 && popupIndex < optionList.Count
+                                     && selectedTypeText != optionList[popupIndex])
+                {
+                    valueProperty.stringValue = optionList[popupIndex];
+                }
+            }
+        }
+
         public static void DrawClassPopup<T>(ref string outType) where T : class
         {
             List<Type> types = GetTypes<T>();

@@ -32,8 +32,14 @@ namespace ProjectCI.CoreSystem.Editor.Attributes
 
                 if (targetObject != null)
                 {
-                    EditorUtils.DrawInterfacesPopup(serviceTypeRect, targetObject, ref serviceTypeProperty);
-
+                    if (targetObject is GameObject gameObject)
+                    {
+                        EditorUtils.DrawInterfacesPopup(serviceTypeRect, gameObject, ref serviceTypeProperty);
+                    }
+                    else
+                    {
+                        EditorUtils.DrawInterfacesPopup(serviceTypeRect, targetObject, ref serviceTypeProperty);
+                    }
                 }
                 // Draw Service Type Name field
                 // EditorGUI.PropertyField(serviceTypeRect, serviceTypeProperty, new GUIContent("Service Type Name"));
