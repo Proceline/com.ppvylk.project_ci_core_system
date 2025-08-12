@@ -70,7 +70,11 @@ namespace ProjectCI.CoreSystem.DependencyInjection
             if (serviceType == null || objectInstance == null)
                 return false;
 
-            return serviceType.IsAssignableFrom(objectInstance.GetType());
+            if (objectInstance is GameObject)
+            {
+                return true;
+            }
+            return serviceType.IsInstanceOfType(objectInstance);
         }
     }
 } 

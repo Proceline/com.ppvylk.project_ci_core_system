@@ -32,14 +32,14 @@ namespace ProjectCI.CoreSystem.DependencyInjection
         {
             if (!registration.IsValid())
             {
-                Debug.LogWarning($"Invalid ScriptableObject service registration: {registration.ServiceTypeName}");
+                Debug.LogWarning($"Invalid Object service registration: {registration.ServiceTypeName}");
                 return;
             }
 
             if (!registration.IsInstanceValid())
             {
                 Debug.LogWarning(
-                    $"ScriptableObject instance does not implement service type: {registration.ServiceTypeName}");
+                    $"Singleton Object does not implement service type: {registration.ServiceTypeName}");
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace ProjectCI.CoreSystem.DependencyInjection
             var instance = registration.ObjectInstance;
 
             container.RegisterSingleton(serviceType, () => instance);
-            Debug.Log($"Registered ScriptableObject service: {serviceType.Name} -> {instance}");
+            Debug.Log($"Registered Object service: {serviceType.Name} -> {instance}");
         }
 
         #region Scene Management
