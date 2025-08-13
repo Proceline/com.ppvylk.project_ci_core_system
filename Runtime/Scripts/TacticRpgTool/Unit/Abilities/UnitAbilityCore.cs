@@ -68,11 +68,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [SerializeField]
         StatusEffect[] m_Ailments;
 
-        [SerializeField, HideInInspector]
-        protected UnitAbilityAnimation abilityAnimation;
-
-        public int[] additionalParameters;
-
         void Reset()
         {
             m_bAllowBlocked = false;
@@ -254,45 +249,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             return abilityCells;
-        }
-
-        public async Awaitable ApplyResult(GridPawnUnit casterUnit, LevelCellBase target,
-            List<Action<GridPawnUnit, LevelCellBase>> InReacts, UnityEvent onNonLogicalComplete = null,
-            UnityEvent<GridPawnUnit> onCasterUnitStartAnim = null, UnityEvent<GridPawnUnit> onCasterUnitAfterExecute = null)
-        {
-            if(GetShape())
-            {
-                casterUnit.LookAtCell(target);
-                TacticBattleManager.AddActionBeingPerformed();
-                
-                abilityAnimation?.PlayAnimation(casterUnit);
-                onCasterUnitStartAnim?.Invoke(casterUnit);
-
-                float firstExecuteTime = abilityAnimation ? abilityAnimation.ExecuteAfterTime(0) : 0.25f;
-                await Awaitable.WaitForSecondsAsync(firstExecuteTime);
-
-                onCasterUnitAfterExecute?.Invoke(casterUnit);
-                // TODO: Handle Audio
-                // AudioPlayData audioData = new AudioPlayData(audioOnExecute);
-                // AudioHandler.PlayAudio(audioData, casterUnit.gameObject.transform.position);
-
-                foreach (Action<GridPawnUnit, LevelCellBase> react in InReacts)
-                {
-                    react?.Invoke(casterUnit, target);
-                }
-
-                if (abilityAnimation)
-                {
-                    float timeRemaining = abilityAnimation.GetAnimationLength() - firstExecuteTime;
-                    timeRemaining = Mathf.Max(0, timeRemaining);
-
-                    await Awaitable.WaitForSecondsAsync(timeRemaining);
-                }
-
-                TacticBattleManager.RemoveActionBeingPerformed();
-            }
-
-            onNonLogicalComplete?.Invoke();
         }
 
         private void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
