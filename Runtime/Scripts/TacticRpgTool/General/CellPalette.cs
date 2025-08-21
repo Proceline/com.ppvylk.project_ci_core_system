@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 {

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
+﻿using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions

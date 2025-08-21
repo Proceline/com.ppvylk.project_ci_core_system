@@ -3,52 +3,40 @@ using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
 {
-    [System.Serializable]
     public struct PositionToLevelCellPair
     {
-        [SerializeField]
-        public Vector2 _Key;
-
-        [SerializeField]
-        public LevelCellBase _Value;
+        public Vector2 Key;
+        public readonly LevelCellBase Value;
 
         public PositionToLevelCellPair(Vector2 InKey, LevelCellBase InValue) : this()
         {
-            this._Key = InKey;
-            this._Value = InValue;
+            Key = InKey;
+            Value = InValue;
         }
     }
 
-    [System.Serializable]
-    public class GridCellMap : System.Object
+    public class GridCellMap
     {
-        [SerializeField]
-        public List<PositionToLevelCellPair> Pairs;
+        public readonly List<PositionToLevelCellPair> Pairs = new();
 
-        public GridCellMap()
-        {
-            Pairs = new List<PositionToLevelCellPair>();
-        }
-
-        public PositionToLevelCellPair Add(Vector2 InKey, LevelCellBase InValue)
+        public void Add(Vector2 InKey, LevelCellBase InValue)
         {
             foreach (PositionToLevelCellPair item in Pairs)
             {
-                if (item._Key == InKey)
+                if (item.Key == InKey)
                 {
-                    return item;
+                    return;
                 }
             }
 
             Pairs.Add(new PositionToLevelCellPair(InKey, InValue));
-            return Pairs[Pairs.Count - 1];
         }
 
         public void Remove(Vector2 InIndex)
         {
             foreach (var item in Pairs)
             {
-                if(item._Key == InIndex)
+                if(item.Key == InIndex)
                 {
                     Pairs.Remove(item);
                     break;
@@ -60,7 +48,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
         {
             foreach (var item in Pairs)
             {
-                if (item._Key == InKey)
+                if (item.Key == InKey)
                 {
                     return true;
                 }
@@ -80,9 +68,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps
             {
                 foreach (var item in Pairs)
                 {
-                    if (item._Key == InKey)
+                    if (item.Key == InKey)
                     {
-                        return item._Value;
+                        return item.Value;
                     }
                 }
 

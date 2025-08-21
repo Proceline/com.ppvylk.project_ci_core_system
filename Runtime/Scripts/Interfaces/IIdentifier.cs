@@ -1,5 +1,3 @@
-using System;
-
 namespace ProjectCI.CoreSystem.Runtime.Interfaces
 {
     /// <summary>

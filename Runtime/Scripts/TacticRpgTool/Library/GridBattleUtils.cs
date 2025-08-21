@@ -15,50 +15,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
     public static class GridBattleUtils
     {
         /// <summary>
-        /// 生成六边形格点的RaycastHit信息（不生成Cell，仅采集地面碰撞点）
-        /// </summary>
-        /// <param name="center">扫描中心点</param>
-        /// <param name="cellSize">单个六边形格子的尺寸（x=宽，z=高）</param>
-        /// <param name="gridSize">网格尺寸（x=列数，y=行数）</param>
-        /// <param name="maxDistance">射线最大距离</param>
-        /// <param name="layerMask">射线检测层</param>
-        /// <returns>字典，key为格子坐标(x, y)，value为RaycastHit</returns>
-        public static Dictionary<Vector2Int, RaycastHit> ScanHexGridRaycastHits(
-            Vector3 center,
-            Vector3 cellSize,
-            Vector2Int gridSize,
-            float maxDistance = 100f,
-            LayerMask layerMask = default)
-        {
-            Dictionary<Vector2Int, RaycastHit> hitResults = new Dictionary<Vector2Int, RaycastHit>();
-
-            for (int y = 0; y < gridSize.y; y++)
-            {
-                float offset = 0;
-                if (y % 2 == 0)
-                {
-                    offset = cellSize.x * 0.5f;
-                }
-
-                float finalY = y * cellSize.z * 0.75f;
-
-                for (int x = 0; x < gridSize.x; x++)
-                {
-                    float finalX = x * cellSize.x + offset;
-                    Vector3 worldPos = center + new Vector3(finalX, 0.0f, -finalY);
-
-                    Ray ray = new Ray(worldPos, Vector3.down);
-                    if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
-                    {
-                        hitResults[new Vector2Int(x, y)] = hit;
-                    }
-                }
-            }
-
-            return hitResults;
-        }
-
-        /// <summary>
         /// 基于地形扫描结果生成六边形网格
         /// </summary>
         /// <typeparam name="T">LevelGrid类型</typeparam>
@@ -68,30 +24,43 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// <param name="gridSize">网格大小</param>
         /// <param name="groundLayer">地面层</param>
         /// <param name="cellPalette">网格预制体配置</param>
+        /// <param name="existedGrid"></param>
         /// <param name="hitHandler"></param>
         /// <returns>生成的LevelGrid对象</returns>
-        public static T GenerateLevelGridFromGround<T>(
+        public static void GenerateLevelGridFromGround<T>(
             Vector3 scanCenter,
             float hexWidth,
             float hexHeight,
             Vector2Int gridSize,
             LayerMask groundLayer,
-            CellPalette cellPalette, UnityEvent<RaycastHit, Vector2Int, T> hitHandler) where T : LevelGridBase
+            CellPalette cellPalette,
+            ref T existedGrid,
+            UnityEvent<RaycastHit, Vector2Int, LevelGridBase> hitHandler) where T : LevelGridBase
         {
-            // 1. 验证参数
             if (cellPalette == null)
             {
-                Debug.LogError("([GridBattleUtils]::GenerateLevelGridFromGround) Missing CellPalette");
-                return null;
+                throw new Exception("([GridBattleUtils]::GenerateLevelGridFromGround) Missing CellPalette");
             }
 
             if (cellPalette.m_CellPieces.Length == 0 || cellPalette.m_CellPieces[0].m_Cells.Length == 0)
             {
-                Debug.LogError("([GridBattleUtils]::GenerateLevelGridFromGround) CellPalette is missing tiles");
-                return null;
+                throw new Exception("([GridBattleUtils]::GenerateLevelGridFromGround) CellPalette is missing tiles");
+            }
+            
+            if (existedGrid == null)
+            {
+                GameObject gridObject = new GameObject("Ground Based Grid");
+                existedGrid = gridObject.AddComponent<T>();
+                existedGrid.Setup();
+                existedGrid.SetPrefabCursor(cellPalette.m_CellPieces[0].m_Cells[0]);
+            }
+            else
+            {
+                existedGrid.RemoveAllCells();
+                existedGrid.Setup();
             }
 
-            var hitPoints = ScanHexGridRaycastHits(
+            var hitPoints = existedGrid.ScanGridRayHits(
                 scanCenter,
                 new Vector3(hexWidth, 0, hexHeight),
                 gridSize,
@@ -99,33 +68,21 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
                 groundLayer
             );
 
-            // 3. 创建网格容器
-            GameObject gridObject = new GameObject("Ground Based Grid");
-            T levelGrid = gridObject.AddComponent<T>();
-
-            // 4. 设置LevelGrid
-            levelGrid.Setup();
-            levelGrid.SetPrefabCursor(cellPalette.m_CellPieces[0].m_Cells[0]);
-            levelGrid.SetTileList(cellPalette);
-
-            // 5. 为每个碰撞点创建网格
+            // Apply Cell Generation on each hit Point
             foreach (var hit in hitPoints)
             {
                 if (hitHandler == null)
                 {
-                    var cell = levelGrid.GenerateCell(hit.Value.point, hit.Key);
+                    var cell = existedGrid.GenerateCell(hit.Value.point, hit.Key);
                     cell.Reset();
                 }
                 else
                 {
-                    hitHandler.Invoke(hit.Value, hit.Key, levelGrid);
+                    hitHandler.Invoke(hit.Value, hit.Key, existedGrid);
                 }
             }
-
-            // 6. 设置网格相邻关系
-            levelGrid.SetupAllCellAdjacencies();
-
-            return levelGrid;
+            
+            existedGrid.SetupAllCellAdjacencies();
         }
 
         private static T SetupBattleUnit<T>(
@@ -135,15 +92,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             BattleTeam InTeam,
             LevelCellBase cell) where T : GridPawnUnit
         {
-            T SpawnedGridUnit = originPawn.AddComponent<T>();
-            SpawnedGridUnit.Initialize();
-            SpawnedGridUnit.SetUnitData(InUnitData);
-            SpawnedGridUnit.SetTeam(InTeam);
-            SpawnedGridUnit.SetGrid(InGrid);
-            SpawnedGridUnit.SetCurrentCell(cell);
-            SpawnedGridUnit.AlignToGrid();
-            SpawnedGridUnit.PostInitialize();
-            return SpawnedGridUnit;
+            T spawnedGridUnit = originPawn.AddComponent<T>();
+            spawnedGridUnit.Initialize();
+            spawnedGridUnit.SetUnitData(InUnitData);
+            spawnedGridUnit.SetTeam(InTeam);
+            spawnedGridUnit.SetGrid(InGrid);
+            spawnedGridUnit.SetCurrentCell(cell);
+            spawnedGridUnit.AlignToGrid();
+            spawnedGridUnit.PostInitialize();
+            return spawnedGridUnit;
         }
 
         public static T AddResourceContainerToUnit<T>(GridPawnUnit InUnit, GameObject resourceContainerPrefab)

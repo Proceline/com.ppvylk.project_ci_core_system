@@ -7,7 +7,36 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 {
     public class SquarePresetGrid : LevelGridBase
     {
-        protected override void SetupAdjacencies(LevelCellBase InCell)
+        public override Dictionary<Vector2Int, RaycastHit> ScanGridRayHits(
+            Vector3 center,
+            Vector3 cellSize,
+            Vector2Int gridSize,
+            float maxDistance = 100f,
+            LayerMask layerMask = default)
+        {
+            Dictionary<Vector2Int, RaycastHit> hitResults = new Dictionary<Vector2Int, RaycastHit>();
+
+            for (int y = 0; y < gridSize.y; y++)
+            {
+                var finalY = y * cellSize.z;
+
+                for (int x = 0; x < gridSize.x; x++)
+                {
+                    var finalX = x * cellSize.x;
+                    Vector3 worldPos = center + new Vector3(finalX, 0.0f, -finalY);
+
+                    Ray ray = new Ray(worldPos, Vector3.down);
+                    if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
+                    {
+                        hitResults[new Vector2Int(x, y)] = hit;
+                    }
+                }
+            }
+
+            return hitResults;
+        }
+        
+        protected override void SetupAllNeighbors(LevelCellBase InCell)
         {
             if (InCell)
             {
@@ -34,7 +63,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             if (!originalCell) 
                 throw new NullReferenceException($"ERROR: Cell of {originalIndex.ToString()} NOT FOUND!");
             
-            Vector3 bounds = m_CellObjCursor.GetComponent<Renderer>().bounds.size;
+            Vector3 bounds = CellObjCursor.GetComponent<Renderer>().bounds.size;
             float finalY;
             float finalX;
             

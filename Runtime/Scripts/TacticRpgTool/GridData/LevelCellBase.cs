@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps;
@@ -8,112 +7,87 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using UnityEngine.Serialization;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 {
     [System.Serializable]
     public struct CellInfo
     {
-        //Used for referencing, primarily used for placing enemies.
-        [SerializeField]
-        public string m_CellId;
-
-        [SerializeField]
-        public bool m_bFriendlySpawnPoint;
-
-        [SerializeField]
-        [Tooltip("Only used if team2 is human.")]
-        public bool m_bHostileSpawnPoint;
-
-        [SerializeField]
-        public bool m_bIsVisible;
+        public bool bFriendlySpawnPoint;
+        public bool bHostileSpawnPoint;
+        public bool bIsVisible;
 
         public static CellInfo Default()
         {
-            return new CellInfo()
+            return new CellInfo
             {
-                m_bIsVisible = true,
-                m_bFriendlySpawnPoint = false,
-                m_bHostileSpawnPoint = false
+                bIsVisible = true,
+                bFriendlySpawnPoint = false,
+                bHostileSpawnPoint = false
             };
         }
     }
 
     public abstract class LevelCellBase : MonoBehaviour
     {
-        [SerializeField]
-        CellInfo m_Info;
+        [SerializeField] 
+        private CellInfo cellInfo;
 
         private GridObject _objectOnCell;
         private Vector2Int _presetIndex;
 
-        [SerializeField]
-        LevelCellMap m_AdjacentCellsMap;
+        private LevelCellMap _adjacentCellsMap;
 
-        CellState m_CellState;
+        private CellState _cellState;
 
-        bool m_bTileNaturallyBlocked = false;
-        bool m_bMouseIsOver = false;
-        bool bIsHovering = false;
+        private bool _bTileNaturallyBlocked;
+        private bool _bMouseIsOver;
+        private bool _bIsHovering;
 
-        public UnityEvent OnCellDestroyed = new UnityEvent();
-
-        private LevelGridBase m_Grid;
-
-        public LevelGridBase Grid
-        {
-            get
-            {
-                if (m_Grid == null)
-                {
-                    m_Grid = GetComponentInParent<LevelGridBase>();
-                }
-                return m_Grid;
-            }
-        }
+        private LevelGridBase _grid;
 
         public void Reset()
         {
-            m_Info = CellInfo.Default();
+            cellInfo = CellInfo.Default();
         }
 
-        void Awake()
+        private void Awake()
         {
             if (!Application.isPlaying)
             {
                 return;
             }
 
-            m_CellState = CellState.eNormal;
+            _cellState = CellState.eNormal;
         }
 
-        void Start()
+        protected virtual void Start()
         {
             if (!Application.isPlaying)
             {
                 return;
             }
 
-            m_bTileNaturallyBlocked = GetWeightInfo().bBlocked;
+            _bTileNaturallyBlocked = GetWeightInfo().bBlocked;
             HandleVisibilityChanged();
         }
 
-        public void Setup()
+        internal void Setup(LevelGridBase gridBase)
         {
-            m_AdjacentCellsMap = new LevelCellMap();
+            _adjacentCellsMap = new LevelCellMap();
+            _grid = gridBase;
         }
 
         public void ClearAdjacencyList()
         {
-            m_AdjacentCellsMap.Pairs.Clear();
+            _adjacentCellsMap.Pairs.Clear();
         }
 
         public void AddAdjacentCell(CompassDir InDirection, LevelCellBase InLevelCell)
         {
-            if (!m_AdjacentCellsMap.ContainsKey(InDirection))
+            if (!_adjacentCellsMap.ContainsKey(InDirection))
             {
-                m_AdjacentCellsMap.Add(InDirection, InLevelCell);
+                _adjacentCellsMap.Add(InDirection, InLevelCell);
             }
             else
             {
@@ -121,22 +95,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        public LevelCellBase AddCellTo(CompassDir InDirection)
+        private void RemoveCell(bool bInRemoveObj)
         {
-            if (!HasAdjacentCell(InDirection))
+            if (_grid)
             {
-                LevelCellBase generatedCell = Grid.GenerateCellAdjacentTo(GetIndex(), InDirection);
-                return generatedCell;
-            }
-
-            return null;
-        }
-
-        public void RemoveCell(bool bInRemoveObj)
-        {
-            if (Grid)
-            {
-                Grid.RemoveCell(GetIndex(), bInRemoveObj);
+                _grid.RemoveCell(GetIndex(), bInRemoveObj);
             }
         }
         
@@ -144,23 +107,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public bool IsMouseOver()
         {
-            return m_bMouseIsOver;
+            return _bMouseIsOver;
         }
 
         public bool IsBlocked()
         {
-            WeightInfo ObjWeightInfo = GetWeightInfo();
-            return (ObjWeightInfo.bBlocked || m_bTileNaturallyBlocked) && IsVisible();
+            WeightInfo objWeightInfo = GetWeightInfo();
+            return (objWeightInfo.bBlocked || _bTileNaturallyBlocked) && IsVisible();
         }
 
         public bool IsFriendlySpawnPoint()
         {
-            return m_Info.m_bFriendlySpawnPoint;
+            return cellInfo.bFriendlySpawnPoint;
         }
 
         public bool IsHostileSpawnPoint()
         {
-            return m_Info.m_bHostileSpawnPoint;
+            return cellInfo.bHostileSpawnPoint;
         }
 
         public bool IsObjectOnCell()
@@ -175,19 +138,19 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public bool IsVisible()
         {
-            return GetInfo().m_bIsVisible;
+            return GetInfo().bIsVisible;
         }
 
         public bool HasAdjacentCell(CompassDir InDirection)
         {
-            return m_AdjacentCellsMap.ContainsKey(InDirection) && m_AdjacentCellsMap[InDirection] != null;
+            return _adjacentCellsMap.ContainsKey(InDirection) && _adjacentCellsMap[InDirection] != null;
         }
 
         public LevelCellBase GetAdjacentCell(CompassDir InDirection)
         {
-            if (m_AdjacentCellsMap.ContainsKey(InDirection))
+            if (_adjacentCellsMap.ContainsKey(InDirection))
             {
-                return m_AdjacentCellsMap[InDirection];
+                return _adjacentCellsMap[InDirection];
             }
             else
             {
@@ -199,7 +162,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         {
             List<LevelCellBase> outCells = new List<LevelCellBase>();
 
-            foreach (var pair in m_AdjacentCellsMap.Pairs)
+            foreach (var pair in _adjacentCellsMap.Pairs)
             {
                 outCells.Add(pair._Value);
             }
@@ -220,7 +183,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public CellInfo GetInfo()
         {
-            return m_Info;
+            return cellInfo;
         }
 
         public CellState GetNormalState()
@@ -230,23 +193,23 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public CellState GetCellState()
         {
-            return m_CellState;
+            return _cellState;
         }
 
         public WeightInfo GetWeightInfo()
         {
-            WeightInfo TotalWeightInfo = new WeightInfo();
+            WeightInfo totalWeightInfo = new WeightInfo();
 
-            ObjectWeightInfo ObjWeightInfo = GetComponent<ObjectWeightInfo>();
-            if (ObjWeightInfo)
+            ObjectWeightInfo objWeightInfo = GetComponent<ObjectWeightInfo>();
+            if (objWeightInfo)
             {
-                TotalWeightInfo += ObjWeightInfo.m_WeightInfo;
+                totalWeightInfo += objWeightInfo.m_WeightInfo;
             }
 
-            ObjectWeightInfo[] WeightInfos = GetComponentsInChildren<ObjectWeightInfo>();
-            foreach (ObjectWeightInfo currWeightInfo in WeightInfos)
+            ObjectWeightInfo[] weightInfos = GetComponentsInChildren<ObjectWeightInfo>();
+            foreach (ObjectWeightInfo currWeightInfo in weightInfos)
             {
-                TotalWeightInfo += currWeightInfo.m_WeightInfo;
+                totalWeightInfo += currWeightInfo.m_WeightInfo;
             }
 
             List<StatusEffect> ailments = GetAilmentContainer().GetStatusEffectList();
@@ -257,12 +220,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
                     CellStatusEffect cellStatusEffect = currAilment as CellStatusEffect;
                     if(cellStatusEffect)
                     {
-                        TotalWeightInfo += cellStatusEffect.m_WeightInfo;
+                        totalWeightInfo += cellStatusEffect.m_WeightInfo;
                     }
                 }
             }
 
-            return TotalWeightInfo;
+            return totalWeightInfo;
         }
 
         public Vector3 GetAllignPos(GridObject InObject)
@@ -275,14 +238,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
                 objectHeightOffset += gridUnit.GetUnitData().m_HeightOffset;
             }
 
-            Renderer CellRenderer = GetRenderer();
-            if (CellRenderer)
+            Renderer cellRenderer = GetRenderer();
+            if (cellRenderer)
             {
-                float cellHeight = CellRenderer.bounds.size.y;
+                float cellHeight = cellRenderer.bounds.size.y;
                 objectHeightOffset += ( cellHeight * 0.5f );
 
-                Vector3 CellPosition = transform.position;
-                return CellPosition + new Vector3(0, objectHeightOffset, 0); ;
+                Vector3 cellPosition = transform.position;
+                return cellPosition + new Vector3(0, objectHeightOffset, 0); ;
             }
 
             return transform.position;
@@ -290,17 +253,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public Vector3 GetAllignPos(GameObject InObject)
         {
-            Renderer CellRenderer = GetRenderer();
-            if (CellRenderer)
+            Renderer cellRenderer = GetRenderer();
+            if (cellRenderer)
             {
-                Vector3 CellPosition = transform.position;
-                Vector3 ObjectBounds = TacticBattleManager.GetBoundsOfObject(InObject);
-                Vector3 LevelCellBounds = CellRenderer.bounds.size;
+                Vector3 cellPosition = transform.position;
+                Vector3 objectBounds = TacticBattleManager.GetBoundsOfObject(InObject);
+                Vector3 levelCellBounds = cellRenderer.bounds.size;
 
-                float heightOffset = (LevelCellBounds.y + (ObjectBounds.y * 0.5f));
-                Vector3 AlignPos = CellPosition + new Vector3(0, heightOffset, 0);
+                float heightOffset = levelCellBounds.y + objectBounds.y * 0.5f;
+                Vector3 alignPos = cellPosition + new Vector3(0, heightOffset, 0);
 
-                return AlignPos;
+                return alignPos;
             }
 
             return transform.position;
@@ -326,11 +289,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return _objectOnCell ? _objectOnCell.GetTeam() : BattleTeam.None;
         }
 
-        public string GetCellId()
-        {
-            return GetInfo().m_CellId;
-        }
-
         public Vector2Int GetIndex()
         {
             return _presetIndex;
@@ -338,7 +296,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public CompassDir GetDirectionToAdjacentCell(LevelCellBase InTarget)
         {
-            foreach (var pair in m_AdjacentCellsMap.Pairs)
+            foreach (var pair in _adjacentCellsMap.Pairs)
             {
                 if (pair._Value == InTarget)
                 {
@@ -351,42 +309,42 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public T GetRenderer<T>() where T : Renderer
         {
-            Renderer renderer = GetComponent<Renderer>();
-            if (!renderer)
+            Renderer obtainedRenderer = GetComponent<Renderer>();
+            if (!obtainedRenderer)
             {
-                renderer = gameObject.GetComponentInChildren<Renderer>();
+                obtainedRenderer = gameObject.GetComponentInChildren<Renderer>();
             }
-            if (!renderer)
+            if (!obtainedRenderer)
             {
-                renderer = gameObject.GetComponentInParent<Renderer>();
+                obtainedRenderer = gameObject.GetComponentInParent<Renderer>();
             }
 
-            return renderer as T;
+            return obtainedRenderer as T;
         }
 
         public Renderer GetRenderer()
         {
-            Renderer renderer = GetComponent<Renderer>();
-            if (!renderer)
+            Renderer obtainedRenderer = GetComponent<Renderer>();
+            if (!obtainedRenderer)
             {
-                renderer = gameObject.GetComponentInChildren<Renderer>();
+                obtainedRenderer = gameObject.GetComponentInChildren<Renderer>();
             }
-            if (!renderer)
+            if (!obtainedRenderer)
             {
-                renderer = gameObject.GetComponentInParent<Renderer>();
+                obtainedRenderer = gameObject.GetComponentInParent<Renderer>();
             }
 
-            return renderer;
+            return obtainedRenderer;
         }
 
         public List<Collider> GetColliders()
         {
             List<Collider> colliderList = new List<Collider>();
 
-            Collider collider = GetComponent<Collider>();
-            if(collider)
+            Collider obtainedCollider = GetComponent<Collider>();
+            if(obtainedCollider)
             {
-                colliderList.Add(collider);
+                colliderList.Add(obtainedCollider);
             }
 
             Collider childCollider = gameObject.GetComponentInChildren<Collider>();
@@ -412,7 +370,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void SetVisible(bool bInVisible)
         {
-            m_Info.m_bIsVisible = bInVisible;
+            cellInfo.bIsVisible = bInVisible;
             TacticBattleManager.ResetCellState(this);
             HandleVisibilityChanged();
         }
@@ -424,7 +382,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void SetCellState(CellState InCellState)
         {
-            m_CellState = InCellState;
+            _cellState = InCellState;
         }
 
         public void SetIndex(Vector2Int InIndex)
@@ -438,12 +396,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void HandleMouseOver()
         {
-            m_bMouseIsOver = true;
+            _bMouseIsOver = true;
         }
 
         public void HandleMouseExit()
         {
-            m_bMouseIsOver = false;
+            _bMouseIsOver = false;
         }
 
         public void HandleVisibilityChanged()
@@ -466,9 +424,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            OnCellDestroyed.Invoke();
             RemoveCell(false);
         }
 
@@ -479,12 +436,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
                 if (!EventSystem.current.IsPointerOverGameObject())
                 {
-                    if (Grid)
+                    if (_grid)
                     {
-                        if (!bIsHovering)
+                        if (!_bIsHovering)
                         {
-                            bIsHovering = true;
-                            Grid.OnCellBeingInteracted?.Invoke(this, CellInteractionState.eBeginFocused);
+                            _bIsHovering = true;
+                            _grid.OnCellBeingInteracted?.Invoke(this, CellInteractionState.BeginFocused);
                         }
                     }
                 }
@@ -497,12 +454,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void OnMouseExit()
         {
-            if (Grid)
+            if (_grid)
             {
-                if (bIsHovering)
+                if (_bIsHovering)
                 {
-                    bIsHovering = false;
-                    Grid.OnCellBeingInteracted.Invoke(this, CellInteractionState.eEndFocused);
+                    _bIsHovering = false;
+                    _grid.OnCellBeingInteracted.Invoke(this, CellInteractionState.EndFocused);
                 }
             }
         }

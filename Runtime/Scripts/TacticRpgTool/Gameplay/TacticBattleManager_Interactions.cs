@@ -196,14 +196,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             switch (InInteractionState)
             {
-                case CellInteractionState.eBeginFocused:
+                case CellInteractionState.BeginFocused:
                     BeginHover(InCell);
                     if (ObjOnCell)
                     {
                         ObjOnCell.HandleBegingFocused();
                     }
                     break;
-                case CellInteractionState.eEndFocused:
+                case CellInteractionState.EndFocused:
                     EndHover(InCell);
                     if (ObjOnCell)
                     {

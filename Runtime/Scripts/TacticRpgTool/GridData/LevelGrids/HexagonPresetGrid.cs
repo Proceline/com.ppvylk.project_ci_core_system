@@ -6,7 +6,42 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 {
     public class HexagonPresetGrid : LevelGridBase
     {
-        protected override void SetupAdjacencies(LevelCellBase InCell)
+        public override Dictionary<Vector2Int, RaycastHit> ScanGridRayHits(
+            Vector3 center,
+            Vector3 cellSize,
+            Vector2Int gridSize,
+            float maxDistance = 100f,
+            LayerMask layerMask = default)
+        {
+            Dictionary<Vector2Int, RaycastHit> hitResults = new Dictionary<Vector2Int, RaycastHit>();
+
+            for (int y = 0; y < gridSize.y; y++)
+            {
+                float offset = 0;
+                if (y % 2 == 0)
+                {
+                    offset = cellSize.x * 0.5f;
+                }
+
+                float finalY = y * cellSize.z * 0.75f;
+
+                for (int x = 0; x < gridSize.x; x++)
+                {
+                    float finalX = x * cellSize.x + offset;
+                    Vector3 worldPos = center + new Vector3(finalX, 0.0f, -finalY);
+
+                    Ray ray = new Ray(worldPos, Vector3.down);
+                    if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
+                    {
+                        hitResults[new Vector2Int(x, y)] = hit;
+                    }
+                }
+            }
+
+            return hitResults;
+        }
+        
+        protected override void SetupAllNeighbors(LevelCellBase InCell)
         {
             if (InCell)
             {
@@ -45,7 +80,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
         {
             LevelCellBase OriginalCell = this[OriginalIndex];
 
-            Vector3 bounds = m_CellObjCursor.GetComponent<Renderer>().bounds.size;
+            Vector3 bounds = CellObjCursor.GetComponent<Renderer>().bounds.size;
 
             float finalY = 0.0f;
             float finalX = 0.0f;

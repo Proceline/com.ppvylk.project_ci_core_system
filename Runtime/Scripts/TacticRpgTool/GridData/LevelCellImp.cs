@@ -9,25 +9,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
     {
         public override void SetMaterial(CellState InCellState)
         {
-            Renderer renderer = GetRenderer();
+            Renderer objRenderer = GetRenderer();
 
-            List<IndexToMaterial> CellMatState = GetStyleInfo().GetCellMaterialState(InCellState);
+            List<IndexToMaterial> cellMatState = GetStyleInfo().GetCellMaterialState(InCellState);
 
-            if(CellMatState != null)
+            if(cellMatState != null)
             {
-                Material[] MeshMaterials = renderer.materials;
+                Material[] meshMaterials = objRenderer.materials;
 
-                foreach (IndexToMaterial MatState in CellMatState)
+                foreach (IndexToMaterial matState in cellMatState)
                 {
-                    if (MeshMaterials.Length > MatState.m_Index)
+                    if (meshMaterials.Length > matState.m_Index)
                     {
-                        MeshMaterials[MatState.m_Index] = MatState.m_Material;
+                        meshMaterials[matState.m_Index] = matState.m_Material;
                     }
                 }
 
-                renderer.materials = MeshMaterials;
+                objRenderer.materials = meshMaterials;
 
-                if (MeshMaterials.Length == 0)
+                if (meshMaterials.Length == 0)
                 {
                     Debug.Log("([TurnBasedTools]::LevelCell::SetMaterial) " + name + " is missing material's in its mesh renderer");
                 }
@@ -39,7 +39,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         }
 
-        CellStyleInfo GetStyleInfo()
+        private CellStyleInfo GetStyleInfo()
         {
             CellStyleInfo cellStyleInfo = gameObject.GetComponent<CellStyleInfo>();
             if(cellStyleInfo == null)
@@ -49,14 +49,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
             return cellStyleInfo;
         }
-        
-        Material GetMaterial(int InMaterialSlot)
-        {
-            Material[] Mats = GetComponent<MeshRenderer>().materials;
 
-            if (Mats.Length >= InMaterialSlot)
+        private Material GetMaterial(int InMaterialSlot)
+        {
+            Material[] mats = GetComponent<MeshRenderer>().materials;
+
+            if (mats.Length >= InMaterialSlot)
             {
-                return Mats[InMaterialSlot];
+                return mats[InMaterialSlot];
             }
             else
             {
@@ -66,7 +66,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return null;
         }
 
-        Material[] GetMaterials()
+        private Material[] GetMaterials()
         {
             return GetComponent<MeshRenderer>().materials;
         }

@@ -2,7 +2,6 @@
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.Commands;
-using ProjectCI.CoreSystem.Runtime.Attributes;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
