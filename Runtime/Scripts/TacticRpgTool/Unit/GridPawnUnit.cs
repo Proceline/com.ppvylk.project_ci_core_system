@@ -79,14 +79,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             EditedCells.Clear();
         }
-        
-        public virtual void LookAtCell(LevelCellBase InCell)
-        {
-            if(InCell && ShouldLookAtTargets())
-            {
-                gameObject.transform.LookAt(GetCellLookAtPos(InCell));
-            }
-        }
+
+        public abstract void LookAtCell(LevelCellBase InCell);
         
         public void AddAI(UnitAI InAIData)
         {
@@ -231,19 +225,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     AllignPos.y = gameObject.transform.position.y;
                     return AllignPos;
                 }
-            }
-
-            return Vector3.zero;
-        }
-
-        Vector3 GetCellLookAtPos(LevelCellBase InCell)
-        {
-            if(InCell)
-            {
-                Vector3 allignPos = InCell.GetAllignPos(this);
-                allignPos.y = gameObject.transform.position.y;
-
-                return allignPos;
             }
 
             return Vector3.zero;
