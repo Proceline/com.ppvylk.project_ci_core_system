@@ -27,15 +27,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
     public abstract class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
     {
-        SoUnitData m_UnitData;
+        private SoUnitData _unitData;
         private UnitAttributeContainer _runtimeAttributes;
         private UnitAttributeContainer _simulatedAttributes;
 
-        protected int m_CurrentMovementPoints;
+        protected int CurrentMovementPoints;
 
-        bool m_bIsTarget = false;
-        bool m_bIsMoving = false;
-        bool m_bActivated = false;
+        private bool _bIsTarget = false;
+        private bool _bIsMoving = false;
+        private bool _bActivated = false;
 
         protected bool m_bIsDead = false;
 
@@ -48,7 +48,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public event Action OnPreHitAnimRequired;
         public event Action OnPreHealAnimRequired;
 
-        protected SoUnitData UnitData => m_UnitData;
+        protected SoUnitData UnitData => _unitData;
 
         public UnitAttributeContainer RuntimeAttributes 
         { 
@@ -80,7 +80,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             EditedCells.Clear();
         }
         
-        public void LookAtCell(LevelCellBase InCell)
+        public virtual void LookAtCell(LevelCellBase InCell)
         {
             if(InCell && ShouldLookAtTargets())
             {
@@ -133,15 +133,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual void SetUnitData(SoUnitData InUnitData)
         {
-            m_UnitData = InUnitData;
+            _unitData = InUnitData;
         }
 
         public void SetActivated(bool bInNewActivateState)
         {
-            if(m_bActivated != bInNewActivateState)
+            if(_bActivated != bInNewActivateState)
             {
-                m_bActivated = bInNewActivateState;
-                if(m_bActivated)
+                _bActivated = bInNewActivateState;
+                if(_bActivated)
                 {
                     HandleActivation();
                 }
@@ -150,7 +150,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void SetAsTarget(bool bInIsTarget)
         {
-            m_bIsTarget = bInIsTarget;
+            _bIsTarget = bInIsTarget;
         }
 
         #endregion
@@ -159,7 +159,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public SoUnitData GetUnitData()
         {
-            return m_UnitData;
+            return _unitData;
         }
 
         public StatusEffectContainer GetAilmentContainer()
@@ -183,17 +183,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public bool IsMoving()
         {
-            return m_bIsMoving;
+            return _bIsMoving;
         }
 
         public bool IsTarget()
         {
-            return m_bIsTarget;
+            return _bIsTarget;
         }
 
         public bool IsActivated()
         {
-            return m_bActivated;
+            return _bActivated;
         }
 
         public bool IsFlying()
@@ -213,7 +213,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual int GetCurrentMovementPoints()
         {
-            return m_CurrentMovementPoints;
+            return CurrentMovementPoints;
         }
 
         public Vector3 GetCellAllignPos(LevelCellBase InCell)
@@ -255,7 +255,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual List<LevelCellBase> GetAllowedMovementCells()
         {
-            return m_UnitData.m_MovementShape.GetCellList(this, GetCell(), m_CurrentMovementPoints, m_UnitData.m_bIsFlying);
+            return _unitData.m_MovementShape.GetCellList(this, GetCell(), CurrentMovementPoints, _unitData.m_bIsFlying);
         }
 
         public virtual void SetupMovement()
@@ -267,7 +267,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             ResetCells();
 
-            if (!m_UnitData.m_MovementShape)
+            if (!_unitData.m_MovementShape)
             {
                 return;
             }
@@ -295,7 +295,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            if (!m_UnitData.m_MovementShape || !targetCell)
+            if (!_unitData.m_MovementShape || !targetCell)
             {
                 return false;
             }
@@ -334,7 +334,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             if (InTargetCell)
             {
-                m_bIsMoving = true;
+                _bIsMoving = true;
 
                 OnPreMovementAnimRequired?.Invoke();
 
@@ -391,7 +391,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         break;
                     }
 
-                    if(movementCount++ >= m_CurrentMovementPoints)
+                    if(movementCount++ >= CurrentMovementPoints)
                     {
                         finalCell = cell;
                         break;
@@ -408,7 +408,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 TacticBattleManager.RemoveActionBeingPerformed();
 
-                m_bIsMoving = false;
+                _bIsMoving = false;
 
                 if (onMovementComplete != null)
                 {
@@ -496,7 +496,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 bIgnoreUnitsOnPath = true,
                 bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam()),
                 AllowedCells = InAllowedCells,
-                bAllowBlocked = m_UnitData.m_bIsFlying
+                bAllowBlocked = _unitData.m_bIsFlying
             };
 
             List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
@@ -506,10 +506,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public void RemoveMovementPoints(int InMoveCount)
         {
-            m_CurrentMovementPoints -= InMoveCount;
-            if(m_CurrentMovementPoints < 0)
+            CurrentMovementPoints -= InMoveCount;
+            if(CurrentMovementPoints < 0)
             {
-                m_CurrentMovementPoints = 0;
+                CurrentMovementPoints = 0;
             }
         }
 
@@ -519,7 +519,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual void HandleTurnStarted()
         {
-            m_CurrentMovementPoints = 5;
+            CurrentMovementPoints = 5;
         }
 
         protected virtual void HandleDeath()

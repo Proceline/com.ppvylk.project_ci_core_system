@@ -17,8 +17,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         Flying,
     }
 
-    [CreateAssetMenu(fileName = "NewAbility", menuName = "ProjectCI Tools/Ability/Create New Ability", order = 1)]
-    public class UnitAbilityCore : ScriptableObject, IIdentifier
+    public abstract class UnitAbilityCore : ScriptableObject, IIdentifier
     {
         public string ID { get; private set; } = string.Empty;
 
@@ -247,113 +246,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return abilityCells;
         }
 
-        private void InternalHandleEffectedCell(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
-        {
-            GridObject targetObj = InEffectCell.GetObjectOnCell();
-            GridPawnUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();
-
-            if (targetExecuteUnit)
-            {
-                targetExecuteUnit.LookAtCell(InCasterUnit.GetCell());
-            }
-
-            foreach (AbilityParticle abilityParticle in m_SpawnOnCaster)
-            {
-                Vector3 pos = InCasterUnit.GetCell().GetAllignPos(InCasterUnit);
-                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
-                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
-            }
-
-            foreach (AbilityParticle abilityParticle in m_SpawnOnTarget)
-            {
-                Vector3 pos = InEffectCell.gameObject.transform.position;
-
-                if (targetObj)
-                {
-                    pos = InEffectCell.GetAllignPos(targetObj);
-                }
-
-                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
-                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
-            }
-
-            foreach (AbilityParamBase param in m_Params)
-            {
-                if (targetObj)
-                {
-                    param.ApplyTo(InCasterUnit, targetObj);
-                }
-
-                param.ApplyTo(InCasterUnit, InEffectCell);
-            }
-
-            foreach (StatusEffect ailment in m_Ailments)
-            {
-                if (ailment)
-                {
-                    if (targetExecuteUnit)
-                    {
-                        targetExecuteUnit.GetAilmentContainer().AddStatusEffect(InCasterUnit, ailment);
-                    }
-
-                    CellStatusEffect cellStatusEffect = ailment as CellStatusEffect;
-                    if (cellStatusEffect)
-                    {
-                        InEffectCell.GetAilmentContainer().AddStatusEffect(InCasterUnit, cellStatusEffect, InEffectCell);
-                    }
-                }
-            }
-        }
-
-        public void ApplyVisualEffects(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell)
-        {
-            GridObject targetObj = InEffectCell.GetObjectOnCell();
-            GridPawnUnit targetExecuteUnit = InEffectCell.GetUnitOnCell();
-
-            if (targetExecuteUnit)
-            {
-                targetExecuteUnit.LookAtCell(InCasterUnit.GetCell());
-            }
-
-            // Visual effects on caster
-            foreach (AbilityParticle abilityParticle in m_SpawnOnCaster)
-            {
-                Vector3 pos = InCasterUnit.GetCell().GetAllignPos(InCasterUnit);
-                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InCasterUnit.transform.rotation).GetComponent<AbilityParticle>();
-                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
-            }
-
-            // Visual effects on target
-            foreach (AbilityParticle abilityParticle in m_SpawnOnTarget)
-            {
-                Vector3 pos = InEffectCell.gameObject.transform.position;
-
-                if (targetObj)
-                {
-                    pos = InEffectCell.GetAllignPos(targetObj);
-                }
-
-                AbilityParticle createdAbilityParticle = Instantiate(abilityParticle.gameObject, pos, InEffectCell.transform.rotation).GetComponent<AbilityParticle>();
-                createdAbilityParticle.Setup(this, InCasterUnit, InEffectCell);
-            }
-
-            // TODO: Should be handled as visual effects
-            foreach (StatusEffect ailment in m_Ailments)
-            {
-                if (ailment)
-                {
-                    if (targetExecuteUnit)
-                    {
-                        targetExecuteUnit.GetAilmentContainer().AddStatusEffect(InCasterUnit, ailment);
-                    }
-
-                    CellStatusEffect cellStatusEffect = ailment as CellStatusEffect;
-                    if (cellStatusEffect)
-                    {
-                        InEffectCell.GetAilmentContainer().AddStatusEffect(InCasterUnit, cellStatusEffect, InEffectCell);
-                    }
-                }
-            }
-        }
+        public abstract void ApplyVisualEffects(GridPawnUnit InCasterUnit, LevelCellBase InEffectCell);
     }
 }
