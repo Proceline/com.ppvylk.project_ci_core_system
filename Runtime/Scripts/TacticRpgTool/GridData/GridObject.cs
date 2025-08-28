@@ -23,10 +23,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         Renderer m_ObjectRenderer;
 
-        public UnityEvent OnGetConfirmed = new UnityEvent();
-        public UnityEvent OnGetCanceled = new UnityEvent();
-        public UnityEvent OnBegingFocused = new UnityEvent();
-        public UnityEvent OnEndFocused = new UnityEvent();
+        [SerializeField] private UnityEvent<LevelCellBase> onStandCellChanged;
 
         protected LevelGridBase m_AssociatedGrid;
         protected LevelCellBase m_CurrentCell;
@@ -41,11 +38,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         public virtual void Initialize()
         {
             DestroyColliders();
-        }
-
-        public virtual void PostInitialize()
-        {
-            
         }
 
         public void AlignToGrid()
@@ -96,7 +88,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             if(m_CurrentCell)
             {
                 m_CurrentCell.SetObjectOnCell(this);
-                HandleOwnerCellChanged(m_CurrentCell);
+                onStandCellChanged?.Invoke(m_CurrentCell);
             }
         }
 
@@ -171,38 +163,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         #endregion
 
-        #region EventListeners
-
-        public virtual void HandleBeingConfirmed()
-        {
-            OnGetConfirmed.Invoke();
-        }
-
-        public virtual void HandleBeingCanceled()
-        {
-            OnGetCanceled.Invoke();
-        }
-
-        public virtual void HandleBegingFocused()
-        {
-            OnBegingFocused.Invoke();
-        }
-
-        public virtual void HandleEndFocused()
-        {
-            OnEndFocused.Invoke();
-        }
-
-        public virtual void HandleOwnerCellChanged(LevelCellBase NewCell)
-        {
-            
-        }
-
-        public virtual void HandleCellStateChanged(CellState InCellState)
-        {
-            
-        }
-
-        #endregion
     }
 }

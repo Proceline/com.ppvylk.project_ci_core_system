@@ -4,8 +4,6 @@ using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.WinConditions;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
@@ -65,13 +63,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
     public partial class TacticBattleManager : MonoBehaviour
     {
-        static TacticBattleManager sInstance = null;
+        private static TacticBattleManager _instance;
         public virtual LevelGridBase LevelGrid { get; set; }
 
         [Space(10)]
-
-        [SerializeField]
-        private InputActionManager m_InputActionManager;
 
         [SerializeField]
         protected BattleGameRules m_GameRules;
@@ -87,56 +82,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [SerializeField]
         protected GameObject m_SelectedHoverObject;
 
-        [Space(10)]
+        [Space(10)] 
+        private readonly Dictionary<BattleTeam, List<GridPawnUnit>> _mTeams = new();
 
-        [SerializeField]
-        protected WinCondition[] m_WinConditions;
-
-        [SerializeField]
-        protected GameObject[] m_SpawnOnStart;
-
-        [SerializeField]
-        protected GameObject[] m_AddToSpawnedUnits;
-
-        [SerializeField]
-        protected AbilityParticle[] m_DeathParticles;
-
-        [Space(10)]
-
-        [SerializeField]
-        public GameTeamEvent OnTeamWon;
-
-        [HideInInspector]
-        public GridUnitEvent OnUnitHover = new GridUnitEvent();
-
-        List<GridObject> SpawnedCellObjects = new List<GridObject>();
-
-        Dictionary<BattleTeam, List<GridPawnUnit>> m_Teams = new Dictionary<BattleTeam, List<GridPawnUnit>>();
-
-        Dictionary<BattleTeam, int> m_NumberOfKilledTargets = new Dictionary<BattleTeam, int>();
-        Dictionary<BattleTeam, int> m_NumberOfKilledEntities = new Dictionary<BattleTeam, int>();
-
-        List<LevelCellBase> CurrentHoverCells = new List<LevelCellBase>();
-
-        UnityEvent OnFinishedPerformedActions = new UnityEvent();
-
-        LevelCellBase m_CurrentHoverCell;
-
-        int m_NumActionsBeingPerformed;
-
-        bool m_bIsPlaying = false;
+        private bool _isPlaying = false;
 
         void Awake()
         {
-            if (sInstance == null)
+            if (_instance == null)
             {
-                sInstance = this;
+                _instance = this;
             }
-        }
-
-        protected virtual void OnDestroy()
-        {
-            UnregisterControlActions();
         }
 
         void Update()
@@ -153,23 +109,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             if (m_GameRules)
             {
-                OnTeamWon.AddListener(m_GameRules.HandleTeamWon);
-                m_GameRules.InitalizeRules();
+                m_GameRules.InitializeRules();
             }
 
             if (m_FogOfWar)
             {
                 m_FogOfWar.SpawnFogObjects();
-            }
-
-            m_InputActionManager.EnableAllActions();
-            RegisterControlActions();
-            foreach (GameObject SpawnObj in m_SpawnOnStart)
-            {
-                if (SpawnObj)
-                {
-                    Instantiate(SpawnObj);
-                }
             }
         }
 
@@ -187,16 +132,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         {
             if (LevelGrid)
             {
-                LevelCellBase TestCell = null;
+                LevelCellBase testCell = null;
 
-                List<LevelCellBase> LevelCells = LevelGrid.GetAllCells();
-                if (LevelCells.Count > 0)
+                List<LevelCellBase> levelCells = LevelGrid.GetAllCells();
+                if (levelCells.Count > 0)
                 {
-                    TestCell = LevelCells[0];
+                    testCell = levelCells[0];
                 }
-                if (TestCell != null)
+                if (testCell != null)
                 {
-                    foreach (LevelCellBase currCell in LevelCells)
+                    foreach (LevelCellBase currCell in levelCells)
                     {
                         CellState cellState = currCell.GetNormalState();
                         currCell.SetCellState(cellState);
@@ -210,37 +155,32 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static TacticBattleManager Get()
         {
-            return sInstance;
+            return _instance;
         }
 
         public static LevelGridBase GetGrid()
         {
-            return sInstance.LevelGrid;
+            return _instance.LevelGrid;
         }
 
         public static BattleGameRules GetRules()
         {
-            return sInstance.m_GameRules;
+            return _instance.m_GameRules;
         }
         
         public static FogOfWar GetFogOfWar()
         {
-            return sInstance.m_FogOfWar;
+            return _instance.m_FogOfWar;
         }
 
         public static CameraController GetCameraController()
         {
-            return sInstance.m_CameraController;
+            return _instance.m_CameraController;
         }
 
         public static GameObject GetSelectedHoverPrefab()
         {
-            return sInstance.m_SelectedHoverObject;
-        }
-
-        public static List<WinCondition> GetWinConditions()
-        {
-            return new List<WinCondition>(sInstance.m_WinConditions);
+            return _instance.m_SelectedHoverObject;
         }
 
         public static BattleTeam GetTeamAffinity(BattleTeam InTeam1, BattleTeam InTeam2)
@@ -255,7 +195,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
         public static Dictionary<BattleTeam, List<GridPawnUnit>> GetTeamsMap()
         {
-            return sInstance.m_Teams;
+            return _instance._mTeams;
         }
 
         public static List<BattleTeam> GetTeamList()
@@ -270,210 +210,62 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return outTeams;
         }
 
-        //Checks if a player is moving, attacking or basically anything that should prevent input.
-        public static bool IsActionBeingPerformed()
-        {
-            return (sInstance.m_NumActionsBeingPerformed > 0);
-        }
-
-        public static void AddActionBeingPerformed()
-        {
-            ++sInstance.m_NumActionsBeingPerformed;
-        }
-
-        public static void RemoveActionBeingPerformed()
-        {
-            --sInstance.m_NumActionsBeingPerformed;
-
-            if (sInstance.m_NumActionsBeingPerformed == 0)
-            {
-                sInstance.OnFinishedPerformedActions.Invoke();
-            }
-        }
-
-        public static void BindToOnFinishedPerformedActions(UnityAction InAction)
-        {
-            sInstance.OnFinishedPerformedActions.AddListener(InAction);
-        }
-
-        public static void UnBindFromOnFinishedPerformedActions(UnityAction InAction)
-        {
-            sInstance.OnFinishedPerformedActions.RemoveListener(InAction);
-        }
-
-        public static int GetNumTargetsKilled(BattleTeam InTeam)
-        {
-            if (sInstance.m_NumberOfKilledTargets.ContainsKey(InTeam))
-            {
-                return sInstance.m_NumberOfKilledTargets[InTeam];
-            }
-
-            return 0;
-        }
-
-        public static int NumUnitsKilled(BattleTeam InTeam)
-        {
-            if (sInstance.m_NumberOfKilledEntities.ContainsKey(InTeam))
-            {
-                return sInstance.m_NumberOfKilledEntities[InTeam];
-            }
-
-            return 0;
-        }
-
-        public static bool AreAllUnitsOnTeamDead(BattleTeam InTeam)
-        {
-            return NumUnitsKilled(InTeam) == sInstance.m_Teams[InTeam].Count;
-        }
-
-        public static bool CanFinishTurn()
-        {
-            bool bActionBeingPerformed = IsActionBeingPerformed();
-            bool bIsTeamHuman = true;
-
-            BattleGameRules gameRules = GetRules();
-            if (gameRules)
-            {
-                bIsTeamHuman = IsTeamHuman(gameRules.GetCurrentTeam());
-            }
-
-            return (!bActionBeingPerformed && bIsTeamHuman);
-        }
-
-        public static int GetNumOfTargets(BattleTeam InTeam)
-        {
-            return GetTeamTargets(InTeam).Count;
-        }
-
-        public static List<GridPawnUnit> GetTeamTargets(BattleTeam InTeam)
-        {
-            List<GridPawnUnit> units = new List<GridPawnUnit>();
-
-            if(sInstance.m_Teams.ContainsKey(InTeam))
-            {
-                foreach (GridPawnUnit unit in sInstance.m_Teams[InTeam])
-                {
-                    if (unit.IsTarget())
-                    {
-                        units.Add(unit);
-                    }
-                }
-            }
-
-            return units;
-        }
-
-        public static bool KilledAllTargets(BattleTeam InTeam)
-        {
-            return GetNumTargetsKilled(InTeam) == GetNumOfTargets(InTeam);
-        }
-
-        public static GridObject SpawnObjectOnCell(GameObject InObject, LevelCellBase InCell, Vector3 InOffset = default(Vector3))
-        {
-            if ( InCell && InObject )
-            {
-                GridObject SpawnedGridObject = Instantiate(InObject).AddComponent<GridObject>();
-
-                float ObjHeight = SpawnedGridObject.GetBounds().y;
-                float CellHeight = InCell.GetRenderer().bounds.size.y;
-
-                Vector3 HeightOffset = new Vector3(0.0f, (CellHeight * 0.5f) + (ObjHeight * 0.5f), 0.0f);
-
-                SpawnedGridObject.gameObject.transform.position = InCell.gameObject.transform.position + HeightOffset + InOffset;
-
-                SpawnedGridObject.Initialize();
-                SpawnedGridObject.SetGrid( GetGrid() );
-                SpawnedGridObject.SetCurrentCell( InCell );
-                SpawnedGridObject.PostInitialize();
-
-                return SpawnedGridObject;
-            }
-
-            return null;
-        }
-
         public static GridPawnUnit SpawnUnit<T>(GameObject prefab, SoUnitData unitData, BattleTeam InTeam, Vector2Int InIndex, CompassDir InStartDirection = CompassDir.S)
             where T : GridPawnUnit
         {
-            LevelCellBase cell = sInstance.LevelGrid[InIndex];
+            LevelCellBase cell = _instance.LevelGrid[InIndex];
 
             if (InTeam == BattleTeam.Friendly)
             {
                 cell.SetVisible(true);
             }
 
-            GridPawnUnit SpawnedGridUnit = Instantiate(prefab).AddComponent<T>();
+            GridPawnUnit spawnedGridUnit = Instantiate(prefab).AddComponent<T>();
 
-            SpawnedGridUnit.Initialize();
-            SpawnedGridUnit.SetUnitData(unitData);
-            SpawnedGridUnit.SetTeam(InTeam);
-            SpawnedGridUnit.SetGrid(sInstance.LevelGrid);
-            SpawnedGridUnit.SetCurrentCell(cell);
-            SpawnedGridUnit.AlignToGrid();
-            SpawnedGridUnit.PostInitialize();
+            spawnedGridUnit.Initialize();
+            spawnedGridUnit.SetUnitData(unitData);
+            spawnedGridUnit.SetTeam(InTeam);
+            spawnedGridUnit.SetGrid(_instance.LevelGrid);
+            spawnedGridUnit.SetCurrentCell(cell);
+            spawnedGridUnit.AlignToGrid();
+            spawnedGridUnit.PostInitialize();
 
-            LevelCellBase DirCell = SpawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
-            if (DirCell)
+            LevelCellBase dirCell = spawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
+            if (dirCell)
             {
-                SpawnedGridUnit.LookAtCell(DirCell);
+                spawnedGridUnit.LookAtCell(dirCell);
             }
 
-            foreach (GameObject obj in sInstance.m_AddToSpawnedUnits)
-            {
-                if (obj)
-                {
-                    Instantiate(obj, SpawnedGridUnit.gameObject.transform);
-                }
-            }
+            AddUnitToTeam(spawnedGridUnit, InTeam);
 
-            AddUnitToTeam(SpawnedGridUnit, InTeam);
-
-            return SpawnedGridUnit;
+            return spawnedGridUnit;
         }
 
         public static void AddUnitToTeam(GridPawnUnit InUnit, BattleTeam InTeam)
         {
-            sInstance.SpawnedCellObjects.Add(InUnit);
-
-            if (!sInstance.m_Teams.ContainsKey(InTeam))
+            if (!_instance._mTeams.ContainsKey(InTeam))
             {
-                sInstance.m_Teams.Add(InTeam, new List<GridPawnUnit>());
+                _instance._mTeams.Add(InTeam, new List<GridPawnUnit>());
             }
 
-            sInstance.m_Teams[InTeam].Add(InUnit);
+            _instance._mTeams[InTeam].Add(InUnit);
 
             if (InTeam == BattleTeam.Friendly)
             {
-                if (sInstance.m_FogOfWar)
+                if (_instance.m_FogOfWar)
                 {
-                    sInstance.m_FogOfWar.CheckPoint(InUnit.GetCell());
+                    _instance.m_FogOfWar.CheckPoint(InUnit.GetCell());
                 }
             }
         }
 
-        void SpawnDeathParticlesForUnit(GridPawnUnit InUnit)
+        private static List<Renderer> GetAllRenderersOfObject(GameObject InObject)
         {
-            foreach (AbilityParticle particle in m_DeathParticles)
-            {
-                if (particle)
-                {
-                    AbilityParticle spawnedParticle = Instantiate(particle.gameObject, InUnit.gameObject.transform.position, particle.gameObject.transform.rotation).GetComponent<AbilityParticle>();
-                    if (spawnedParticle)
-                    {
-                        spawnedParticle.Setup(null, null, null);
-                    }
-                }
-            }
-        }
+            List<Renderer> renderers = new() { InObject.GetComponent<Renderer>() };
 
-        public static List<Renderer> GetAllRenderersOfObject(GameObject InObject)
-        {
-            List<Renderer> Renderers = new List<Renderer>();
+            renderers.AddRange(InObject.GetComponentsInChildren<Renderer>());
 
-            Renderers.Add(InObject.GetComponent<Renderer>());
-            Renderers.AddRange(InObject.GetComponentsInChildren<Renderer>());
-
-            return Renderers;
+            return renderers;
         }
 
         public static Vector3 GetBoundsOfObject(GameObject InObject)
@@ -482,8 +274,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             {
                 Vector3 bounds = new Vector3();
 
-                List<Renderer> Renderers = GetAllRenderersOfObject(InObject);
-                foreach (Renderer currRenderer in Renderers)
+                List<Renderer> renderers = GetAllRenderersOfObject(InObject);
+                foreach (Renderer currRenderer in renderers)
                 {
                     if (currRenderer)
                     {
@@ -516,9 +308,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
                 Debug.Log("([ProjectCI]::TacticBattleManager::GetUnitsOnTeam) Trying to get units for invalid team: " + InTeam.ToString());
             }
 
-            if (sInstance.m_Teams.ContainsKey(InTeam))
+            if (_instance._mTeams.TryGetValue(InTeam, out var team))
             {
-                return sInstance.m_Teams[InTeam];
+                return team;
             }
 
             return new List<GridPawnUnit>();
@@ -537,31 +329,31 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         }
         public static bool IsTeamHuman(BattleTeam InTeam)
         {
-            return sInstance.IsTeamHumanByBattleTeam(InTeam);
+            return _instance.IsTeamHumanByBattleTeam(InTeam);
         }
 
         public static bool IsTeamAI(BattleTeam InTeam)
         {
-            return !sInstance.IsTeamHumanByBattleTeam(InTeam);
+            return !_instance.IsTeamHumanByBattleTeam(InTeam);
         }
 
         public static bool IsUnitOnTeam(GridPawnUnit InUnit, BattleTeam InTeam)
         {
-            if(sInstance.m_Teams.ContainsKey(InTeam))
+            if(_instance._mTeams.ContainsKey(InTeam))
             {
-                return sInstance.m_Teams[InTeam].Contains(InUnit);
+                return _instance._mTeams[InTeam].Contains(InUnit);
             }
             return false;
         }
 
         public static bool IsPlaying()
         {
-            return sInstance.m_bIsPlaying;
+            return _instance._isPlaying;
         }
 
         public static void HandleGameStarted()
         {
-            sInstance.m_bIsPlaying = true;
+            _instance._isPlaying = true;
         }
 
         public static BattleTeam GetUnitTeam(GridPawnUnit InUnit)
@@ -583,15 +375,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             SetCellState(InCell, InCell.GetNormalState());
         }
 
-        public static void SetCellState(LevelCellBase InCell, CellState InCellState)
+        public static void SetCellState(LevelCellBase inCell, CellState inCellState)
         {
-            if (sInstance.LevelGrid)
+            if (_instance.LevelGrid)
             {
-                InCell.SetMaterial(InCellState);
-                InCell.SetCellState(InCellState);
-                if (InCell.IsMouseOver())
+                inCell.SetMaterial(inCellState);
+                inCell.SetCellState(inCellState);
+                if (inCell.IsMouseOver())
                 {
-                    sInstance.BeginHover(InCell);
+                    _instance.onCellPointed?.Invoke(inCell);
                 }
             }
         }
@@ -615,8 +407,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             if (InCaster.GetCellTeam() != BattleTeam.None)
             {
-                BattleTeam ObjAffinity = TacticBattleManager.GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
-                if (ObjAffinity == BattleTeam.Friendly && InEffectedTeam == BattleTeam.Hostile)
+                BattleTeam objAffinity = GetTeamAffinity(InCaster.GetCellTeam(), InTarget.GetCellTeam());
+                if (objAffinity == BattleTeam.Friendly && InEffectedTeam == BattleTeam.Hostile)
                 {
                     return false;
                 }
@@ -624,153 +416,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 
             return true;
         }
-
-        public static void FinishTurn()
-        {
-            if (CanFinishTurn())
-            {
-                if (sInstance.m_GameRules)
-                {
-                    sInstance.m_GameRules.EndTurn();
-                }
-
-                CheckWinConditions();
-            }
-        }
-
-        public static void CheckWinConditions()
-        {
-            if (!sInstance.m_bIsPlaying)
-            {
-                return;
-            }
-
-            Dictionary<BattleTeam, int> TeamToWinCount = new Dictionary<BattleTeam, int>()
-            {
-                { BattleTeam.Friendly, 0},
-                { BattleTeam.Hostile, 0}
-            };
-
-            int NumWinConditions = sInstance.m_WinConditions.Length;
-
-            foreach (WinCondition currWinCondition in sInstance.m_WinConditions)
-            {
-                if (currWinCondition)
-                {
-                    if (currWinCondition.m_bCheckWinFirst)
-                    {
-                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Friendly))
-                        {
-                            if (++TeamToWinCount[BattleTeam.Friendly] >= NumWinConditions)
-                            {
-                                TeamWon(BattleTeam.Friendly);
-                            }
-                        }
-
-                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Hostile))
-                        {
-                            if (++TeamToWinCount[BattleTeam.Hostile] >= NumWinConditions)
-                            {
-                                TeamWon(BattleTeam.Hostile);
-                            }
-                        }
-
-                        CheckLost(currWinCondition, BattleTeam.Friendly);
-                        CheckLost(currWinCondition, BattleTeam.Hostile);
-                    }
-                    else
-                    {
-                        CheckLost(currWinCondition, BattleTeam.Friendly);
-                        CheckLost(currWinCondition, BattleTeam.Hostile);
-
-                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Friendly))
-                        {
-                            if (++TeamToWinCount[BattleTeam.Friendly] >= NumWinConditions)
-                            {
-                                TeamWon(BattleTeam.Friendly);
-                            }
-                        }
-
-                        if (DidTeamPassCondition(currWinCondition, BattleTeam.Hostile))
-                        {
-                            if (++TeamToWinCount[BattleTeam.Hostile] >= NumWinConditions)
-                            {
-                                TeamWon(BattleTeam.Hostile);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void HandleUnitDeath(GridPawnUnit InUnit)
-        {
-            if (!sInstance.m_NumberOfKilledEntities.ContainsKey(InUnit.GetTeam()))
-            {
-                sInstance.m_NumberOfKilledEntities.Add(InUnit.GetTeam(), 0);
-            }
-
-            sInstance.m_NumberOfKilledEntities[InUnit.GetTeam()]++;
-
-            if (InUnit.IsTarget())
-            {
-                if (!sInstance.m_NumberOfKilledTargets.ContainsKey(InUnit.GetTeam()))
-                {
-                    sInstance.m_NumberOfKilledTargets.Add(InUnit.GetTeam(), 0);
-                }
-
-                sInstance.m_NumberOfKilledTargets[InUnit.GetTeam()]++;
-            }
-
-            sInstance.SpawnDeathParticlesForUnit(InUnit);
-
-            CheckWinConditions();
-        }
-
-        public static void HandleUnitActivated(GridPawnUnit InUnit)
-        {
-
-        }
-
-        #endregion
-
-        #region Conditions
-        static bool DidTeamPassCondition(WinCondition InCondition, BattleTeam InTeam)
-        {
-            if (InCondition)
-            {
-                if (InCondition.CheckTeamWin(InTeam))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        static void CheckLost(WinCondition InCondition, BattleTeam InTeam)
-        {
-            if (InCondition)
-            {
-                if (InCondition.CheckTeamLost(InTeam))
-                {
-                    TeamLost(InTeam);
-                }
-            }
-        }
-
-        static void TeamWon(BattleTeam InTeam)
-        {
-            sInstance.OnTeamWon.Invoke(InTeam);
-            sInstance.HandleGameComplete();
-        }
-
-        static void TeamLost(BattleTeam InTeam)
-        {
-            BattleTeam WinningTeam = InTeam == BattleTeam.Friendly ? BattleTeam.Hostile : BattleTeam.Friendly;
-            TeamWon(WinningTeam);
-        }
-
         #endregion
     }
 }

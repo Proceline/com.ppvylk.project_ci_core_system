@@ -47,8 +47,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions
                     }
                 }
             }
-
-            TacticBattleManager.CheckWinConditions();
         }
 
         public void SpawnFogObjects()

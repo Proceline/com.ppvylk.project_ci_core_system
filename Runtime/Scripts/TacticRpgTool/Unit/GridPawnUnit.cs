@@ -32,16 +32,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         private UnitAttributeContainer _simulatedAttributes;
 
         protected int CurrentMovementPoints;
-
-        private bool _bIsTarget = false;
+        
         private bool _bIsMoving = false;
-        private bool _bActivated = false;
-
-        protected bool m_bIsDead = false;
 
         protected UnityEvent OnMovementPostComplete = new();
-
-        protected readonly List<LevelCellBase> EditedCells = new();
 
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
@@ -62,22 +56,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             protected set => _simulatedAttributes = value; 
         }
 
-        public override void PostInitialize()
+        public virtual void PostInitialize()
         {
             GetCell().HandleVisibilityChanged();
-        }
-        
-        protected void ResetCells()
-        {
-            foreach (LevelCellBase cell in EditedCells)
-            {
-                if (cell)
-                {
-                    TacticBattleManager.ResetCellState(cell);
-                }
-            }
-
-            EditedCells.Clear();
         }
 
         public abstract void LookAtCell(LevelCellBase InCell);
@@ -130,23 +111,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             _unitData = InUnitData;
         }
 
-        public void SetActivated(bool bInNewActivateState)
-        {
-            if(_bActivated != bInNewActivateState)
-            {
-                _bActivated = bInNewActivateState;
-                if(_bActivated)
-                {
-                    HandleActivation();
-                }
-            }
-        }
-
-        public void SetAsTarget(bool bInIsTarget)
-        {
-            _bIsTarget = bInIsTarget;
-        }
-
         #endregion
 
         #region Getters
@@ -180,16 +144,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _bIsMoving;
         }
 
-        public bool IsTarget()
-        {
-            return _bIsTarget;
-        }
-
-        public bool IsActivated()
-        {
-            return _bActivated;
-        }
-
         public bool IsFlying()
         {
             return GetUnitData().m_bIsFlying;
@@ -200,28 +154,25 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return GetUnitData().m_bLookAtTargets;
         }
 
-        public bool IsDead()
-        {
-            return m_bIsDead;
-        }
+        public virtual bool IsDead() => false;
 
         public virtual int GetCurrentMovementPoints()
         {
             return CurrentMovementPoints;
         }
 
-        public Vector3 GetCellAllignPos(LevelCellBase InCell)
+        public Vector3 GetCellAllignPos(LevelCellBase inCell)
         {
-            if(InCell)
+            if(inCell)
             {
-                GridObject Obj = InCell.GetObjectOnCell();
-                if (Obj)
+                GridObject obj = inCell.GetObjectOnCell();
+                if (obj)
                 {
-                    return InCell.GetAllignPos(Obj);
+                    return inCell.GetAllignPos(obj);
                 }
                 else
                 {
-                    Vector3 AllignPos = InCell.gameObject.transform.position;
+                    Vector3 AllignPos = inCell.gameObject.transform.position;
                     AllignPos.y = gameObject.transform.position.y;
                     return AllignPos;
                 }
@@ -239,36 +190,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _unitData.m_MovementShape.GetCellList(this, GetCell(), CurrentMovementPoints, _unitData.m_bIsFlying);
         }
 
-        public virtual void SetupMovement()
-        {
-            if (IsMoving() || TacticBattleManager.IsActionBeingPerformed())
-            {
-                return;
-            }
-
-            ResetCells();
-
-            if (!_unitData.m_MovementShape)
-            {
-                return;
-            }
-
-            AddState(UnitBattleState.Moving);
-            List<LevelCellBase> allowedMovementCells = GetAllowedMovementCells();
-
-            foreach (LevelCellBase cell in allowedMovementCells)
-            {
-                if (cell && cell.IsVisible())
-                {
-                    TacticBattleManager.SetCellState(cell, CellState.eMovement);
-                }
-            }
-
-            EditedCells.AddRange(allowedMovementCells);
-
-            TacticBattleManager.Get().UpdateHoverCells();
-        }
-
         public bool ExecuteMovement(LevelCellBase targetCell)
         {
             if (IsMoving())
@@ -281,7 +202,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            if(!targetCell.IsVisible())
+            if (!targetCell.IsVisible())
             {
                 return false;
             }
@@ -293,10 +214,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             TraverseTo(targetCell, OnMovementPostComplete, allowedMovementCells);
-
-            TacticBattleManager.CheckWinConditions();
-
-            ResetCells();
             return true;
         }
 
@@ -306,12 +223,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             await OnGridTraverseTo(InTargetCell, onMovementComplete, InAllowedCells);
         }
 
-        public async void ForceMoveTo(LevelCellBase InTargetCell)
+        public virtual async void ForceMoveTo(LevelCellBase targetCell)
         {
-            await ForceMoveToInternally(InTargetCell);
+            await ForceMoveToInternally(targetCell);
         }
 
-        internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
+        protected internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
         {
             if (InTargetCell)
             {
@@ -319,7 +236,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 OnPreMovementAnimRequired?.Invoke();
 
-                TacticBattleManager.AddActionBeingPerformed();
                 List<LevelCellBase> cellPath = GetPathTo(InTargetCell, InAllowedCells);
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
@@ -364,7 +280,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     if ( cell != startingCell )
                     {
                         StatusEffectUtils.HandleUnitOnCell(this, cell);
-                        PlayTravelAudio();
                     }
 
                     if (IsDead())
@@ -387,8 +302,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     OnPreStandIdleAnimRequired?.Invoke();
                 }
 
-                TacticBattleManager.RemoveActionBeingPerformed();
-
                 _bIsMoving = false;
 
                 if (onMovementComplete != null)
@@ -398,16 +311,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
         }
 
-        protected virtual async Awaitable ForceMoveToInternally(LevelCellBase InTargetCell)
+        protected async Awaitable ForceMoveToInternally(LevelCellBase targetCell)
         {
-            if (InTargetCell)
+            if (targetCell)
             {
-                TacticBattleManager.AddActionBeingPerformed();
-
                 AIPathInfo pathInfo = new AIPathInfo
                 {
                     StartCell = GetCell(),
-                    TargetCell = InTargetCell,
+                    TargetCell = targetCell,
                     bNoDestinationUnits = true,
                     bIgnoreUnitsOnPath = true,
                     bTakeWeightIntoAccount = false
@@ -419,7 +330,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 Vector3 StartPos = GetCell().GetAllignPos(this);
 
-                SetCurrentCell(InTargetCell);
+                SetCurrentCell(targetCell);
 
                 foreach (LevelCellBase cell in cellPath)
                 {
@@ -436,17 +347,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         }
                     }
 
-                    float TimeTo = 0;
-                    Vector3 EndPos = cell.GetAllignPos(this);
-                    while (TimeTo < 1.5f)
+                    float timeTo = 0;
+                    Vector3 endPos = cell.GetAllignPos(this);
+                    while (timeTo < 1.5f)
                     {
-                        TimeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
-                        gameObject.transform.position = Vector3.MoveTowards(StartPos, EndPos, TimeTo);
+                        timeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
+                        gameObject.transform.position = Vector3.MoveTowards(StartPos, endPos, timeTo);
 
                         await Awaitable.WaitForSecondsAsync(0.00001f);
                     }
 
-                    gameObject.transform.position = EndPos;
+                    gameObject.transform.position = endPos;
                     StartPos = cell.GetAllignPos(this);
 
                     await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
@@ -456,8 +367,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         StatusEffectUtils.HandleUnitOnCell(this, cell);
                     }
                 }
-
-                TacticBattleManager.RemoveActionBeingPerformed();
             }
         }
 
@@ -485,10 +394,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return cellPath;
         }
 
-        public void RemoveMovementPoints(int InMoveCount)
+        private void RemoveMovementPoints(int moveCount)
         {
-            CurrentMovementPoints -= InMoveCount;
-            if(CurrentMovementPoints < 0)
+            CurrentMovementPoints -= moveCount;
+            if (CurrentMovementPoints < 0)
             {
                 CurrentMovementPoints = 0;
             }
@@ -503,21 +412,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             CurrentMovementPoints = 5;
         }
 
-        protected virtual void HandleDeath()
-        {
-            TacticBattleManager.HandleUnitDeath(this);
-        }
-
-        protected virtual void DestroyObj()
-        {
-            TacticBattleManager.UnBindFromOnFinishedPerformedActions(DestroyObj);
-            Destroy(gameObject);
-        }
-
         protected void PlayHitVisualResult()
         {
-            bool bShowHitAnimationOnMove = TacticBattleManager.GetRules().GetGameplayData().bShowHitAnimOnMove;
-            if (!IsMoving() || bShowHitAnimationOnMove)
+            if (!IsMoving())
             {
                 OnPreHitAnimRequired?.Invoke();
             }
@@ -564,21 +461,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 AudioPlayData audioData = new AudioPlayData(clip);
                 AudioHandler.PlayAudio(audioData, gameObject.transform.position);
             }
-        }
-
-        void PlayTravelAudio()
-        {
-            AudioClip clip = GetUnitData().m_TravelSound;
-            if (clip)
-            {
-                AudioPlayData audioData = new AudioPlayData(clip);
-                AudioHandler.PlayAudio(audioData, gameObject.transform.position);
-            }
-        }
-
-        void HandleActivation()
-        {
-            TacticBattleManager.HandleUnitActivated(this);
         }
 
         #endregion

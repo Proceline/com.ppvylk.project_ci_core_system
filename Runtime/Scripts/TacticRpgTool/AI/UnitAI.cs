@@ -21,9 +21,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             if ( InAIUnit )
             {
-                CheckActivation( InAIUnit );
+                // CheckActivation( InAIUnit );
 
-                if ( InAIUnit.IsActivated() )
+                if (InAIUnit)//InAIUnit.IsActivated() )
                 {
                     //Calculate target
                     GridPawnUnit target = CalculateTargetUnit( InAIUnit );
@@ -68,39 +68,39 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             }
         }
 
-        protected void CheckActivation(GridPawnUnit InUnit)
-        {
-            if (!InUnit.IsActivated())
-            {
-                if (m_bActivateOnStart)
-                {
-                    InUnit.SetActivated(true);
-                }
-                else
-                {
-                    AIRadiusInfo radiusInfo = new AIRadiusInfo(InUnit.GetCell(), m_ActivationRange)
-                    {
-                        Caster = InUnit,
-                        bAllowBlocked = true,
-                        bStopAtBlockedCell = true,
-                        EffectedTeam = BattleTeam.Hostile
-                    };
-
-                    List<LevelCellBase> ActivationCells = AStarAlgorithmUtils.GetRadius(radiusInfo);
-                    foreach (var cell in ActivationCells)
-                    {
-                        GridObject objOnCell = cell.GetObjectOnCell();
-                        if (objOnCell)
-                        {
-                            if (TacticBattleManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == BattleTeam.Hostile)
-                            {
-                                InUnit.SetActivated(true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // protected void CheckActivation(GridPawnUnit InUnit)
+        // {
+        //     if (!InUnit.IsActivated())
+        //     {
+        //         if (m_bActivateOnStart)
+        //         {
+        //             // InUnit.SetActivated(true);
+        //         }
+        //         else
+        //         {
+        //             AIRadiusInfo radiusInfo = new AIRadiusInfo(InUnit.GetCell(), m_ActivationRange)
+        //             {
+        //                 Caster = InUnit,
+        //                 bAllowBlocked = true,
+        //                 bStopAtBlockedCell = true,
+        //                 EffectedTeam = BattleTeam.Hostile
+        //             };
+        //
+        //             List<LevelCellBase> ActivationCells = AStarAlgorithmUtils.GetRadius(radiusInfo);
+        //             foreach (var cell in ActivationCells)
+        //             {
+        //                 GridObject objOnCell = cell.GetObjectOnCell();
+        //                 if (objOnCell)
+        //                 {
+        //                     if (TacticBattleManager.GetTeamAffinity(InUnit.GetTeam(), objOnCell.GetTeam()) == BattleTeam.Hostile)
+        //                     {
+        //                         // InUnit.SetActivated(true);
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         protected GridPawnUnit CalculateTargetUnit(GridPawnUnit InAIUnit)
         {

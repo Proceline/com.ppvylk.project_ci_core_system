@@ -148,28 +148,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #endregion
 
-        public List<LevelCellBase> Setup(GridPawnUnit InCasterUnit)
-        {
-            if (!GetShape())
-            {
-                return new List<LevelCellBase>();
-            }
-
-            List<LevelCellBase> abilityCells = GetAbilityCells(InCasterUnit);
-
-            CellState abilityState = GetEffectedTeam() == BattleTeam.Hostile ? CellState.eNegative : CellState.ePositive;
-
-            foreach (LevelCellBase cell in abilityCells)
-            {
-                if (cell)
-                {
-                    TacticBattleManager.SetCellState(cell, abilityState);
-                }
-            }
-
-            return abilityCells;
-        }
-
         public List<LevelCellBase> GetEffectedCells(GridPawnUnit InCasterUnit, LevelCellBase InTarget)
         {
             List<LevelCellBase> effectCellList = new List<LevelCellBase>();
