@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
@@ -7,8 +8,6 @@ using UnityEngine.InputSystem;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 {
-    public class TeamTurnChangeEvent : UnityEvent<BattleTeam> { }
-
     public abstract class BattleGameRules : ScriptableObject
     {
         public BattleTeam CurrentTeam { get; protected set; }
@@ -18,7 +17,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
             CurrentTeam = BattleTeam.All;
             StartGame();
         }
-        
+
         protected abstract void StartGame();
 
         public abstract void Update();
