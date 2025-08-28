@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using UnityEngine.InputSystem;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
 {
@@ -25,11 +21,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules
         public abstract GridPawnUnit GetSelectedUnit();
         
         public abstract void BeginTeamTurn(BattleTeam inTeam);
-        
-        public abstract void HandlePlayerSelected(GridPawnUnit playerUnit);
-
-        public abstract void HandleEnemySelected(GridPawnUnit enemyUnit);
-
-        public abstract void HandleCellSelected(LevelCellBase cell);
     }
 }
