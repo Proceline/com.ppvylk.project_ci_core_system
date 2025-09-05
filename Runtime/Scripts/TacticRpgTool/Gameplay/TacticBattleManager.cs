@@ -74,9 +74,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [SerializeField]
         protected FogOfWar m_FogOfWar;
 
-        [SerializeField]
-        protected CameraController m_CameraController;
-
         [Space(10)]
 
         [SerializeField]
@@ -171,11 +168,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         public static FogOfWar GetFogOfWar()
         {
             return _instance.m_FogOfWar;
-        }
-
-        public static CameraController GetCameraController()
-        {
-            return _instance.m_CameraController;
         }
 
         public static GameObject GetSelectedHoverPrefab()
