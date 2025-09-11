@@ -18,7 +18,7 @@ namespace ProjectCI.CoreSystem.DependencyInjection
             var type = target.GetType();
             
             // Inject fields
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var field in fields)
             {
                 var injectAttribute = field.GetCustomAttribute<InjectAttribute>();
