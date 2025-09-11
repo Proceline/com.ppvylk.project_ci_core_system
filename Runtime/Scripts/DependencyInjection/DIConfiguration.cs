@@ -84,6 +84,15 @@ namespace ProjectCI.CoreSystem.DependencyInjection
         }
 
         /// <summary>
+        /// Used to outside event to register
+        /// </summary>
+        /// <param name="target"></param>
+        public void InjectFromConfiguration(Object target)
+        {
+            Inject(target);
+        }
+
+        /// <summary>
         /// Inject dependencies into any object
         /// </summary>
         /// <param name="target">The object to inject into</param>
