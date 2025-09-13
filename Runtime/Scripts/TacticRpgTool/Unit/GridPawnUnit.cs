@@ -413,6 +413,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
 
         public abstract void BroadcastActionTriggerByTag(string actionTagName);
+        public abstract float GrabActionValueDataByIndexTag(int additionalIndex, params string[] tags);
         
         protected void PlayHitVisualResult()
         {
