@@ -412,6 +412,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             CurrentMovementPoints = 5;
         }
 
+        public abstract void BroadcastActionTriggerByTag(string actionTagName);
+        
         protected void PlayHitVisualResult()
         {
             if (!IsMoving())
