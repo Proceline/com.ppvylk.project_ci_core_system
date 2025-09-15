@@ -150,7 +150,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
         {
             foreach (AbilityParamBase abilityParam in InAilmentExecution.m_Params)
             {
-                abilityParam.ApplyTo(null, InUnit);
+                // abilityParam.ApplyTo(null, InUnit);
             }
 
             foreach (AbilityParticle abilityParticle in InAilmentExecution.m_SpawnOnReciever)
@@ -176,7 +176,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem
             {
                 foreach (AbilityParamBase abilityParam in InAilmentExecution.m_Params)
                 {
-                    abilityParam.ApplyTo(null, unitOnCell);
+                    // abilityParam.ApplyTo(null, unitOnCell);
                 }
 
                 foreach (AbilityParticle abilityParticle in InAilmentExecution.m_SpawnOnReciever)
