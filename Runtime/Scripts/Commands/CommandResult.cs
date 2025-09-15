@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using UnityEngine;
 
@@ -25,6 +24,6 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public int Value; // e.g. damage or heal amount
         public string ExtraInfo; // Optional, for custom info
         
-        public abstract void AddReaction(UnitAbilityCore ability, List<Action<GridPawnUnit>> reactions);
+        public abstract void AddReaction(UnitAbilityCore ability, Queue<Action<GridPawnUnit>> reactions);
     }
 } 
