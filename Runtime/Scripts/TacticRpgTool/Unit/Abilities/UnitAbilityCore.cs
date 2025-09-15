@@ -51,11 +51,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [SerializeField]
         int m_EffectRadius;
 
-        [SerializeField]
-        AbilityParticle[] m_SpawnOnCaster;
+        [SerializeField] 
+        protected List<GameObject> spawnOnCaster = new();
 
-        [SerializeField]
-        AbilityParticle[] m_SpawnOnTarget;
+        [SerializeField] 
+        protected List<GameObject> spawnOnTarget = new();
 
         [SerializeField]
         AbilityParamBase[] m_Params;
@@ -126,15 +126,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return m_EffectRadius;
         }
 
-        public List<AbilityParticle> GetCasterParticles()
-        {
-            return new List<AbilityParticle>(m_SpawnOnCaster);
-        }
+        public List<GameObject> GetCasterParticles() => spawnOnCaster;
 
-        public List<AbilityParticle> GetTargetParticles()
-        {
-            return new List<AbilityParticle>(m_SpawnOnTarget);
-        }
+        public List<GameObject> GetTargetParticles() => spawnOnTarget;
 
         public List<AbilityParamBase> GetParameters()
         {
