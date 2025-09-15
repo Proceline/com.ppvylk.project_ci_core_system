@@ -25,6 +25,6 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public int Value; // e.g. damage or heal amount
         public string ExtraInfo; // Optional, for custom info
         
-        public abstract void AddReaction(UnitAbilityCore ability, List<Action<GridPawnUnit, LevelCellBase>> reactions);
+        public abstract void AddReaction(UnitAbilityCore ability, List<Action<GridPawnUnit>> reactions);
     }
 } 
