@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using UnityEngine;
 
@@ -58,6 +59,39 @@ namespace ProjectCI.CoreSystem.DependencyInjection
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Inject dependencies into static class
+        /// </summary>
+        /// <param name="container">The DI container</param>
+        /// <param name="typeFullName"></param>
+        public static void StaticInject(DIContainer container, string typeFullName)
+        {
+            var exactType = Type.GetType(typeFullName);
+            if (exactType == null)
+            {
+                return;
+            }
+            
+            var staticFields = exactType.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+                                                   BindingFlags.DeclaredOnly | BindingFlags.Static);
+            foreach (var field in staticFields)
+            {
+                if (field.GetCustomAttribute<InjectAttribute>(false) == null)
+                {
+                    continue;
+                }
+
+                var typeOfField = field.FieldType;
+                var service = container.Resolve(typeOfField);
+
+                field.SetValue(null, service);
+
+                Debug.Log(
+                    $"<color=#0F0>Static Injection Context </color> is injecting {exactType.Name}.{field.Name} as {field.FieldType.Name}");
+            }
+
         }
     }
 } 

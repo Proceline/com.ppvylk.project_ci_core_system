@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ProjectCI.CoreSystem.DependencyInjection
 {
@@ -11,6 +12,9 @@ namespace ProjectCI.CoreSystem.DependencyInjection
     {
         [Header("UnityObject Service Registrations")]
         [SerializeField] private List<UnityObjectServiceRegistration> unityObjectRegistrations = new();
+
+        [Header("Registered Target Static Classes")] 
+        [SerializeField, HideInInspector] private List<string> staticInjectTargets = new();
 
         private static DIConfiguration _instance;
         private DIContainer Container => DIContainer.Instance;
@@ -24,6 +28,11 @@ namespace ProjectCI.CoreSystem.DependencyInjection
             foreach (var registration in unityObjectRegistrations)
             {
                 RegisterSingletonObjectService(container, registration);
+            }
+
+            foreach (var target in staticInjectTargets)
+            {
+                DIExtensions.StaticInject(container, target);
             }
         }
 
