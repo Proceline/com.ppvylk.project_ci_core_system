@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
 {
@@ -6,21 +7,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
     public struct WeightInfo
     {
         public bool bBlocked;
-        public int Weight;
+        
+        [FormerlySerializedAs("Weight")] 
+        public int weight;
 
-        public static WeightInfo operator+ (WeightInfo InWeightLeft, WeightInfo InWeightRight)
+        public static WeightInfo operator+ (WeightInfo weightLeftSide, WeightInfo weightRightSide)
         {
-            WeightInfo NewWeightInfo = InWeightLeft;
+            WeightInfo newWeightInfo = weightLeftSide;
 
-            NewWeightInfo.Weight = InWeightLeft.Weight + InWeightRight.Weight;
-            NewWeightInfo.bBlocked = (InWeightLeft.bBlocked || InWeightRight.bBlocked);
+            newWeightInfo.weight = weightLeftSide.weight + weightRightSide.weight;
+            newWeightInfo.bBlocked = weightLeftSide.bBlocked || weightRightSide.bBlocked;
 
-            return NewWeightInfo;
+            return newWeightInfo;
         }
     }
 
     public class ObjectWeightInfo : MonoBehaviour
     {
-        public WeightInfo m_WeightInfo;
+        [FormerlySerializedAs("m_WeightInfo")] 
+        public WeightInfo weightInfo;
     }
 }

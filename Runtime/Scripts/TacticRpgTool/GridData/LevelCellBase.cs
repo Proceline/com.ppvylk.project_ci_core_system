@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
@@ -33,6 +34,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         [SerializeField] 
         private CellInfo cellInfo;
 
+        private Renderer _hintRenderer;
+
         private GridObject _objectOnCell;
         private Vector2Int _presetIndex;
 
@@ -45,6 +48,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         private bool _bIsHovering;
 
         private LevelGridBase _grid;
+        private readonly List<ObjectWeightInfo> _weightInfosCol = new();
 
         public void Reset()
         {
@@ -59,6 +63,26 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
 
             _cellState = CellState.eNormal;
+            
+            var objWeightInfo = GetComponent<ObjectWeightInfo>();
+            if (objWeightInfo)
+            {
+                _weightInfosCol.Add(objWeightInfo);
+            }
+
+            var weightInfos = GetComponentsInChildren<ObjectWeightInfo>();
+            foreach (var currWeightInfo in weightInfos)
+            {
+                _weightInfosCol.Add(currWeightInfo);
+            }
+            
+            Renderer obtainedRenderer = GetComponent<Renderer>();
+            if (!obtainedRenderer)
+            {
+                throw new NullReferenceException("Renderer ERROR: Add Renderer to Cell!");
+            }
+
+            _hintRenderer = obtainedRenderer;
         }
 
         protected virtual void Start()
@@ -170,6 +194,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return outCells;
         }
 
+        // TODO: Optimize this function
         public StatusEffectContainer GetAilmentContainer()
         {
             StatusEffectContainer statusEffectHandler = GetComponent<StatusEffectContainer>();
@@ -199,32 +224,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         public WeightInfo GetWeightInfo()
         {
             WeightInfo totalWeightInfo = new WeightInfo();
-
-            ObjectWeightInfo objWeightInfo = GetComponent<ObjectWeightInfo>();
-            if (objWeightInfo)
+            foreach (var weightInfoComp in _weightInfosCol)
             {
-                totalWeightInfo += objWeightInfo.m_WeightInfo;
+                totalWeightInfo += weightInfoComp.weightInfo;
             }
 
-            ObjectWeightInfo[] weightInfos = GetComponentsInChildren<ObjectWeightInfo>();
-            foreach (ObjectWeightInfo currWeightInfo in weightInfos)
-            {
-                totalWeightInfo += currWeightInfo.m_WeightInfo;
-            }
-
-            List<StatusEffect> ailments = GetAilmentContainer().GetStatusEffectList();
-            foreach (StatusEffect currAilment in ailments)
-            {
-                if(currAilment)
-                {
-                    CellStatusEffect cellStatusEffect = currAilment as CellStatusEffect;
-                    if(cellStatusEffect)
-                    {
-                        totalWeightInfo += cellStatusEffect.m_WeightInfo;
-                    }
-                }
-            }
-
+            // List<StatusEffect> ailments = GetAilmentContainer().GetStatusEffectList();
             return totalWeightInfo;
         }
 
@@ -294,11 +299,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return _presetIndex;
         }
 
-        public CompassDir GetDirectionToAdjacentCell(LevelCellBase InTarget)
+        public CompassDir GetDirectionToAdjacentCell(LevelCellBase inTarget)
         {
             foreach (var pair in _adjacentCellsMap.Pairs)
             {
-                if (pair._Value == InTarget)
+                if (pair._Value == inTarget)
                 {
                     return pair._Key;
                 }
@@ -307,35 +312,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return CompassDir.N;
         }
 
-        public T GetRenderer<T>() where T : Renderer
-        {
-            Renderer obtainedRenderer = GetComponent<Renderer>();
-            if (!obtainedRenderer)
-            {
-                obtainedRenderer = gameObject.GetComponentInChildren<Renderer>();
-            }
-            if (!obtainedRenderer)
-            {
-                obtainedRenderer = gameObject.GetComponentInParent<Renderer>();
-            }
-
-            return obtainedRenderer as T;
-        }
-
-        public Renderer GetRenderer()
-        {
-            Renderer obtainedRenderer = GetComponent<Renderer>();
-            if (!obtainedRenderer)
-            {
-                obtainedRenderer = gameObject.GetComponentInChildren<Renderer>();
-            }
-            if (!obtainedRenderer)
-            {
-                obtainedRenderer = gameObject.GetComponentInParent<Renderer>();
-            }
-
-            return obtainedRenderer;
-        }
+        public Renderer GetRenderer() => _hintRenderer;
 
         public List<Collider> GetColliders()
         {

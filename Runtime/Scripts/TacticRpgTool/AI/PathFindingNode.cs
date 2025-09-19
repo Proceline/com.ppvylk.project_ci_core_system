@@ -53,12 +53,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             Cell = InCell;
         }
 
-        public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent, int GCost, int HCost)
+        public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent, int gCost, int hCost)
         {
             Cell = InCell;
             Parent = InParent;
-            G = GCost;
-            H = HCost;
+            G = gCost;
+            H = hCost;
         }
 
         public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent)

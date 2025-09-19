@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
+using Object = UnityEngine.Object;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 {
@@ -78,7 +80,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             List<PathFindingNode> openSet = new List<PathFindingNode>();
             List<PathFindingNode> closedSet = new List<PathFindingNode>();
 
-            openSet.Add(AStarCalculatePathNode(null, InPathInfo.StartCell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
+            openSet.Add(AStarCalculatePathNode(null, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo));
 
             while (openSet.Count > 0)
             {
@@ -104,7 +106,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 List<LevelCellBase> adjCells = currNode.Cell.GetAllAdjacentCells();
                 foreach (var cell in adjCells)
                 {
-                    PathFindingNode newPathFindNode = AStarCalculatePathNode(currNode, cell, InPathInfo.StartCell, InPathInfo.TargetCell, InPathInfo);
+                    PathFindingNode newPathFindNode = AStarCalculatePathNode(currNode, cell, InPathInfo.TargetCell, InPathInfo);
 
                     if (closedSet.Contains(newPathFindNode))
                     {
@@ -142,14 +144,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     }
                     else
                     {
-                        int tenativeGScore = AStarCalculateG(cell, currNode, InPathInfo);
+                        int gScore = AStarCalculateG(cell, currNode, InPathInfo);
 
-                        if (tenativeGScore < newPathFindNode.G)
+                        if (gScore >= newPathFindNode.G)
                         {
-                            newPathFindNode.Parent = currNode;
-                            newPathFindNode.G = tenativeGScore;
-                            openSet = AStarUpdateList(openSet, newPathFindNode);
+                            continue;
                         }
+
+                        newPathFindNode.Parent = currNode;
+                        newPathFindNode.G = gScore;
+                        openSet = AStarUpdateList(openSet, newPathFindNode);
                     }
                 }
             }
@@ -157,40 +161,40 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return outPath;
         }
 
-        public static List<LevelCellBase> GetRadius(AIRadiusInfo InRadiusInfo)
+        public static List<LevelCellBase> GetRadius(AIRadiusInfo inRadiusInfo)
         {
             List<LevelCellBase> outPath = new List<LevelCellBase>();
 
-            if (InRadiusInfo.StartCell == null)
+            if (!inRadiusInfo.StartCell)
             {
-                Debug.Log("([TurnBasedTools]::AIManager::GetRadius) Invalid Start, or Target");
-                return outPath;
+                throw new NullReferenceException(
+                    $"([{nameof(AStarAlgorithmUtils)}]::AIManager::GetRadius) Invalid Start, or Target");
             }
 
-            List<PathFindingNode> OpenSet = new List<PathFindingNode>();
-            List<PathFindingNode> ClosedSet = new List<PathFindingNode>();
+            List<PathFindingNode> openSet = new();
+            List<PathFindingNode> closedSet = new();
 
-            PathFindingNode NewNode = new PathFindingNode(InRadiusInfo.StartCell, null);
+            var newNode = new PathFindingNode(inRadiusInfo.StartCell, null);
 
-            OpenSet.Add(NewNode);
+            openSet.Add(newNode);
 
-            while (OpenSet.Count > 0)
+            while (openSet.Count > 0)
             {
-                PathFindingNode CurrNode = DijGetLowestGScore(OpenSet);
+                PathFindingNode currNode = DijGetLowestGScore(openSet);
 
-                if (CurrNode.G == InRadiusInfo.Radius + 1)
+                if (currNode.G == inRadiusInfo.Radius + 1)
                 {
-                    foreach (var open in OpenSet)
+                    foreach (var open in openSet)
                     {
-                        if (open.Cell != InRadiusInfo.StartCell)
+                        if (open.Cell != inRadiusInfo.StartCell)
                         {
                             outPath.Add(open.Cell);
                         }
                     }
 
-                    foreach (var closed in ClosedSet)
+                    foreach (var closed in closedSet)
                     {
-                        if (closed.Cell != InRadiusInfo.StartCell)
+                        if (closed.Cell != inRadiusInfo.StartCell)
                         {
                             outPath.Add(closed.Cell);
                         }
@@ -199,66 +203,60 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     break;
                 }
 
-                OpenSet.Remove(CurrNode);
-                ClosedSet.Add(CurrNode);
+                openSet.Remove(currNode);
+                closedSet.Add(currNode);
 
-                List<LevelCellBase> adjCells = CurrNode.Cell.GetAllAdjacentCells();
+                List<LevelCellBase> adjCells = currNode.Cell.GetAllAdjacentCells();
                 foreach (var cell in adjCells)
                 {
-                    PathFindingNode NewPathFindNode = new PathFindingNode(cell, CurrNode);
+                    PathFindingNode newPathFindNode = new PathFindingNode(cell, currNode);
 
-                    if (ClosedSet.Contains(NewPathFindNode))
+                    if (closedSet.Contains(newPathFindNode))
                     {
                         continue;
                     }
 
-                    if (InRadiusInfo.bStopAtBlockedCell)
+                    if (inRadiusInfo.bStopAtBlockedCell)
                     {
-                        if (!AllowCellInRadius(NewPathFindNode.Cell, InRadiusInfo))
+                        if (!AllowCellInRadius(newPathFindNode.Cell, inRadiusInfo))
                         {
                             continue;
                         }
                     }
 
-                    if (!OpenSet.Contains(NewPathFindNode))
+                    if (!openSet.Contains(newPathFindNode))
                     {
-                        OpenSet.Add(NewPathFindNode);
+                        openSet.Add(newPathFindNode);
                     }
                     else
                     {
-                        int tenativeGScore = DijCalculateG(cell, CurrNode);
+                        int tenativeGScore = DijCalculateG(cell, currNode);
 
-                        if (tenativeGScore < NewPathFindNode.G)
+                        if (tenativeGScore < newPathFindNode.G)
                         {
-                            NewPathFindNode.Parent = CurrNode;
-                            NewPathFindNode.G = tenativeGScore;
-                            OpenSet = DijUpdateList(OpenSet, NewPathFindNode);
+                            newPathFindNode.Parent = currNode;
+                            newPathFindNode.G = tenativeGScore;
+                            openSet = DijUpdateList(openSet, newPathFindNode);
                         }
                     }
                 }
             }
 
-            if (!InRadiusInfo.bStopAtBlockedCell)
+            if (!inRadiusInfo.bStopAtBlockedCell)
             {
-                List<LevelCellBase> CellsToRemove = new List<LevelCellBase>();
-                foreach (LevelCellBase cell in outPath)
+                for (var delIndex = outPath.Count - 1; delIndex >= 0; delIndex--)
                 {
-                    if (!AllowCellInRadius(cell, InRadiusInfo))
+                    if (!AllowCellInRadius(outPath[delIndex], inRadiusInfo))
                     {
-                        CellsToRemove.Add(cell);
+                        outPath.RemoveAt(delIndex);
                     }
-                }
-
-                foreach (LevelCellBase cellToRemove in CellsToRemove)
-                {
-                    outPath.Remove(cellToRemove);
                 }
             }
             else
             {
-                foreach (var closed in ClosedSet)
+                foreach (var closed in closedSet)
                 {
-                    if (closed.Cell != InRadiusInfo.StartCell)
+                    if (closed.Cell != inRadiusInfo.StartCell)
                     {
                         outPath.Add(closed.Cell);
                     }
@@ -268,38 +266,38 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return outPath;
         }
 
-        static bool AllowCellInRadius(LevelCellBase InCell, AIRadiusInfo InRadiusInfo)
+        static bool AllowCellInRadius(LevelCellBase inCell, AIRadiusInfo inRadiusInfo)
         {
-            if (!InCell)
+            if (!inCell)
             {
                 return false;
             }
 
-            if (InCell.IsBlocked() && !InRadiusInfo.bAllowBlocked)
+            if (inCell.IsBlocked() && !inRadiusInfo.bAllowBlocked)
             {
                 return false;
             }
 
-            GridObject gridObj = InCell.GetObjectOnCell();
+            GridObject gridObj = inCell.GetObjectOnCell();
             if (!gridObj)
             {
                 return true;
             }
             
-            if (InRadiusInfo.EffectedTeam == BattleTeam.None)
+            if (inRadiusInfo.EffectedTeam == BattleTeam.None)
             {
                 return false;
             }
 
-            if (InRadiusInfo.Caster != null)
+            if (inRadiusInfo.Caster != null)
             {
-                BattleTeam objAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), InRadiusInfo.Caster.GetTeam());
-                if (objAffinity == BattleTeam.Friendly && InRadiusInfo.EffectedTeam == BattleTeam.Hostile)
+                BattleTeam objAffinity = TacticBattleManager.GetTeamAffinity(gridObj.GetTeam(), inRadiusInfo.Caster.GetTeam());
+                if (objAffinity == BattleTeam.Friendly && inRadiusInfo.EffectedTeam == BattleTeam.Hostile)
                 {
                     return false;
                 }
 
-                if (objAffinity == BattleTeam.Hostile && InRadiusInfo.EffectedTeam == BattleTeam.Friendly)
+                if (objAffinity == BattleTeam.Hostile && inRadiusInfo.EffectedTeam == BattleTeam.Friendly)
                 {
                     return false;
                 }
@@ -340,24 +338,24 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         #region AStarComponents
 
-        private static PathFindingNode AStarCalculatePathNode(PathFindingNode InParent, LevelCellBase InCurrent,
-            LevelCellBase InStart, LevelCellBase InTarget, AIPathInfo InPathInfo)
+        private static PathFindingNode AStarCalculatePathNode(PathFindingNode parent, LevelCellBase current,
+            LevelCellBase target, AIPathInfo pathInfo)
         {
-            int gCost = AStarCalculateG(InCurrent, InParent, InPathInfo);
-            int hCost = AStarDistance(InCurrent, InTarget);
+            var gCost = AStarCalculateG(current, parent, pathInfo);
+            var hCost = AStarDistance(current, target);
 
-            return new PathFindingNode(InCurrent, InParent, gCost, hCost);
+            return new PathFindingNode(current, parent, gCost, hCost);
         }
 
-        static int AStarCalculateG(LevelCellBase InCurrent, PathFindingNode InParent, AIPathInfo InPathInfo)
+        private static int AStarCalculateG(LevelCellBase current, PathFindingNode parent, AIPathInfo pathInfo)
         {
-            int weight = 0;
-            if (InPathInfo.bTakeWeightIntoAccount)
+            var weight = 0;
+            if (pathInfo.bTakeWeightIntoAccount)
             {
-                weight = InCurrent.GetWeightInfo().Weight;
+                weight = current.GetWeightInfo().weight;
             }
 
-            return 1 + (InParent != null ? InParent.G : 0) + weight;
+            return 1 + (parent?.G ?? 0) + weight;
         }
 
         private static int AStarDistance(LevelCellBase InStart, LevelCellBase InDest) =>
