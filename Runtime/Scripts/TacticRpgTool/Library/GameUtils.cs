@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
+using UnityEngine;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 {
@@ -25,6 +27,16 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             }
 
             return null;
+        }
+        
+         public static IEnumerator WaitSecondsNoAlloc(float seconds, bool unscaled = false)
+        {
+            var t = 0f;
+            while (t < seconds)
+            {
+                t += unscaled ? Time.unscaledDeltaTime : Time.deltaTime;
+                yield return null;
+            }
         }
     }
 }

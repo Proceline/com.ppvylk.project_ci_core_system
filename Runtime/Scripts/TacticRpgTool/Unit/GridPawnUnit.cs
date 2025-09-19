@@ -352,7 +352,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         timeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
                         gameObject.transform.position = Vector3.MoveTowards(StartPos, endPos, timeTo);
 
-                        await Awaitable.WaitForSecondsAsync(0.00001f);
+                        await Awaitable.NextFrameAsync();
                     }
 
                     gameObject.transform.position = endPos;

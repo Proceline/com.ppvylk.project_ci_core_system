@@ -12,10 +12,6 @@ namespace ProjectCI.CoreSystem.Editor.Attributes
     [CustomEditor(typeof(DIConfiguration))]
     public class DIConfigurationEditor : Editor
     {
-        private readonly List<string> _options = new();
-
-        [NonSerialized] private bool _optionUpdated;
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
