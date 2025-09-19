@@ -39,8 +39,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
-        public event Action OnPreHitAnimRequired;
-        public event Action OnPreHealAnimRequired;
 
         protected SoUnitData UnitData => _unitData;
 
@@ -414,57 +412,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public abstract void BroadcastActionTriggerByTag(string actionTagName);
         public abstract float GrabActionValueDataByIndexTag(int additionalIndex, params string[] tags);
-        
-        protected void PlayHitVisualResult()
-        {
-            if (!IsMoving())
-            {
-                OnPreHitAnimRequired?.Invoke();
-            }
-
-            PlayDamagedAudio();
-        }
-
-        protected void PlayHealVisualResult()
-        {
-            OnPreHealAnimRequired?.Invoke();
-
-            PlayHealAudio();
-
-            AbilityParticle[] particles = GetUnitData().m_SpawnOnHeal;
-            foreach (AbilityParticle particle in particles)
-            {
-                if(particle)
-                {
-                    Vector3 pos = GetCell().gameObject.transform.position;
-
-                    pos = GetCell().GetAllignPos(this);
-
-                    AbilityParticle CreatedAbilityParticle = Instantiate(particle.gameObject, pos, GetCell().transform.rotation).GetComponent<AbilityParticle>();
-                    CreatedAbilityParticle.Setup(null, this, GetCell());
-                }
-            }
-        }
-
-        void PlayDamagedAudio()
-        {
-            AudioClip clip = GetUnitData().m_DamagedSound;
-            if(clip)
-            {
-                AudioPlayData audioData = new AudioPlayData(clip);
-                AudioHandler.PlayAudio(audioData, gameObject.transform.position);
-            }
-        }
-
-        void PlayHealAudio()
-        {
-            AudioClip clip = GetUnitData().m_HealSound;
-            if (clip)
-            {
-                AudioPlayData audioData = new AudioPlayData(clip);
-                AudioHandler.PlayAudio(audioData, gameObject.transform.position);
-            }
-        }
 
         #endregion
 
