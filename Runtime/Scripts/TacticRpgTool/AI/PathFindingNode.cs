@@ -31,17 +31,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return G + H;
         }
 
-        public int GetDistanceToStart()
+        private int GetDistanceToStart()
         {
             return InternalGetDistance(this);
         }
 
-        int InternalGetDistance(PathFindingNode InPathNode)
+        private int InternalGetDistance(PathFindingNode inPathNode)
         {
             int count = 0;
-            if (InPathNode.Parent != null)
+            if (inPathNode.Parent != null)
             {
-                count += InternalGetDistance(InPathNode.Parent);
+                count += InternalGetDistance(inPathNode.Parent);
             }
             count++;
 
@@ -61,10 +61,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             H = hCost;
         }
 
-        public PathFindingNode(LevelCellBase InCell, PathFindingNode InParent)
+        public PathFindingNode(LevelCellBase inCell, PathFindingNode inParent)
         {
-            Cell = InCell;
-            Parent = InParent;
+            Cell = inCell;
+            Parent = inParent;
             G = GetDistanceToStart();
         }
     }

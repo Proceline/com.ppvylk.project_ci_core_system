@@ -266,7 +266,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             return outPath;
         }
 
-        static bool AllowCellInRadius(LevelCellBase inCell, AIRadiusInfo inRadiusInfo)
+        internal static bool AllowCellInRadius(LevelCellBase inCell, AIRadiusInfo inRadiusInfo)
         {
             if (!inCell)
             {
