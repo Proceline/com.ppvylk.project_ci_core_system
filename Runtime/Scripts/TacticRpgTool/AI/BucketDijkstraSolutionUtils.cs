@@ -40,7 +40,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
     public sealed class AttackField
     {
         public readonly HashSet<LevelCellBase> AllVictims = new();
-        public Dictionary<LevelCellBase, List<LevelCellBase>> VictimsFromCells = new();
+        public readonly Dictionary<LevelCellBase, List<LevelCellBase>> VictimsFromCells = new();
         // FromWhich[t] = 可以从哪些站位格打到 t
     }
     
