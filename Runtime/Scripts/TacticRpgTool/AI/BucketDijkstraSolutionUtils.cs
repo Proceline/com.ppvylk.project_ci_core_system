@@ -15,10 +15,33 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
         // 按总代价分层（下标=总代价）。layers[d] 是所有 Dist==d 的格。
         // 便于“从近到远”遍历（比如先用低代价格生成候选）
-        // public readonly List<List<LevelCellBase>> Layers = new();
+        public readonly List<List<LevelCellBase>> Layers = new();
 
         // 可选：回溯父指针（若需要重构路径）
-        // public readonly Dictionary<LevelCellBase, LevelCellBase> Parent = new();
+        public readonly Dictionary<LevelCellBase, LevelCellBase> Parent = new();
+
+        public void AddCellToLayerOnIndex(int layerValue, LevelCellBase cell)
+        {
+            var cellsList = GetCellsInLayer(layerValue);
+            cellsList.Add(cell);
+        }
+
+        public List<LevelCellBase> GetCellsInLayer(int layerValue)
+        {
+            while (layerValue >= Layers.Count)
+            {
+                Layers.Add(new List<LevelCellBase>());
+            }
+
+            return Layers[layerValue];
+        }
+    }
+    
+    public sealed class AttackField
+    {
+        public readonly HashSet<LevelCellBase> AllVictims = new();
+        public Dictionary<LevelCellBase, List<LevelCellBase>> VictimsFromCells = new();
+        // FromWhich[t] = 可以从哪些站位格打到 t
     }
     
     public sealed class BucketQueue<T>
@@ -95,7 +118,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             
             field.Dist[startCell] = 0;
             bucketQueue.Enqueue(0, startCell);
-            // field.Layers[0].Add(startCell);  // TODO
+            field.AddCellToLayerOnIndex(0, startCell);
+            field.Reach.Add(startCell);
             
             while (bucketQueue.TryDequeueUpTo(radius, out int currG, out LevelCellBase cell))
             {
@@ -104,7 +128,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     continue;
                 }
 
-                // 标记可达
+                // 标记可达, No need to check duplicated because correct Cell only browse once
                 if (currG <= radius)
                 {
                     field.Reach.Add(cell);
@@ -134,12 +158,35 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     if (!field.Dist.TryGetValue(vertex, out var oldG) || newG < oldG)
                     {
                         field.Dist[vertex] = newG;
-                        // field.Parent[vertex] = cell; // TODO
+                        field.Parent[vertex] = cell;
                         bucketQueue.Enqueue(newG, vertex);
 
                         // 分层：记录“总代价为 newG 的格”
-                        // field.Layers[newG].Add(vertex);  // TODO
+                        field.AddCellToLayerOnIndex(newG, vertex);
                     }
+                }
+            }
+
+            return field;
+        }
+
+        public static AttackField ComputeAttackField(RadiusField moveField,
+            Func<LevelCellBase, List<LevelCellBase>> startToAoe)
+        {
+            var field = new AttackField();
+            foreach (var reachableCell in moveField.Reach)
+            {
+                var victims = startToAoe.Invoke(reachableCell);
+                foreach (var victim in victims)
+                {
+                    field.AllVictims.Add(victim);
+                    if (!field.VictimsFromCells.TryGetValue(victim, out var fromCells))
+                    {
+                        fromCells = new List<LevelCellBase>();
+                        field.VictimsFromCells[victim] = fromCells;
+                    }
+
+                    fromCells.Add(reachableCell);
                 }
             }
 

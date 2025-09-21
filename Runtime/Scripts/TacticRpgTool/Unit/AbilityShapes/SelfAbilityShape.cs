@@ -7,9 +7,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
     [CreateAssetMenu(fileName = "NewSelfAbilityShape", menuName = "ProjectCI Tools/Ability/Shapes/Create SelfAbilityShape", order = 1)]
     public class SelfAbilityShape : AbilityShape
     {
-        public override List<LevelCellBase> GetCellList(GridPawnUnit InCaster, LevelCellBase InCell, int InRange, bool bAllowBlocked = true, BattleTeam m_EffectedTeam = BattleTeam.None)
+        public override List<LevelCellBase> GetCellList(GridPawnUnit inCaster, LevelCellBase inCell, int inRange, bool bAllowBlocked = true, BattleTeam effectTeam = BattleTeam.None)
         {
-            return new List<LevelCellBase> { InCaster.GetCell() };
+            return new List<LevelCellBase> { inCaster.GetCell() };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
@@ -293,14 +294,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             return new Vector3();
         }
 
-        public static List<GridPawnUnit> GetUnitsOnTeam(BattleTeam InTeam)
+        public static List<GridPawnUnit> GetUnitsOnTeam(BattleTeam inTeam)
         {
-            if (InTeam == BattleTeam.None)
+            if (inTeam == BattleTeam.None)
             {
-                Debug.Log("([ProjectCI]::TacticBattleManager::GetUnitsOnTeam) Trying to get units for invalid team: " + InTeam.ToString());
+                throw new Exception("([ProjectCI]::TacticBattleManager::GetUnitsOnTeam) Trying to get units for invalid team: " + inTeam);
             }
 
-            if (_instance._mTeams.TryGetValue(InTeam, out var team))
+            if (_instance._mTeams.TryGetValue(inTeam, out var team))
             {
                 return team;
             }

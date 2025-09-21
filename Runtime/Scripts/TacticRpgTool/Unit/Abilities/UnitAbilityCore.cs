@@ -163,14 +163,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return effectCellList;
         }
 
-        public List<LevelCellBase> GetAbilityCells(GridPawnUnit InUnit)
+        public List<LevelCellBase> GetAbilityCells(GridPawnUnit inUnit)
         {
-            if (!InUnit)
+            if (!inUnit)
             {
                 return new List<LevelCellBase>();
             }
 
-            List<LevelCellBase> abilityCells = GetShape().GetCellList(InUnit, InUnit.GetCell(), GetRadius(),
+            List<LevelCellBase> abilityCells = GetShape().GetCellList(inUnit, inUnit.GetCell(), GetRadius(),
                 DoesAllowBlocked(), GetEffectedTeam());
 
             if (GetEffectedUnitType() != EffectedVictimType.All)
