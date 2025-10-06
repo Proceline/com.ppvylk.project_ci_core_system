@@ -25,20 +25,17 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
         // Get final attribute value (including all modifiers)
         public virtual int GetAttributeValue(AttributeType type)
         {
-            int baseValue = _generalAttributes.TryGetValue(type, out int value) ? value : 0;
-            
-            if (_attributeModifiers.TryGetValue(type, out var modifiers))
-            {
-                return modifiers.CalculateFinalValue(baseValue);
-            }
-
-            return baseValue;
+            var baseValue = _generalAttributes.GetValueOrDefault(type, 0);
+            return _attributeModifiers.TryGetValue(type, out var modifiers)
+                ? modifiers.CalculateFinalValue(baseValue)
+                : baseValue;
         }
 
         // Set base attribute value
-        public void SetGeneralAttribute(AttributeType type, int value)
+        public virtual void SetGeneralAttribute(AttributeType type, int value)
         {
-            _generalAttributes[type] = value;
+            var baseValue = _generalAttributes.GetValueOrDefault(type, 0);
+            _generalAttributes[type] = baseValue + value;
         }
 
         // Add attribute modifier
@@ -71,8 +68,8 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
     // Accumulated modifiers for a single attribute type
     public class AttributeModifiers
     {
-        private const float MIN_PERCENT = -1f;
-        private const float MAX_PERCENT = 999f;
+        private const float MinPercent = -1f;
+        private const float MaxPercent = 999f;
 
         public int FlatValue { get; private set; } = 0;
         public float PercentAddValue { get; private set; } = 0f;
@@ -87,12 +84,12 @@ namespace ProjectCI.CoreSystem.Runtime.Attributes
                     break;
                 case AttributeModifier.ModifierType.PercentAdd:
                     float percentAdd = (float)modifier.Value / 100f;
-                    PercentAddValue = Mathf.Clamp(PercentAddValue + percentAdd, MIN_PERCENT, MAX_PERCENT);
+                    PercentAddValue = Mathf.Clamp(PercentAddValue + percentAdd, MinPercent, MaxPercent);
                     break;
                 case AttributeModifier.ModifierType.PercentExtra:
                     float percentExtra = (float)modifier.Value / 100f;
                     PercentExtra = 
-                        Mathf.Clamp(PercentExtra + percentExtra, MIN_PERCENT, MAX_PERCENT);
+                        Mathf.Clamp(PercentExtra + percentExtra, MinPercent, MaxPercent);
                     break;
             }
         }
