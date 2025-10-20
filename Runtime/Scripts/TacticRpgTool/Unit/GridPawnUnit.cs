@@ -109,6 +109,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             _unitData = InUnitData;
         }
 
+        public abstract void SetCurrentActionPoints(int actionPoint);
+
         #endregion
 
         #region Getters
@@ -158,6 +160,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         {
             return CurrentMovementPoints;
         }
+
+        public abstract int GetCurrentActionPoints();
 
         public Vector3 GetCellAllignPos(LevelCellBase inCell)
         {
