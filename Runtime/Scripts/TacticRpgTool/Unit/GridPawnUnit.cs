@@ -110,6 +110,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
 
         public abstract void SetCurrentActionPoints(int actionPoint);
+        
+        public abstract void SetCurrentMovementPoints(int movePoint);
 
         #endregion
 
