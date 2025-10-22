@@ -227,7 +227,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             await OnGridTraverseTo(InTargetCell, onMovementComplete, InAllowedCells);
         }
 
-        public virtual async void ForceMoveTo(LevelCellBase targetCell, float duration)
+        public virtual async void ForceMoveTo(LevelCellBase targetCell)
         {
             if (!targetCell)
             {
@@ -240,12 +240,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             float time = 0;
             var endPosition = targetCell.GetAllignPos(this);
-            while (time < duration)
+            while (time < 1f)
             {
-                var currentDeltaTime = Time.deltaTime;
-                time += currentDeltaTime;
+                await Awaitable.NextFrameAsync();
+                time += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed() * 2f;
                 gameObject.transform.position = Vector3.Lerp(startPosition, endPosition, time);
-                await Awaitable.WaitForSecondsAsync(currentDeltaTime);
             }
 
             gameObject.transform.position = endPosition;
