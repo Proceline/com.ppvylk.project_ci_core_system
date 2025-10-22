@@ -243,7 +243,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             while (time < duration)
             {
                 time += Time.deltaTime;
-                gameObject.transform.position = Vector3.MoveTowards(startPosition, endPosition, time);
+                gameObject.transform.position = Vector3.Lerp(startPosition, endPosition, time);
                 await Awaitable.NextFrameAsync();
             }
 
