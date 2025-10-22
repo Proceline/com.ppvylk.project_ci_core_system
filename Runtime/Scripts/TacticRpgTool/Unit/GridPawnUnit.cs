@@ -242,9 +242,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             var endPosition = targetCell.GetAllignPos(this);
             while (time < duration)
             {
-                time += Time.deltaTime;
+                var currentDeltaTime = Time.deltaTime;
+                time += currentDeltaTime;
                 gameObject.transform.position = Vector3.Lerp(startPosition, endPosition, time);
-                await Awaitable.NextFrameAsync();
+                await Awaitable.WaitForSecondsAsync(currentDeltaTime);
             }
 
             gameObject.transform.position = endPosition;
