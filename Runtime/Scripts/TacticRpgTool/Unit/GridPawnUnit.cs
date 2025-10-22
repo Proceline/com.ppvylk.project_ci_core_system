@@ -227,9 +227,28 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             await OnGridTraverseTo(InTargetCell, onMovementComplete, InAllowedCells);
         }
 
-        public virtual async void ForceMoveTo(LevelCellBase targetCell)
+        public virtual async void ForceMoveTo(LevelCellBase targetCell, float duration)
         {
-            await ForceMoveToInternally(targetCell);
+            if (!targetCell)
+            {
+                return;
+            }
+
+            var startingCell = GetCell();
+            var startPosition = startingCell.GetAllignPos(this);
+            SetCurrentCell(targetCell);
+
+            float time = 0;
+            var endPosition = targetCell.GetAllignPos(this);
+            while (time < duration)
+            {
+                time += Time.deltaTime;
+                gameObject.transform.position = Vector3.MoveTowards(startPosition, endPosition, time);
+                await Awaitable.NextFrameAsync();
+            }
+
+            gameObject.transform.position = endPosition;
+            StatusEffectUtils.HandleUnitOnCell(this, targetCell);
         }
 
         protected internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
@@ -311,65 +330,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 if (onMovementComplete != null)
                 {
                     onMovementComplete.Invoke();
-                }
-            }
-        }
-
-        protected async Awaitable ForceMoveToInternally(LevelCellBase targetCell)
-        {
-            if (targetCell)
-            {
-                AIPathInfo pathInfo = new AIPathInfo
-                {
-                    StartCell = GetCell(),
-                    TargetCell = targetCell,
-                    bNoDestinationUnits = true,
-                    bIgnoreUnitsOnPath = true,
-                    bTakeWeightIntoAccount = false
-                };
-
-                List<LevelCellBase> cellPath = AStarAlgorithmUtils.GetPath(pathInfo);
-
-                LevelCellBase StartingCell = GetCell();
-
-                Vector3 StartPos = GetCell().GetAllignPos(this);
-
-                SetCurrentCell(targetCell);
-
-                foreach (LevelCellBase cell in cellPath)
-                {
-                    FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
-                    if (fogOfWar)
-                    {
-                        if (GetTeam() == BattleTeam.Friendly)
-                        {
-                            fogOfWar.CheckPoint(cell);
-                        }
-                        else
-                        {
-                            CheckCellVisibility( cell );
-                        }
-                    }
-
-                    float timeTo = 0;
-                    Vector3 endPos = cell.GetAllignPos(this);
-                    while (timeTo < 1.5f)
-                    {
-                        timeTo += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
-                        gameObject.transform.position = Vector3.MoveTowards(StartPos, endPos, timeTo);
-
-                        await Awaitable.NextFrameAsync();
-                    }
-
-                    gameObject.transform.position = endPos;
-                    StartPos = cell.GetAllignPos(this);
-
-                    await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
-
-                    if ( cell != StartingCell )
-                    {
-                        StatusEffectUtils.HandleUnitOnCell(this, cell);
-                    }
                 }
             }
         }
