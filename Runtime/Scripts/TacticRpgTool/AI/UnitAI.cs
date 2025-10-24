@@ -39,9 +39,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         {
                             if( targetMovementCell != InAIUnit.GetCell() )
                             {
-                                UnityEvent OnMovementComplete = new UnityEvent();
-                                List<LevelCellBase> AllowedCells = InAIUnit.GetAllowedMovementCells();
-                                await InAIUnit.OnGridTraverseTo(targetMovementCell, OnMovementComplete, AllowedCells);
+                                UnityEvent<List<LevelCellBase>> onPathObtained = new();
+                                UnityEvent onMovementComplete = new UnityEvent();
+                                List<LevelCellBase> allowedCells = InAIUnit.GetAllowedMovementCells();
+                                await InAIUnit.OnGridTraverseTo(targetMovementCell, onPathObtained, onMovementComplete,
+                                    allowedCells);
                             }
                         }
 

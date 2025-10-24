@@ -69,22 +69,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             AIComponent.SetAIData( InAIData );
         }
-        
-        public void CheckCellVisibility(LevelCellBase InCell)
-        {
-            if(InCell)
-            {
-                bool bDead = IsDead();
-                bool bCellIsVisible = InCell.IsVisible();
-
-                SetVisible(bCellIsVisible && !bDead);
-            }
-        }
-
-        public void CheckCellVisibility()
-        {
-            CheckCellVisibility(GetCell());
-        }
 
         #region Events
 
@@ -154,20 +138,20 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public abstract int GetCurrentActionPoints();
 
-        public Vector3 GetCellAllignPos(LevelCellBase inCell)
+        public Vector3 GetCellAlignPos(LevelCellBase inCell)
         {
             if(inCell)
             {
                 GridObject obj = inCell.GetObjectOnCell();
                 if (obj)
                 {
-                    return inCell.GetAllignPos(obj);
+                    return inCell.GetAlignPos(obj);
                 }
                 else
                 {
-                    Vector3 AllignPos = inCell.gameObject.transform.position;
-                    AllignPos.y = gameObject.transform.position.y;
-                    return AllignPos;
+                    var alignPos = inCell.gameObject.transform.position;
+                    alignPos.y = gameObject.transform.position.y;
+                    return alignPos;
                 }
             }
 
@@ -183,7 +167,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _unitData.m_MovementShape.GetCellList(this, GetCell(), CurrentMovementPoints, _unitData.m_bIsFlying);
         }
 
-        public bool ExecuteMovement(LevelCellBase targetCell)
+        public bool ExecuteMovement(LevelCellBase targetCell, UnityEvent<List<LevelCellBase>> onPathCalculated,
+            UnityEvent onMovementCompleted)
         {
             if (IsMoving())
             {
@@ -206,14 +191,15 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 return false;
             }
 
-            TraverseTo(targetCell, OnMovementPostComplete, allowedMovementCells);
+            TraverseTo(targetCell, onPathCalculated, onMovementCompleted, allowedMovementCells);
             return true;
         }
 
-        private async void TraverseTo(LevelCellBase InTargetCell, 
-            UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
+        private async void TraverseTo(LevelCellBase targetCell, UnityEvent<List<LevelCellBase>> onPathCalculated,
+            UnityEvent onMovementCompleted, List<LevelCellBase> allowedCells)
         {
-            await OnGridTraverseTo(InTargetCell, onMovementComplete, InAllowedCells);
+            await OnGridTraverseTo(targetCell, onPathCalculated, onMovementCompleted, allowedCells);
+            OnMovementPostComplete?.Invoke();
         }
 
         public virtual async void ForceMoveTo(LevelCellBase targetCell)
@@ -224,11 +210,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             var startingCell = GetCell();
-            var startPosition = startingCell.GetAllignPos(this);
+            var startPosition = startingCell.GetAlignPos(this);
             SetCurrentCell(targetCell);
 
             float time = 0;
-            var endPosition = targetCell.GetAllignPos(this);
+            var endPosition = targetCell.GetAlignPos(this);
             while (time < 1f)
             {
                 await Awaitable.NextFrameAsync();
@@ -239,52 +225,40 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             gameObject.transform.position = endPosition;
         }
 
-        protected internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
+        protected internal async Awaitable OnGridTraverseTo(LevelCellBase inTargetCell,
+            UnityEvent<List<LevelCellBase>> onPathCalculated, UnityEvent onMovementCompleted,
+            List<LevelCellBase> inAllowedCells)
         {
-            if (InTargetCell)
+            if (inTargetCell)
             {
                 _bIsMoving = true;
 
                 OnPreMovementAnimRequired?.Invoke();
 
-                List<LevelCellBase> cellPath = GetPathTo(InTargetCell, InAllowedCells);
-                Vector3 StartPos = GetCell().GetAllignPos(this);
+                List<LevelCellBase> cellPath = GetPathTo(inTargetCell, inAllowedCells);
+                onPathCalculated?.Invoke(cellPath);
+                Vector3 startPos = GetCell().GetAlignPos(this);
 
                 int movementCount = 0;
 
-                LevelCellBase finalCell = InTargetCell;
-
-                LevelCellBase startingCell = GetCell();
+                LevelCellBase finalCell = inTargetCell;
 
                 foreach (LevelCellBase cell in cellPath)
                 {
-                    FogOfWar fogOfWar = TacticBattleManager.GetFogOfWar();
-                    if (fogOfWar)
-                    {
-                        if (GetTeam() == BattleTeam.Friendly)
-                        {
-                            fogOfWar.CheckPoint(cell);
-                        }
-                        else
-                        {
-                            CheckCellVisibility(cell);
-                        }
-                    }
-
                     float timeSpent = 0;
-                    Vector3 endPos = cell.GetAllignPos(this);
+                    Vector3 endPos = cell.GetAlignPos(this);
 
                     LookAtCell(cell);
 
-                    while (timeSpent < 1f && StartPos != endPos)
+                    while (timeSpent < 1f && startPos != endPos)
                     {
                         await Awaitable.NextFrameAsync();
                         timeSpent += Time.deltaTime * AStarAlgorithmUtils.GetMovementSpeed();
-                        gameObject.transform.position = Vector3.Lerp(StartPos, endPos, timeSpent);
+                        gameObject.transform.position = Vector3.Lerp(startPos, endPos, timeSpent);
                     }
 
                     gameObject.transform.position = endPos;
-                    StartPos = cell.GetAllignPos(this);
+                    startPos = cell.GetAlignPos(this);
 
                     await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
 
@@ -293,14 +267,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                         break;
                     }
 
-                    if(movementCount++ >= CurrentMovementPoints)
+                    if (movementCount++ >= CurrentMovementPoints)
                     {
                         finalCell = cell;
                         break;
                     }
                 }
 
-                if ( !IsDead() )
+                if (!IsDead())
                 {
                     SetCurrentCell(finalCell);
                     RemoveMovementPoints(cellPath.Count - 1);
@@ -310,29 +284,26 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
                 _bIsMoving = false;
 
-                if (onMovementComplete != null)
-                {
-                    onMovementComplete.Invoke();
-                }
+                onMovementCompleted?.Invoke();
             }
         }
 
         /// <summary>
         /// Used for Pathfinding Moving on Grid, no Teleport
         /// </summary>
-        /// <param name="InTargetCell"></param>
-        /// <param name="InAllowedCells"></param>
+        /// <param name="targetCell"></param>
+        /// <param name="allowedCells"></param>
         /// <returns></returns>
-        public List<LevelCellBase> GetPathTo(LevelCellBase InTargetCell, List<LevelCellBase> InAllowedCells)
+        public List<LevelCellBase> GetPathTo(LevelCellBase targetCell, List<LevelCellBase> allowedCells)
         {
-            AIPathInfo pathInfo = new AIPathInfo
+            var pathInfo = new AIPathInfo
             {
                 StartCell = GetCell(),
-                TargetCell = InTargetCell,
+                TargetCell = targetCell,
                 bNoDestinationUnits = true,
                 bIgnoreUnitsOnPath = true,
                 bTakeWeightIntoAccount = TacticBattleManager.IsTeamAI(GetTeam()),
-                AllowedCells = InAllowedCells,
+                AllowedCells = allowedCells,
                 bAllowBlocked = _unitData.m_bIsFlying
             };
 

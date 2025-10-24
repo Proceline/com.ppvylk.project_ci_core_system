@@ -44,7 +44,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         {
             if (m_CurrentCell)
             {
-                transform.position = m_CurrentCell.GetAllignPos(this);
+                transform.position = m_CurrentCell.GetAlignPos(this);
             }
         }
 

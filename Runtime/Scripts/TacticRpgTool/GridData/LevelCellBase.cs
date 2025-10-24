@@ -220,7 +220,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return totalWeightInfo;
         }
 
-        public Vector3 GetAllignPos(GridObject InObject)
+        public Vector3 GetAlignPos(GridObject InObject)
         {
             float objectHeightOffset = 0.0f;
 
@@ -243,7 +243,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             return transform.position;
         }
 
-        public Vector3 GetAllignPos(GameObject InObject)
+        public Vector3 GetAlignPos(GameObject InObject)
         {
             Renderer cellRenderer = GetRenderer();
             if (cellRenderer)
@@ -370,12 +370,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void HandleVisibilityChanged()
         {
-            GridPawnUnit unit = GetUnitOnCell();
-            if (unit)
-            {
-                unit.CheckCellVisibility();
-            }
-
             GetRenderer().enabled = IsVisible();
 
             List<Collider> colliders = GetColliders();
