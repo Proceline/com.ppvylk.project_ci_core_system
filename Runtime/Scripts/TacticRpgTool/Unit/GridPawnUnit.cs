@@ -5,7 +5,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Status;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 using System;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 using ProjectCI.CoreSystem.Runtime.States.Interfaces;
@@ -167,8 +166,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _unitData.m_MovementShape.GetCellList(this, GetCell(), CurrentMovementPoints, _unitData.m_bIsFlying);
         }
 
-        public bool ExecuteMovement(LevelCellBase targetCell, UnityEvent<List<LevelCellBase>> onPathCalculated,
-            UnityEvent onMovementCompleted)
+        public bool ExecuteMovement(LevelCellBase targetCell, Action<List<LevelCellBase>> onPathCalculated,
+            Action onMovementCompleted)
         {
             if (IsMoving())
             {
@@ -195,8 +194,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return true;
         }
 
-        private async void TraverseTo(LevelCellBase targetCell, UnityEvent<List<LevelCellBase>> onPathCalculated,
-            UnityEvent onMovementCompleted, List<LevelCellBase> allowedCells)
+        private async void TraverseTo(LevelCellBase targetCell, Action<List<LevelCellBase>> onPathCalculated,
+            Action onMovementCompleted, List<LevelCellBase> allowedCells)
         {
             await OnGridTraverseTo(targetCell, onPathCalculated, onMovementCompleted, allowedCells);
             OnMovementPostComplete?.Invoke();
@@ -226,7 +225,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
 
         protected internal async Awaitable OnGridTraverseTo(LevelCellBase inTargetCell,
-            UnityEvent<List<LevelCellBase>> onPathCalculated, UnityEvent onMovementCompleted,
+            Action<List<LevelCellBase>> onPathCalculated, Action onMovementCompleted,
             List<LevelCellBase> inAllowedCells)
         {
             if (inTargetCell)
