@@ -81,7 +81,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
                 new PropertyReplaceInfo("m_AbilityShape", EditorUtils.MakeBlankWidget),
                 new PropertyReplaceInfo("spawnOnCaster", EditorUtils.MakeCustomArrayWidget),
                 new PropertyReplaceInfo("spawnOnTarget", EditorUtils.MakeCustomArrayWidget),
-                new PropertyReplaceInfo("m_Ailments", EditorUtils.MakeCustomArrayWidget),
                 new PropertyReplaceInfo("m_EffectShape", EditorUtils.MakeBlankWidget),
                 new PropertyReplaceInfo("m_EffectRadius", EditorUtils.MakeBlankWidget),
                 new PropertyReplaceInfo("m_Script", EditorUtils.MakeBlankWidget),

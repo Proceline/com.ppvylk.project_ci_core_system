@@ -6,7 +6,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.Maps;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
@@ -152,10 +151,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public bool IsObjectOnCell()
         {
-            return (_objectOnCell != null);
+            return _objectOnCell;
         }
 
-        public bool IsCellAccesible()
+        public bool IsCellAccessible()
         {
             return !IsBlocked() && !IsObjectOnCell();
         }
@@ -192,18 +191,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
             }
 
             return outCells;
-        }
-
-        // TODO: Optimize this function
-        public StatusEffectContainer GetAilmentContainer()
-        {
-            StatusEffectContainer statusEffectHandler = GetComponent<StatusEffectContainer>();
-            if (!statusEffectHandler)
-            {
-                statusEffectHandler = gameObject.AddComponent<StatusEffectContainer>();
-            }
-
-            return statusEffectHandler;
         }
 
         public CellInfo GetInfo()

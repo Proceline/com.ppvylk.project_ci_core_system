@@ -4,7 +4,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
 using System;
 using ProjectCI.CoreSystem.Runtime.Interfaces;
 
@@ -59,9 +58,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         [SerializeField]
         AbilityParamBase[] m_Params;
-
-        [SerializeField]
-        StatusEffect[] m_Ailments;
 
         void Reset()
         {
@@ -133,11 +129,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public List<AbilityParamBase> GetParameters()
         {
             return new List<AbilityParamBase>(m_Params);
-        }
-
-        public List<StatusEffect> GetAilments()
-        {
-            return new List<StatusEffect>(m_Ailments);
         }
 
         #endregion

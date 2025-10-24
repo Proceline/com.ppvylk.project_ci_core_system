@@ -52,29 +52,33 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         }
     }
 
-    public class AStarAlgorithmUtils : Object
+    public static class AStarAlgorithmUtils
     {
-        static float m_CellWaitTime = 0.0f;
-        public static float m_MovementSpeed = 3.0f;
+        private const float CellWaitTime = 0.0f;
+        private static float _movementSpeed = 3.0f;
 
         public static float GetWaitTime()
         {
-            return m_CellWaitTime;
+            return CellWaitTime;
         }
 
         public static float GetMovementSpeed()
         {
-            return m_MovementSpeed;
+            return _movementSpeed;
+        }
+
+        public static void SetMovementSpeed(float value)
+        {
+            _movementSpeed = value;
         }
 
         public static List<LevelCellBase> GetPath(AIPathInfo InPathInfo)
         {
             List<LevelCellBase> outPath = new List<LevelCellBase>();
 
-            if (InPathInfo.StartCell == null || InPathInfo.TargetCell == null)
+            if (!InPathInfo.StartCell || !InPathInfo.TargetCell)
             {
-                Debug.Log("([TurnBasedTools]::AIManager::GetPath) Invalid Start, or Target");
-                return outPath;
+                throw new Exception($"([{nameof(AStarAlgorithmUtils)}]::AIManager::GetPath) Invalid Start, or Target");
             }
 
             List<PathFindingNode> openSet = new List<PathFindingNode>();

@@ -4,10 +4,8 @@ using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.AilmentSystem;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Status;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Audio;
 using System;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 using ProjectCI.CoreSystem.Runtime.States.Interfaces;
@@ -122,16 +120,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return _unitData;
         }
 
-        public StatusEffectContainer GetAilmentContainer()
-        {
-            StatusEffectContainer statusEffectHandler = GetComponent<StatusEffectContainer>();
-            if (!statusEffectHandler)
-            {
-                statusEffectHandler = gameObject.AddComponent<StatusEffectContainer>();
-            }
-
-            return statusEffectHandler;
-        }
+        public abstract IStatusEffectContainer GetStatusEffectContainer();
 
         public abstract UnitBattleState GetCurrentState();
 
@@ -248,7 +237,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             }
 
             gameObject.transform.position = endPosition;
-            StatusEffectUtils.HandleUnitOnCell(this, targetCell);
         }
 
         protected internal async Awaitable OnGridTraverseTo(LevelCellBase InTargetCell, UnityEvent onMovementComplete, List<LevelCellBase> InAllowedCells)
@@ -299,11 +287,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     StartPos = cell.GetAllignPos(this);
 
                     await Awaitable.WaitForSecondsAsync(AStarAlgorithmUtils.GetWaitTime());
-
-                    if ( cell != startingCell )
-                    {
-                        StatusEffectUtils.HandleUnitOnCell(this, cell);
-                    }
 
                     if (IsDead())
                     {
