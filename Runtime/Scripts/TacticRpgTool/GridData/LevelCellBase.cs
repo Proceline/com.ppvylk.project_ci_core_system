@@ -10,7 +10,7 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 {
-    [System.Serializable]
+    [Serializable]
     public struct CellInfo
     {
         public bool bFriendlySpawnPoint;

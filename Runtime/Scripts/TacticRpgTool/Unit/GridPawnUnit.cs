@@ -27,12 +27,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         private SoUnitData _unitData;
         private UnitAttributeContainer _runtimeAttributes;
         private UnitAttributeContainer _simulatedAttributes;
-
-        protected int CurrentMovementPoints;
         
         private bool _bIsMoving = false;
 
-        protected UnityEvent OnMovementPostComplete = new();
+        protected readonly UnityEvent OnMovementPostComplete = new();
 
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
@@ -130,10 +128,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public virtual bool IsDead() => false;
 
-        public virtual int GetCurrentMovementPoints()
-        {
-            return CurrentMovementPoints;
-        }
+        public abstract int GetCurrentMovementPoints();
 
         public abstract int GetCurrentActionPoints();
 
@@ -161,10 +156,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #region MovementStuff
 
-        public virtual List<LevelCellBase> GetAllowedMovementCells()
-        {
-            return _unitData.m_MovementShape.GetCellList(this, GetCell(), CurrentMovementPoints, _unitData.m_bIsFlying);
-        }
+        public abstract List<LevelCellBase> GetAllowedMovementCells();
 
         public bool ExecuteMovement(LevelCellBase targetCell, Action<List<LevelCellBase>> onPathCalculated,
             Action onMovementCompleted)
@@ -265,19 +257,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                     {
                         break;
                     }
-
-                    if (movementCount++ >= CurrentMovementPoints)
-                    {
-                        finalCell = cell;
-                        break;
-                    }
                 }
 
                 if (!IsDead())
                 {
                     SetCurrentCell(finalCell);
-                    RemoveMovementPoints(cellPath.Count - 1);
-
                     OnPreStandIdleAnimRequired?.Invoke();
                 }
 
@@ -311,23 +295,11 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             return cellPath;
         }
 
-        private void RemoveMovementPoints(int moveCount)
-        {
-            CurrentMovementPoints -= moveCount;
-            if (CurrentMovementPoints < 0)
-            {
-                CurrentMovementPoints = 0;
-            }
-        }
-
         #endregion
 
         #region EventListeners
 
-        public virtual void HandleTurnStarted()
-        {
-            CurrentMovementPoints = 5;
-        }
+        public abstract void HandleTurnStarted();
 
         public abstract void BroadcastActionTriggerByTag(string actionTagName);
         public abstract float GrabActionValueDataByIndexTag(int additionalIndex, params string[] tags);
