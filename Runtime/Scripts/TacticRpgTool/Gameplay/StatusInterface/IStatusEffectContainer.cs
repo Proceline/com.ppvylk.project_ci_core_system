@@ -14,6 +14,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Status
     {
         List<IBattleStatus> GetStatusList();
         void AddStatus(IBattleStatus status);
-        void RemoveStatus(IBattleStatus status);
+        void RemoveStatusDirectly(IBattleStatus status);
+        void RemoveStatusByIndex(int index);
+        void MarkDeductStatus(IBattleStatus status);
     }
 }
