@@ -7,6 +7,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Status
         string StatusTag { get; }
         int Duration  { get; }
         int Layer  { get; }
+        bool IsBeingDisposed();
     }
 
     public interface IStatusEffectContainer
