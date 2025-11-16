@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using UnityEngine;
@@ -16,8 +14,6 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public string OwnerId;
         public Vector2Int TargetCellIndex;
         public string ExtraInfo; // Optional, for custom info
-        
-        public abstract void AddReaction(UnitAbilityCore ability, Queue<Action<GridPawnUnit>> reactions);
 
         public virtual void ApplyCommand(GridPawnUnit fromUnit, GridPawnUnit toUnit)
         {
