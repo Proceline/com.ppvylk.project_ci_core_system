@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using UnityEngine;
 
@@ -10,20 +11,22 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
     /// </summary>
     public abstract class CommandResult
     {
-        public const string TakeDamage = "TakeDamage";
-        public const string Heal = "Heal";
-        public const string TakeDefense = "TakeDefense";
-        public const string Dodge = "Dodge";
-        public const string TakeCritical = "TakeCritical";
-
         public string ResultId;
         public string AbilityId;
         public string OwnerId;
         public Vector2Int TargetCellIndex;
-        public string CommandType; // e.g. "Damage", "Heal"
-        public int Value; // e.g. damage or heal amount
         public string ExtraInfo; // Optional, for custom info
         
         public abstract void AddReaction(UnitAbilityCore ability, Queue<Action<GridPawnUnit>> reactions);
+
+        public virtual void ApplyCommand(GridPawnUnit fromUnit, GridPawnUnit toUnit)
+        {
+            // Empty
+        }
+
+        public virtual void ApplyCommand(GridPawnUnit fromUnit, LevelCellBase targetCell)
+        {
+            // Empty
+        }
     }
 } 
