@@ -7,11 +7,17 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
 {
     public abstract class AbilityParamBase : ScriptableObject
     {
+        /// <summary>
+        /// Execute on each target
+        /// </summary>
+        /// <param name="resultId">identical if in same ability</param>
+        /// <param name="ability">target ability</param>
+        /// <param name="fromUnit">caster</param>
+        /// <param name="mainTarget">main target, might not be current target cell</param>
+        /// <param name="targetCell">target cell</param>
+        /// <param name="results">calculated result</param>
         public abstract void Execute(string resultId, UnitAbilityCore ability, GridPawnUnit fromUnit,
-            GridPawnUnit toUnit, Queue<CommandResult> results);
-        
-        public abstract void Execute(string resultId, UnitAbilityCore ability, GridPawnUnit fromUnit,
-            List<LevelCellBase> targetCells, Queue<CommandResult> results);
+            GridPawnUnit mainTarget, LevelCellBase targetCell, Queue<CommandResult> results);
 
         public virtual string GetAbilityInfo()
         {
