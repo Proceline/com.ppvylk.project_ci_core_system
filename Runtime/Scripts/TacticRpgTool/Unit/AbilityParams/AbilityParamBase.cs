@@ -16,12 +16,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         /// <param name="mainTarget">main target, might not be current target cell</param>
         /// <param name="targetCell">target cell</param>
         /// <param name="results">calculated result</param>
+        /// <param name="passValue">Could be some value indicate accurate/hit/etc</param>
         public abstract void Execute(string resultId, UnitAbilityCore ability, GridPawnUnit fromUnit,
-            GridPawnUnit mainTarget, LevelCellBase targetCell, Queue<CommandResult> results);
-
-        public virtual string GetAbilityInfo()
-        {
-            return name;
-        }
+            GridPawnUnit mainTarget, LevelCellBase targetCell, Queue<CommandResult> results, int passValue);
     }
 }
