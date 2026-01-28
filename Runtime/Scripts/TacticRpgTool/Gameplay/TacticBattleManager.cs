@@ -8,29 +8,29 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
-using ProjectCI.CoreSystem.Runtime.InputSupport;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 {
-    [System.Serializable]
+    [Serializable]
     public enum CellState
     {
         eNormal,
         eHover,
         ePositive,
         eNegative,
-        eMovement
+        eMovement,
+        eSpecial,
     }
 
-    [System.Serializable]
+    [Serializable]
     public class GameTeamEvent : UnityEvent<BattleTeam>
     { }
 
-    [System.Serializable]
+    [Serializable]
     public class GridUnitEvent : UnityEvent<GridPawnUnit>
     { }
 
-    [System.Serializable]
+    [Serializable]
     public struct TeamInfo
     {
         public int TeamId;
