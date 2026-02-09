@@ -34,6 +34,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
         [SerializeField]
         List<IndexToMaterial> m_SpecialMatStates;
 
+        [SerializeField]
+        private List<IndexToMaterial> readOnlyAggroMats;
+
+        [SerializeField]
+        private List<IndexToMaterial> readOnlyMoveMats;
+
         List<IndexToMaterial> m_NormalMatStates = new List<IndexToMaterial>();
 
         void Start()
@@ -72,6 +78,10 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.General
                     return m_MovementMatStates;
                 case CellState.eSpecial:
                     return m_SpecialMatStates;
+                case CellState.eReadOnlyAggro:
+                    return readOnlyAggroMats;
+                case CellState.eReadOnlyMove:
+                    return readOnlyMoveMats;
             }
 
             return m_NormalMatStates;
