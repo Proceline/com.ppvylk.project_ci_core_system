@@ -6,9 +6,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.Abilities
 {
     public class AbilityShape : ScriptableObject
     {
-        public virtual List<LevelCellBase> GetCellList(GridPawnUnit caster, LevelCellBase cell, int range, bool isAllowBlock = true, BattleTeam effectedTeam = BattleTeam.None)
+        public virtual List<LevelCellBase> GetCellList(GridPawnUnit caster, LevelCellBase cell, int range, 
+            bool isAllowBlock = true, BattleTeam effectedTeam = BattleTeam.None)
         {
             return new List<LevelCellBase>();
         }
+
+        public virtual List<LevelCellBase> GetCellListPreview(GridPawnUnit caster, LevelCellBase cell,
+            int range, bool isAllowBlock = true, BattleTeam effectedTeam = BattleTeam.None) 
+            => GetCellList(caster, cell, range, isAllowBlock, effectedTeam);
     }
 }
