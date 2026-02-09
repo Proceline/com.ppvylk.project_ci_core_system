@@ -20,6 +20,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         eNegative,
         eMovement,
         eSpecial,
+        eReadOnlyAggro,
+        eReadOnlyMove
     }
 
     [Serializable]
