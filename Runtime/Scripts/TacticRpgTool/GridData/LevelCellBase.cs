@@ -389,6 +389,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void OnMouseOver()
         {
+            Debug.LogError("MouseOver");
             if(EventSystem.current)
             {
 
@@ -412,6 +413,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
         public void OnMouseExit()
         {
+            Debug.LogError("MouseEnd");
             if (_grid)
             {
                 if (_bIsHovering)
