@@ -24,5 +24,10 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         {
             // Empty
         }
+
+        public virtual void ClearCommand()
+        {
+            // Empty
+        }
     }
 } 
