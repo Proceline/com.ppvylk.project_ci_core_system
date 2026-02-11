@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
-using Object = UnityEngine.Object;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 {
@@ -309,36 +304,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return true;
         }
-
-        #region UnitAI
-
-        public static void RunAI(List<GridPawnUnit> InAIUnits, UnityAction OnComplete)
-        {
-            UnityEvent OnAIComplete = new UnityEvent();
-            OnAIComplete.AddListener(OnComplete);
-
-            TacticBattleManager.Get().StartCoroutine(InternalRunAI(InAIUnits, OnAIComplete));
-        }
-
-        static IEnumerator InternalRunAI(List<GridPawnUnit> InAIUnits, UnityEvent OnComplete)
-        {
-            foreach (GridPawnUnit AIUnit in InAIUnits)
-            {
-                if (AIUnit && !AIUnit.IsDead())
-                {
-                    UnitAIComponent AIComponent = AIUnit.GetComponent<UnitAIComponent>();
-                    if (AIComponent)
-                    {
-                        IEnumerator RunOnUnitEnum = AIComponent.GetAIData().RunOnUnit(AIUnit);
-                        yield return TacticBattleManager.Get().StartCoroutine(RunOnUnitEnum);
-                    }
-                }
-            }
-
-            OnComplete.Invoke();
-        }
-
-        #endregion
 
         #region AStarComponents
 

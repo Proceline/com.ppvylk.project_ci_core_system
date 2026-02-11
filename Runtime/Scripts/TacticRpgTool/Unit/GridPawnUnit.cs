@@ -26,7 +26,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
     {
         private SoUnitData _unitData;
         private UnitAttributeContainer _runtimeAttributes;
-        private UnitAttributeContainer _simulatedAttributes;
         
         private bool _bIsMoving = false;
 
@@ -43,29 +42,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             protected set => _runtimeAttributes = value; 
         }
 
-        public UnitAttributeContainer SimulatedAttributes 
-        { 
-            get => _simulatedAttributes; 
-            protected set => _simulatedAttributes = value; 
-        }
-
         public virtual void PostInitialize()
         {
             GetCell().HandleVisibilityChanged();
         }
 
         public abstract void LookAtCell(LevelCellBase InCell);
-        
-        public void AddAI(UnitAI InAIData)
-        {
-            UnitAIComponent AIComponent = gameObject.GetComponent<UnitAIComponent>();
-            if( !AIComponent )
-            {
-                AIComponent = gameObject.AddComponent<UnitAIComponent>();
-            }
-
-            AIComponent.SetAIData( InAIData );
-        }
 
         #region Events
 
@@ -297,14 +279,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         #endregion
 
-        #region EventListeners
-
         public abstract void HandleTurnStarted();
-
-        public abstract void BroadcastActionTriggerByTag(string actionTagName);
-        public abstract float GrabActionValueDataByIndexTag(int additionalIndex, params string[] tags);
-
-        #endregion
 
     }
 }
