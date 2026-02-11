@@ -19,5 +19,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         /// <param name="passValue">Could be some value indicate accurate/hit/etc</param>
         public abstract void Execute(string resultId, UnitAbilityCore ability, GridPawnUnit fromUnit,
             GridPawnUnit mainTarget, LevelCellBase targetCell, Queue<CommandResult> results, int passValue);
+
+        public abstract void Mock(GridPawnUnit fromUnit, GridPawnUnit targetUnit, ref int totalValueAdjust, uint damageForm);
     }
 }
