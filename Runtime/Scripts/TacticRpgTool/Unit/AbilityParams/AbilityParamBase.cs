@@ -20,6 +20,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit.AbilityParams
         public abstract void Execute(string resultId, UnitAbilityCore ability, GridPawnUnit fromUnit,
             GridPawnUnit mainTarget, LevelCellBase targetCell, Queue<CommandResult> results, int passValue);
 
-        public abstract void Mock(GridPawnUnit fromUnit, GridPawnUnit targetUnit, ref int totalValueAdjust, uint damageForm);
+        public abstract int MockValue(GridPawnUnit fromUnit, GridPawnUnit targetUnit, uint damageForm);
     }
 }
