@@ -121,7 +121,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
             field.AddCellToLayerOnIndex(0, startCell);
             field.Reach.Add(startCell);
             
-            while (bucketQueue.TryDequeueUpTo(radius, out int currG, out LevelCellBase cell))
+            while (bucketQueue.TryDequeueUpTo(maxTotalWeight, out int currG, out LevelCellBase cell))
             {
                 if (!visited.Add(cell))
                 {
