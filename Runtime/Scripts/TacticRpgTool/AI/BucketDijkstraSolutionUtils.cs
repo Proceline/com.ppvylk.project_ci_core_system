@@ -149,7 +149,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     }
 
                     int newG = currG + weight;
-                    if (newG > radius) 
+                    if (newG > maxTotalWeight) 
                     {
                         continue;
                     }
