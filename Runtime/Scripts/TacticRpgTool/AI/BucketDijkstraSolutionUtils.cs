@@ -161,7 +161,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                         field.Parent[vertex] = cell;
                         bucketQueue.Enqueue(newG, vertex);
 
-                        // 分层：记录“总代价为 newG 的格”
+                        // Don't need to check unitOnCell since they might be future target
                         field.AddCellToLayerOnIndex(newG, vertex);
                     }
                 }
