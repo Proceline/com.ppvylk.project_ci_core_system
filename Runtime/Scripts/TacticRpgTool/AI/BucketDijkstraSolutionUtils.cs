@@ -11,7 +11,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
         public readonly Dictionary<LevelCellBase, int> Dist = new();
 
         // 可达格集合：Dist[cell] <= M
-        public readonly HashSet<LevelCellBase> Reach = new();
+        public readonly List<LevelCellBase> Reach = new();
 
         // 按总代价分层（下标=总代价）。layers[d] 是所有 Dist==d 的格。
         // 便于“从近到远”遍历（比如先用低代价格生成候选）
