@@ -129,7 +129,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                 }
 
                 // 标记可达, No need to check duplicated because correct Cell only browse once
-                if (currG <= radius)
+                if (currG <= radius && !cell.GetUnitOnCell())
                 {
                     field.Reach.Add(cell);
                 }
