@@ -192,25 +192,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
 
             return field;
         }
-
-        public static AttackField ComputeAttackField(RadiusField moveField,
-            Func<LevelCellBase, LevelCellBase> startToTarget)
-        {
-            var field = new AttackField();
-            foreach (var reachableCell in moveField.Reach)
-            {
-                var victim = startToTarget.Invoke(reachableCell);
-                field.AllVictims.Add(victim);
-                if (!field.VictimsFromCells.TryGetValue(victim, out var fromCells))
-                {
-                    fromCells = new List<LevelCellBase>();
-                    field.VictimsFromCells[victim] = fromCells;
-                }
-
-                fromCells.Add(reachableCell);
-            }
-
-            return field;
-        }
     }
 }
