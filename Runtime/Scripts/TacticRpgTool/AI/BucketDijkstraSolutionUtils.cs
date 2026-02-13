@@ -128,15 +128,22 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI
                     continue;
                 }
 
-                // 标记可达, No need to check duplicated because correct Cell only browse once
-                if (currG <= radius && !cell.GetUnitOnCell())
+                // No need to check duplicated because correct Cell only browse once
+                if (currG <= radius)
                 {
-                    field.Reach.Add(cell);
+                    if (!cell.GetUnitOnCell())
+                    {
+                        field.Reach.Add(cell);
+                    }
+                    else if (currG == radius)
+                    {
+                        continue;
+                    }
                 }
 
                 foreach (var vertex in cell.GetAllAdjacentCells())
                 {
-                    // 遇阻即停：不把不允许的格扩展进搜索
+                    // Blocked cell will not get into result
                     if (radiusInfo.bStopAtBlockedCell && !AStarAlgorithmUtils.AllowCellInRadius(vertex, radiusInfo))
                     {
                         continue;
