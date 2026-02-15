@@ -1,35 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.AI;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Status;
 using System;
 using ProjectCI.CoreSystem.Runtime.Attributes;
-using ProjectCI.CoreSystem.Runtime.States.Interfaces;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 {
-    public enum UnitBattleState
-    {
-        Idle,
-        Moving,
-        MovingProgress,
-        UsingAbility,
-        AbilityTargeting,
-        AbilityConfirming,
-        Finished
-    }
-
-    public abstract class GridPawnUnit : GridObject, IStateOwner<UnitBattleState>
+    public abstract class GridPawnUnit : GridObject
     {
         private SoUnitData _unitData;
         private UnitAttributeContainer _runtimeAttributes;
         
         private bool _bIsMoving = false;
-
-        protected readonly UnityEvent OnMovementPostComplete = new();
 
         public event Action OnPreStandIdleAnimRequired;
         public event Action OnPreMovementAnimRequired;
@@ -48,20 +33,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
 
         public abstract void LookAtCell(LevelCellBase InCell);
-
-        #region Events
-
-        public void BindToOnMovementPostCompleted(UnityAction InAction)
-        {
-            OnMovementPostComplete.AddListener(InAction);
-        }
-
-        public void UnBindFromOnMovementPostCompleted(UnityAction InAction)
-        {
-            OnMovementPostComplete.RemoveListener(InAction);
-        }
-
-        #endregion
 
         #region Setters
 
@@ -84,14 +55,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         }
 
         public abstract IStatusEffectContainer GetStatusEffectContainer();
-
-        public abstract UnitBattleState GetCurrentState();
-
-        public abstract void AddState(UnitBattleState state);
-
-        public abstract void RemoveLastState();
-
-        public abstract void ClearStates();
 
         public bool IsMoving()
         {
@@ -172,7 +135,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
             Action onMovementCompleted, List<LevelCellBase> allowedCells)
         {
             await OnGridTraverseTo(targetCell, onPathCalculated, onMovementCompleted, allowedCells);
-            OnMovementPostComplete?.Invoke();
         }
 
         public virtual async void ForceMoveTo(LevelCellBase targetCell)
