@@ -9,7 +9,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 {
     using Editor = UnityEditor.Editor;
     
-    [CustomEditor(typeof(SoUnitData), true)]
+    [CustomEditor(typeof(SoUnitData))]
     [CanEditMultipleObjects]
     public class UnitDataEditor : Editor
     {
