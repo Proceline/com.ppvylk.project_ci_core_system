@@ -24,13 +24,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         string m_AbilityName;
 
         [SerializeField]
-        Texture2D m_Icon;
-
-        [SerializeField]
         int m_Radius;
-
-        [SerializeField]
-        int m_ActionPointCost;
 
         [SerializeField]
         bool m_bAllowBlocked;
@@ -74,16 +68,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public void GenerateNewID()
         {
             ID = Guid.NewGuid().ToString();
-        }
-
-        public Texture2D GetIcon()
-        {
-            return m_Icon;
-        }
-
-        public int GetActionPointCost()
-        {
-            return m_ActionPointCost;
         }
 
         public bool DoesAllowBlocked()

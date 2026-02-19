@@ -174,8 +174,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
                 onPathCalculated?.Invoke(cellPath);
                 Vector3 startPos = GetCell().GetAlignPos(this);
 
-                int movementCount = 0;
-
                 LevelCellBase finalCell = inTargetCell;
 
                 foreach (LevelCellBase cell in cellPath)

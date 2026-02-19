@@ -15,9 +15,7 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
         {
             SerializedProperty m_Script = serializedObject.FindProperty("m_Script");
             SerializedProperty m_AbilityName = serializedObject.FindProperty("m_AbilityName");
-            SerializedProperty m_Icon = serializedObject.FindProperty("m_Icon");
             SerializedProperty m_Radius = serializedObject.FindProperty("m_Radius");
-            SerializedProperty m_ActionPointCost = serializedObject.FindProperty("m_ActionPointCost");
             SerializedProperty m_bAllowBlocked = serializedObject.FindProperty("m_bAllowBlocked");
             SerializedProperty m_EffectedType = serializedObject.FindProperty("m_EffectedType");
             SerializedProperty m_EffectedTeam = serializedObject.FindProperty("m_EffectedTeam");
@@ -25,8 +23,6 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
 
             SerializedProperty m_EffectShape = serializedObject.FindProperty("m_EffectShape");
             SerializedProperty m_EffectRadius = serializedObject.FindProperty("m_EffectRadius");
-
-            Texture2D IconTexture = AssetPreview.GetAssetPreview(m_Icon.objectReferenceValue);
 
             GUIStyle BorderStyle = new GUIStyle(EditorStyles.helpBox)
             {
@@ -40,16 +36,12 @@ namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
             EditorGUILayout.BeginVertical(BorderStyle, GUILayout.Width(100), GUILayout.Height(110));
             GUI.backgroundColor = Color.white;
 
-            GUILayout.Label(IconTexture, GUILayout.Width(100), GUILayout.Height(100));
-            EditorGUILayout.PropertyField(m_Icon, new GUIContent(""));
-
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
 
             EditorGUILayout.PropertyField(m_AbilityName, new GUIContent(m_AbilityName.displayName));
             EditorGUILayout.PropertyField(m_Radius, new GUIContent(m_Radius.displayName));
-            EditorGUILayout.PropertyField(m_ActionPointCost, new GUIContent(m_ActionPointCost.displayName));
             EditorGUILayout.PropertyField(m_bAllowBlocked, new GUIContent(m_bAllowBlocked.displayName));
             EditorGUILayout.PropertyField(m_EffectedType, new GUIContent(m_EffectedType.displayName));
             EditorGUILayout.PropertyField(m_EffectedTeam, new GUIContent(m_EffectedTeam.displayName));
