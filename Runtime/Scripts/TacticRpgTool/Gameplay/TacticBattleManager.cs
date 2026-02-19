@@ -375,10 +375,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             {
                 inCell.SetMaterial(inCellState);
                 inCell.SetCellState(inCellState);
-                if (inCell.IsMouseOver())
-                {
-                    _instance.onCellPointed?.Invoke(inCell);
-                }
             }
         }
 
