@@ -27,7 +27,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         /// <param name="existedGrid"></param>
         /// <param name="hitHandler"></param>
         /// <returns>生成的LevelGrid对象</returns>
-        public static void GenerateLevelGridFromGround<T>(
+        public static void GenerateLevelGridFromGround<T, TC>(
             Vector3 scanCenter,
             float hexWidth,
             float hexHeight,
@@ -35,7 +35,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             LayerMask groundLayer,
             CellPalette cellPalette,
             ref T existedGrid,
-            UnityEvent<RaycastHit, Vector2Int, LevelGridBase> hitHandler) where T : LevelGridBase
+            UnityEvent<RaycastHit, Vector2Int, LevelGridBase> hitHandler) 
+                where T : LevelGridBase
+                where TC : LevelCellBase
         {
             if (cellPalette == null)
             {
@@ -73,7 +75,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             {
                 if (hitHandler == null)
                 {
-                    var cell = existedGrid.GenerateCell(hit.Value.point, hit.Key);
+                    var cell = existedGrid.GenerateCell<TC>(hit.Value.point, hit.Key);
                     cell.Reset();
                 }
                 else

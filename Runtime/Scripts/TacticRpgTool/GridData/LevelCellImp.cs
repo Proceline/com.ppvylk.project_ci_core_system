@@ -49,26 +49,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
 
             return cellStyleInfo;
         }
-
-        private Material GetMaterial(int InMaterialSlot)
-        {
-            Material[] mats = GetComponent<MeshRenderer>().materials;
-
-            if (mats.Length >= InMaterialSlot)
-            {
-                return mats[InMaterialSlot];
-            }
-            else
-            {
-                Debug.Log("[TurnBasedTools]::LevelCell::GetMaterial) " + name + " is missing a material in the mesh renderer, or the index(" + InMaterialSlot + ") is set wrong in the GridStyle");
-            }
-
-            return null;
-        }
-
-        private Material[] GetMaterials()
-        {
-            return GetComponent<MeshRenderer>().materials;
-        }
     }
 }

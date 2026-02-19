@@ -51,14 +51,14 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             CellObjCursor = InCellObj;
         }
 
-        private LevelCellBase AddLevelCellToObject(GameObject InObj)
+        private LevelCellBase AddLevelCellToObject<T>(GameObject InObj) where T : LevelCellBase
         {
             if (!InObj)
             {
                 return null;
             }
             
-            return InObj.AddComponent<LevelCellImp>();
+            return InObj.AddComponent<T>();
         }
 
         public List<LevelCellBase> GetAllCells()
@@ -78,12 +78,12 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
             float maxDistance = 100f,
             LayerMask layerMask = default);
         
-        public LevelCellBase GenerateCell(Vector3 InPos, Vector2Int InIndex)
+        public LevelCellBase GenerateCell<T>(Vector3 InPos, Vector2Int InIndex) where T : LevelCellBase
         {
             GameObject generatedCell = Instantiate(CellObjCursor, InPos, CellObjCursor.transform.rotation, gameObject.transform);
             generatedCell.name = "CELL: " + InIndex.x + ", " + InIndex.y;
 
-            LevelCellBase newCell = AddLevelCellToObject(generatedCell);
+            LevelCellBase newCell = AddLevelCellToObject<T>(generatedCell);
             newCell.Setup(this);
             newCell.SetIndex(InIndex);
 
