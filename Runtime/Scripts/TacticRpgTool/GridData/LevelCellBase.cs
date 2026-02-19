@@ -386,42 +386,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData
         {
             RemoveCell(false);
         }
-
-        public void OnMouseOver()
-        {
-            if(EventSystem.current)
-            {
-
-                if (!EventSystem.current.IsPointerOverGameObject())
-                {
-                    if (_grid)
-                    {
-                        if (!_bIsHovering)
-                        {
-                            _bIsHovering = true;
-                            _grid.OnCellBeingInteracted?.Invoke(this, CellInteractionState.BeginFocused);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ProjectCI] You need to add an EventSystem to your scene.");
-            }
-        }
-
-        public void OnMouseExit()
-        {
-            if (_grid)
-            {
-                if (_bIsHovering)
-                {
-                    _bIsHovering = false;
-                    _grid.OnCellBeingInteracted.Invoke(this, CellInteractionState.EndFocused);
-                }
-            }
-        }
-
         #endregion
     }
 }

@@ -123,7 +123,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             if (LevelGrid)
             {
                 LevelGrid.SetupAllCellAdjacencies();
-                LevelGrid.OnCellBeingInteracted += HandleInteractionFocused;
             }
             SetupMaterials();
         }

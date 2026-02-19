@@ -21,8 +21,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids
 
         private readonly List<GameObject> _objectsToDestroy = new();
 
-        public Action<LevelCellBase, CellInteractionState> OnCellBeingInteracted;
-
         public LevelCellBase this[Vector2Int InIndex] => this[InIndex.x, InIndex.y];
 
         public LevelCellBase this[int InX, int InY]
