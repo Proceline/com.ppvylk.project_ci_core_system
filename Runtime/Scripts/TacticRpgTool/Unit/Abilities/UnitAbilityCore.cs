@@ -192,7 +192,5 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
             return abilityCells;
         }
-
-        public abstract void ApplyVisualEffects(GridPawnUnit casterUnit, LevelCellBase effectCell);
     }
 }
