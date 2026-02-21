@@ -16,10 +16,8 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         Flying,
     }
 
-    public abstract class UnitAbilityCore : ScriptableObject, IIdentifier
+    public abstract class UnitAbilityCore : ScriptableObject
     {
-        public string ID { get; private set; } = string.Empty;
-
         [SerializeField]
         string m_AbilityName;
 
@@ -63,11 +61,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         public string GetAbilityName()
         {
             return m_AbilityName;
-        }
-
-        public void GenerateNewID()
-        {
-            ID = Guid.NewGuid().ToString();
         }
 
         public bool DoesAllowBlocked()
