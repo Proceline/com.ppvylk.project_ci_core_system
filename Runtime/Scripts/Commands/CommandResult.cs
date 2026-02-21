@@ -10,7 +10,6 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
     public abstract class CommandResult
     {
         public string ResultId;
-        public string AbilityId;
         public string OwnerId;
         public Vector2Int TargetCellIndex;
         public string ExtraInfo; // Optional, for custom info
