@@ -2,10 +2,8 @@
 using UnityEditor;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 
-namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
+namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
 {
-    using Editor = UnityEditor.Editor;
-    
     [CustomEditor(typeof(HexagonPresetGrid))]
     [CanEditMultipleObjects]
     public class HexagonLevelGridEditor : Editor

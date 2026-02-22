@@ -2,10 +2,8 @@
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay;
 using UnityEditor;
 
-namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
-{
-    using Editor = UnityEditor.Editor;
-    
+namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
+{   
     [CustomEditor(typeof(TacticBattleManager))]
     [CanEditMultipleObjects]
     public class GameManagerEditor : Editor

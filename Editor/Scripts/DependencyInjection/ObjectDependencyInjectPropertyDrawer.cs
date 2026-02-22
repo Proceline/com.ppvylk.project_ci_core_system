@@ -1,9 +1,9 @@
 using ProjectCI.CoreSystem.DependencyInjection;
 using UnityEngine;
 using UnityEditor;
-using ProjectCI.CoreSystem.Editor.TacticRpgTool;
+using ProjectCI.CoreSystem.IEditor.TacticRpgTool;
 
-namespace ProjectCI.CoreSystem.Editor.Attributes
+namespace ProjectCI.CoreSystem.IEditor.Configuration
 {
     [CustomPropertyDrawer(typeof(ObjectServiceRegistration), true)]
     public class ObjectDependencyInjectPropertyDrawer : PropertyDrawer

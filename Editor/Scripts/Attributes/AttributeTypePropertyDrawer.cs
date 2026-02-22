@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 
-namespace ProjectCI.CoreSystem.Editor.Attributes
+namespace ProjectCI.CoreSystem.IEditor.Attributes
 {
     [CustomPropertyDrawer(typeof(AttributeType))]
     public class AttributeTypePropertyDrawer : PropertyDrawer

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 
-namespace ProjectCI.CoreSystem.Editor.Attributes
+namespace ProjectCI.CoreSystem.IEditor.Attributes
 {
     public class AttributeTypeDefinitionWindow : EditorWindow
     {

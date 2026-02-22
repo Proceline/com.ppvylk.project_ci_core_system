@@ -3,10 +3,8 @@ using UnityEngine;
 using UnityEditor;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.General;
 
-namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
+namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
 {
-    using Editor = UnityEditor.Editor;
-    
     [CustomEditor(typeof(CellPalette))]
     [CanEditMultipleObjects]
     public class CellPaletteEditor : Editor

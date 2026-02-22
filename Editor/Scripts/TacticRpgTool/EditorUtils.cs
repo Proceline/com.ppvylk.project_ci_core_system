@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library;
 
-namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
+namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
 {
     public struct PropertyReplaceInfo
     {

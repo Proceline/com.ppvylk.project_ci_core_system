@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 
-namespace ProjectCI.CoreSystem.Editor.Attributes
+namespace ProjectCI.CoreSystem.IEditor.Attributes
 {
     [CustomEditor(typeof(AttributeTypeDefinition))]
-    public class AttributeTypeDefinitionEditor : UnityEditor.Editor
+    public class AttributeTypeDefinitionEditor : Editor
     {
         private SerializedProperty attributeTypeNamesProperty;
         private Vector2 scrollPosition;

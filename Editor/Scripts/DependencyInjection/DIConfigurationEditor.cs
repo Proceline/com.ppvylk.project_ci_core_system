@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using ProjectCI.CoreSystem.DependencyInjection;
 using UnityEditor;
 using UnityEngine;
 
-namespace ProjectCI.CoreSystem.Editor.Attributes
+namespace ProjectCI.CoreSystem.IEditor.Configuration
 {
-    using Editor = UnityEditor.Editor;
-    
     [CustomEditor(typeof(DIConfiguration))]
     public class DIConfigurationEditor : Editor
     {

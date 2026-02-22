@@ -5,10 +5,8 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using System.Linq;
 using ProjectCI.CoreSystem.Runtime.Attributes;
 
-namespace ProjectCI.CoreSystem.Editor.TacticRpgTool
+namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
 {
-    using Editor = UnityEditor.Editor;
-    
     [CustomEditor(typeof(SoUnitData))]
     [CanEditMultipleObjects]
     public class UnitDataEditor : Editor
