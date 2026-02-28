@@ -49,9 +49,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         [SerializeField]
         AbilityParamBase[] m_Params;
 
-        [SerializeField]
-        private List<List<AbilityParamBase>> abilityParamFrames = new();
-
         void Reset()
         {
             m_bAllowBlocked = false;
@@ -104,16 +101,9 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
 
         public List<GameObject> GetTargetParticles() => spawnOnTarget;
 
-        public int TotalCountOfParamFrames => abilityParamFrames.Count;
-
-        public List<AbilityParamBase> GetFrameOfParameters(int frameIndex)
+        public List<AbilityParamBase> GetParameters()
         {
-            if (frameIndex < TotalCountOfParamFrames)
-            {
-                return abilityParamFrames[frameIndex];
-            }
-
-            return null;
+            return new List<AbilityParamBase>(m_Params);
         }
 
         #endregion
