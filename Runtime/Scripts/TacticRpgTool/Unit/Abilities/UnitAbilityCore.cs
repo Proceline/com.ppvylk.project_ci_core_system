@@ -47,9 +47,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit
         protected List<GameObject> spawnOnTarget = new();
 
         [SerializeField]
-        AbilityParamBase[] m_Params;
-
-        [SerializeField]
         private List<AbilityParamBase> abilityParams = new(); 
 
         void Reset()
