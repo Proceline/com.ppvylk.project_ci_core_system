@@ -59,7 +59,6 @@ namespace ProjectCI.CoreSystem.IEditor.TacticRpgTool
 
             List<PropertyReplaceInfo> ReplaceInfoList = new List<PropertyReplaceInfo>()
             {
-                new PropertyReplaceInfo("m_Params", EditorUtils.MakeCustomArrayWidget),
                 new PropertyReplaceInfo("m_AbilityName", EditorUtils.MakeBlankWidget),
                 new PropertyReplaceInfo("m_Icon", EditorUtils.MakeBlankWidget),
                 new PropertyReplaceInfo("m_Radius", EditorUtils.MakeBlankWidget),
