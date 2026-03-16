@@ -11,23 +11,7 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
     {
         public string ResultId;
         public string OwnerId;
-        public Vector2Int TargetCellIndex;
 
         public abstract void ApplyCommand();
-
-        public virtual void ApplyCommand(GridPawnUnit fromUnit, GridPawnUnit toUnit)
-        {
-            // Empty
-        }
-
-        public virtual void ApplyCommand(GridPawnUnit fromUnit, LevelCellBase targetCell)
-        {
-            // Empty
-        }
-
-        public virtual void ClearCommand()
-        {
-            // Empty
-        }
     }
 } 
