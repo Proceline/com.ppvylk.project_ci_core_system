@@ -1,7 +1,3 @@
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
-using UnityEngine;
-
 namespace ProjectCI.CoreSystem.Runtime.Commands
 {
     /// <summary>
@@ -13,5 +9,10 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public string OwnerId;
 
         public abstract void ApplyCommand();
+        public virtual bool TryGetTarget(out string targetId)
+        {
+            targetId = string.Empty;
+            return false;
+        }
     }
 } 
