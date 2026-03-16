@@ -13,6 +13,8 @@ namespace ProjectCI.CoreSystem.Runtime.Commands
         public string OwnerId;
         public Vector2Int TargetCellIndex;
 
+        public abstract void ApplyCommand();
+
         public virtual void ApplyCommand(GridPawnUnit fromUnit, GridPawnUnit toUnit)
         {
             // Empty
