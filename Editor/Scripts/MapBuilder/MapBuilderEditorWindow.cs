@@ -385,8 +385,41 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
         private void ActivateSceneHandler()
         {
             if (_root == null || _config == null) return;
+
+            // If edit mode is off, auto-enable it and restore config content.
+            // This means the user only needs ONE action (turn on Scene Brush)
+            // instead of having to manually open edit mode first.
+            if (!_root.IsEditModeEnabled)
+            {
+                AutoEnableEditMode(_root);
+            }
+
             _sceneHandlerActive = true;
             MapBuilderSceneHandler.Activate(this, _root, _config);
+        }
+
+        /// <summary>
+        /// Enables IsEditModeEnabled on the root via SerializedObject (so Undo/serialization
+        /// work correctly), then restores scene objects from the config's saved cell data.
+        /// </summary>
+        private static void AutoEnableEditMode(MapBuilderRoot root)
+        {
+            Undo.SetCurrentGroupName("Auto-Enable Map Edit Mode");
+            int group = Undo.GetCurrentGroup();
+
+            // Set the private field through SerializedObject so Unity tracks the change properly
+            var so = new SerializedObject(root);
+            so.Update();
+            so.FindProperty("isEditModeEnabled").boolValue = true;
+            so.ApplyModifiedProperties();
+
+            // Restore whatever cell data is already saved in the config
+            if (root.Config != null)
+            {
+                MapBuilderOperations.RestoreFromConfig(root, root.Config);
+            }
+
+            Undo.CollapseUndoOperations(group);
         }
 
         private void DeactivateSceneHandler()
