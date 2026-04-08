@@ -275,11 +275,12 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
             EditorGUILayout.BeginHorizontal();
 
             GUI.backgroundColor = new Color(0.4f, 0.85f, 0.45f);
-            if (GUILayout.Button("⚡ Generate Full Grid", GUILayout.Height(32)))
+            if (GUILayout.Button("⚡ Restore from Config", GUILayout.Height(32)))
             {
                 if (_root != null && _config != null)
                 {
-                    MapBuilderOperations.GenerateGrid(_root, _config);
+                    MapBuilderOperations.ClearSceneObjects(_root);
+                    MapBuilderOperations.RestoreFromConfig(_root, _config);
                 }
                 else
                 {
@@ -289,14 +290,14 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
             }
 
             GUI.backgroundColor = new Color(0.9f, 0.35f, 0.35f);
-            if (GUILayout.Button("🗑 Clear All", GUILayout.Height(32), GUILayout.Width(90)))
+            if (GUILayout.Button("💥 Reset All", GUILayout.Height(32), GUILayout.Width(90)))
             {
                 if (_root != null && _config != null &&
-                    EditorUtility.DisplayDialog("Clear Map",
-                        "This will destroy all generated objects and clear cell data. Are you sure?",
-                        "Clear", "Cancel"))
+                    EditorUtility.DisplayDialog("Reset Map",
+                        "This will destroy all scene objects AND permanently clear all cell data from the config. Are you sure?",
+                        "Reset", "Cancel"))
                 {
-                    MapBuilderOperations.ClearAll(_root, _config);
+                    MapBuilderOperations.ResetAll(_root, _config);
                 }
             }
 
@@ -305,8 +306,8 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
 
             EditorGUILayout.Space(4);
 
-            // Fill All shortcut
-            if (GUILayout.Button("Fill All with Selected Ground Tile"))
+            // Fill All: paint every cell with selected tile and write to cellDataMap
+            if (GUILayout.Button("🖌 Fill All with Selected Ground Tile"))
             {
                 if (_root != null && _config != null)
                     MapBuilderOperations.FillAll(_root, _config, _selectedGroundIndex);

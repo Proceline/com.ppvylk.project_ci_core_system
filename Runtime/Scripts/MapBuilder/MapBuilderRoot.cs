@@ -11,6 +11,10 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
     [ExecuteAlways]
     public class MapBuilderRoot : MonoBehaviour
     {
+        [Header("Edit Mode")]
+        [SerializeField]
+        private bool isEditModeEnabled = false;
+
         [Header("Config")]
         [SerializeField]
         private MapBuilderConfig config;
@@ -24,6 +28,7 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
 
         // ── Public Accessors ────────────────────────────────────────
 
+        public bool IsEditModeEnabled => isEditModeEnabled;
         public MapBuilderConfig Config => config;
         public Transform CellsRoot => cellsRoot;
         public Transform DecoRoot => decoRoot;

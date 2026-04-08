@@ -10,59 +10,76 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
     /// </summary>
     public static class MapBuilderOperations
     {
-        // ── Grid Generation ─────────────────────────────────────────
+        // ── Config Restore ───────────────────────────────────────────
 
         /// <summary>
-        /// Generates the full ground tile grid based on the config.
-        /// Each cell already recorded in cellDataMap is placed; missing cells get default tile index 0.
+        /// Restores scene GameObjects from the cell data already recorded in the config.
+        /// Only cells that have an entry in CellDataMap are placed — empty areas stay empty.
+        /// Does NOT modify CellDataMap at all.
         /// </summary>
-        public static void GenerateGrid(MapBuilderRoot root, MapBuilderConfig config)
+        public static void RestoreFromConfig(MapBuilderRoot root, MapBuilderConfig config)
         {
             if (!ValidateInputs(root, config)) return;
-            if (config.Palette == null || config.Palette.GroundTiles.Count == 0)
+            if (config.Palette == null)
             {
-                Debug.LogWarning("[MapBuilder] No ground tiles in palette. Aborting grid generation.");
+                Debug.LogWarning("[MapBuilder] Config has no palette. Cannot restore scene objects.");
                 return;
             }
 
-            Undo.SetCurrentGroupName("Generate Map Grid");
+            Undo.SetCurrentGroupName("Restore Map from Config");
             int group = Undo.GetCurrentGroup();
 
-            for (int y = 0; y < config.GridSize.y; y++)
+            foreach (var entry in config.CellDataMap)
             {
-                for (int x = 0; x < config.GridSize.x; x++)
-                {
-                    var index = new Vector2Int(x, y);
-                    MapCellEntry? existing = config.GetEntry(index);
-                    int tileIdx = existing.HasValue ? existing.Value.groundTileIndex : 0;
-                    int decoIdx = existing.HasValue ? existing.Value.decoObjectIndex : -1;
+                if (!config.IsIndexInBounds(entry.index)) continue;
 
-                    PlaceCellObject(root, config, index, tileIdx);
+                if (entry.groundTileIndex >= 0)
+                    PlaceCellObject(root, config, entry.index, entry.groundTileIndex);
 
-                    if (decoIdx >= 0)
-                    {
-                        PlaceDecoObject(root, config, index, decoIdx);
-                    }
-                }
+                if (entry.decoObjectIndex >= 0)
+                    PlaceDecoObject(root, config, entry.index, entry.decoObjectIndex);
             }
 
             Undo.CollapseUndoOperations(group);
         }
 
         /// <summary>
-        /// Clears all generated GameObjects under CellsRoot and DecoRoot, and resets cell data.
+        /// Clears all scene GameObjects under CellsRoot and DecoRoot.
+        /// Does NOT modify CellDataMap — persistent data is preserved.
+        /// Use this when switching configs or toggling edit mode.
         /// </summary>
-        public static void ClearAll(MapBuilderRoot root, MapBuilderConfig config)
+        public static void ClearSceneObjects(MapBuilderRoot root)
         {
-            if (!ValidateInputs(root, config)) return;
+            if (root == null)
+            {
+                Debug.LogWarning("[MapBuilder] MapBuilderRoot is null.");
+                return;
+            }
 
-            Undo.SetCurrentGroupName("Clear Map");
+            Undo.SetCurrentGroupName("Clear Map Scene Objects");
             int group = Undo.GetCurrentGroup();
 
             ClearChildren(root.CellsRoot);
             ClearChildren(root.DecoRoot);
 
-            Undo.RecordObject(config, "Clear Cell Data");
+            Undo.CollapseUndoOperations(group);
+        }
+
+        /// <summary>
+        /// Fully resets the map: destroys all scene GOs AND wipes CellDataMap.
+        /// Use only for explicit "start over" operations — this permanently removes saved cell data.
+        /// </summary>
+        public static void ResetAll(MapBuilderRoot root, MapBuilderConfig config)
+        {
+            if (!ValidateInputs(root, config)) return;
+
+            Undo.SetCurrentGroupName("Reset Map");
+            int group = Undo.GetCurrentGroup();
+
+            ClearChildren(root.CellsRoot);
+            ClearChildren(root.DecoRoot);
+
+            Undo.RecordObject(config, "Wipe Cell Data");
             config.ClearAllEntries();
             EditorUtility.SetDirty(config);
 
@@ -159,6 +176,7 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
 
         /// <summary>
         /// Fills the entire grid with the given ground tile index, leaving existing decos intact.
+        /// Writes every cell into CellDataMap. Use this for "fill blank canvas" operations.
         /// </summary>
         public static void FillAll(MapBuilderRoot root, MapBuilderConfig config, int groundTileIndex)
         {
@@ -167,11 +185,34 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
             Undo.SetCurrentGroupName("Fill All Ground");
             int group = Undo.GetCurrentGroup();
 
+            // Clear existing scene objects first (preserving any existing data that will be overwritten)
+            ClearChildren(root.CellsRoot);
+            ClearChildren(root.DecoRoot);
+
             for (int y = 0; y < config.GridSize.y; y++)
             {
                 for (int x = 0; x < config.GridSize.x; x++)
                 {
-                    PaintGround(root, config, new Vector2Int(x, y), groundTileIndex);
+                    var index = new Vector2Int(x, y);
+
+                    // Preserve existing deco index if any
+                    MapCellEntry? existing = config.GetEntry(index);
+                    int decoIdx = existing.HasValue ? existing.Value.decoObjectIndex : -1;
+
+                    // Write to cellDataMap
+                    Undo.RecordObject(config, "Fill Cell Data");
+                    config.SetEntry(new MapCellEntry
+                    {
+                        index = index,
+                        groundTileIndex = groundTileIndex,
+                        decoObjectIndex = decoIdx
+                    });
+                    EditorUtility.SetDirty(config);
+
+                    // Place scene objects
+                    PlaceCellObject(root, config, index, groundTileIndex);
+                    if (decoIdx >= 0)
+                        PlaceDecoObject(root, config, index, decoIdx);
                 }
             }
 
