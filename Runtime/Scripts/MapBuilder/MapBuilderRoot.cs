@@ -45,7 +45,77 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
             EnsureChildRoots();
         }
 
-        // ── Helpers ─────────────────────────────────────────────────
+        private void Awake()
+        {
+            // [ExecuteAlways] causes Awake to fire in Edit Mode too — block that here.
+            if (!Application.isPlaying) return;
+
+            // INTENT check: if Edit Mode is enabled, the Editor was responsible
+            // for this map. Cells may or may not exist (config could be empty),
+            // but either way, runtime should not generate anything.
+            if (isEditModeEnabled) return;
+
+            // EVIDENCE check: defensive guard against accidental double-spawn.
+            if (cellsRoot != null && cellsRoot.childCount > 0) return;
+
+            // Edit Mode was OFF → scene is empty → generate from config at runtime.
+            if (config != null)
+                RuntimeGenerateFromConfig();
+        }
+
+        // ── Runtime Generation ───────────────────────────────────────
+
+        /// <summary>
+        /// Generates the map at runtime (Play Mode) using Instantiate.
+        /// Called only when isEditModeEnabled is false and the scene has no pre-spawned cells.
+        /// This is intentionally separate from the Editor-side generation in MapBuilderOperations
+        /// which uses PrefabUtility.InstantiatePrefab. Zero Editor API usage here.
+        /// </summary>
+        private void RuntimeGenerateFromConfig()
+        {
+            EnsureChildRoots();
+
+            if (config == null || config.Palette == null)
+            {
+                Debug.LogWarning("[MapBuilder] Cannot generate at runtime: config or palette is null.");
+                return;
+            }
+
+            var groundTiles = config.Palette.GroundTiles;
+            var decoObjects = config.Palette.DecorationObjects;
+
+            foreach (var entry in config.CellDataMap)
+            {
+                if (!config.IsIndexInBounds(entry.index)) continue;
+
+                Vector3 worldPos = config.IndexToWorldPosition(entry.index);
+
+                // Ground tile
+                if (entry.groundTileIndex >= 0 && entry.groundTileIndex < groundTiles.Count)
+                {
+                    var prefab = groundTiles[entry.groundTileIndex];
+                    if (prefab != null)
+                    {
+                        var go = Instantiate(prefab, cellsRoot);
+                        go.name = $"Cell_{entry.index.x}_{entry.index.y}";
+                        go.transform.position = worldPos;
+                    }
+                }
+
+                // Decoration
+                if (entry.decoObjectIndex >= 0 && entry.decoObjectIndex < decoObjects.Count)
+                {
+                    var decoEntry = decoObjects[entry.decoObjectIndex];
+                    if (decoEntry.prefab != null)
+                    {
+                        var go = Instantiate(decoEntry.prefab, decoRoot);
+                        go.name = $"Deco_{entry.index.x}_{entry.index.y}";
+                        go.transform.position = worldPos;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Ensures the CellsRoot and DecoRoot child transforms exist.
