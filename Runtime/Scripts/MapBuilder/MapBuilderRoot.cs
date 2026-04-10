@@ -36,7 +36,12 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
         // ── Public Accessors ────────────────────────────────────────
 
         public bool IsEditModeEnabled => isEditModeEnabled;
-        public MapBuilderConfig Config => config;
+        public MapBuilderConfig Config 
+        { 
+            get => config;
+            set => config = value; 
+        }
+
         public Transform CellsRoot => cellsRoot;
         public Transform DecoRoot => decoRoot;
 
