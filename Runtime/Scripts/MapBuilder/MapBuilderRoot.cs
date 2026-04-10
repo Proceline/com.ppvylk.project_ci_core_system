@@ -26,8 +26,12 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
         [SerializeField]
         private Transform decoRoot;
 
+        [Header("Runtime Settings")]
+        [Tooltip("Prevent Awake from auto-generating the map at Play Mode start. " +
+                 "Useful when you want to control generation timing manually.")]
         [SerializeField]
         private bool stopAwakeGeneration = false;
+
 
         // ── Public Accessors ────────────────────────────────────────
 

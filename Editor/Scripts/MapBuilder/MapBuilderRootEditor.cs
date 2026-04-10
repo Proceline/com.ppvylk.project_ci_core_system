@@ -64,7 +64,7 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
                 serializedObject.FindProperty("config"),
                 new GUIContent("Map Config"));
 
-            // Hierarchy roots (collapsed / foldout style)
+            // Hierarchy roots
             EditorGUILayout.PropertyField(
                 serializedObject.FindProperty("cellsRoot"),
                 new GUIContent("Cells Root"));
@@ -78,6 +78,19 @@ namespace ProjectCI.CoreSystem.IEditor.MapBuilder
             {
                 EvaluateAndApplyChanges(root);
             }
+
+            // ── Runtime Settings ─────────────────────────────────────
+            // Drawn outside the BeginChangeCheck block — this field does not
+            // affect Editor-time scene generation, so no need to trigger EvaluateAndApplyChanges.
+            EditorGUILayout.Space(4);
+            DrawHorizontalLine();
+            EditorGUILayout.Space(2);
+            EditorGUILayout.LabelField("Runtime Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(
+                serializedObject.FindProperty("stopAwakeGeneration"),
+                new GUIContent("Stop Awake Generation",
+                    "Prevent Awake from auto-generating the map at Play Mode start."));
+            serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space(4);
 
