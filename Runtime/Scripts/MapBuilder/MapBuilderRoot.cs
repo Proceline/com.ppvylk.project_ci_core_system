@@ -26,6 +26,9 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
         [SerializeField]
         private Transform decoRoot;
 
+        [SerializeField]
+        private bool stopAwakeGeneration = false;
+
         // ── Public Accessors ────────────────────────────────────────
 
         public bool IsEditModeEnabled => isEditModeEnabled;
@@ -56,10 +59,10 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
             if (isEditModeEnabled) return;
 
             // EVIDENCE check: defensive guard against accidental double-spawn.
-            if (cellsRoot != null && cellsRoot.childCount > 0) return;
+            if (cellsRoot && cellsRoot.childCount > 0) return;
 
             // Edit Mode was OFF → scene is empty → generate from config at runtime.
-            if (config != null)
+            if (config && !stopAwakeGeneration)
                 RuntimeGenerateFromConfig();
         }
 
@@ -71,7 +74,7 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
         /// This is intentionally separate from the Editor-side generation in MapBuilderOperations
         /// which uses PrefabUtility.InstantiatePrefab. Zero Editor API usage here.
         /// </summary>
-        private void RuntimeGenerateFromConfig()
+        public void RuntimeGenerateFromConfig()
         {
             EnsureChildRoots();
 
