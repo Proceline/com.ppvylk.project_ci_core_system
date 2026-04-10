@@ -86,6 +86,7 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
         public void RuntimeGenerateFromConfig()
         {
             EnsureChildRoots();
+            ClearRuntimeGeneratedObjects();
 
             if (config == null || config.Palette == null)
             {
@@ -128,6 +129,26 @@ namespace ProjectCI.CoreSystem.Runtime.MapBuilder
             }
         }
 
+        private void ClearRuntimeGeneratedObjects()
+        {
+            if (!Application.isPlaying) return;
+
+            if (cellsRoot != null)
+            {
+                for (int i = cellsRoot.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(cellsRoot.GetChild(i).gameObject);
+                }
+            }
+
+            if (decoRoot != null)
+            {
+                for (int i = decoRoot.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(decoRoot.GetChild(i).gameObject);
+                }
+            }
+        }
 
         /// <summary>
         /// Ensures the CellsRoot and DecoRoot child transforms exist.
