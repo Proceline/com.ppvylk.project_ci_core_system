@@ -7,7 +7,6 @@ using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Unit;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.GridData.LevelGrids;
 using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.GameRules;
-using ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay.Extensions;
 
 namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
 {
@@ -74,9 +73,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         [SerializeField]
         protected BattleGameRules m_GameRules;
 
-        [SerializeField]
-        protected FogOfWar m_FogOfWar;
-
         [Space(10)]
 
         [SerializeField]
@@ -110,11 +106,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             if (m_GameRules)
             {
                 m_GameRules.InitializeRules();
-            }
-
-            if (m_FogOfWar)
-            {
-                m_FogOfWar.SpawnFogObjects();
             }
         }
 
@@ -165,11 +156,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
         public static BattleGameRules GetRules()
         {
             return _instance.m_GameRules;
-        }
-        
-        public static FogOfWar GetFogOfWar()
-        {
-            return _instance.m_FogOfWar;
         }
 
         public static GameObject GetSelectedHoverPrefab()
@@ -243,14 +229,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Gameplay
             }
 
             _instance._mTeams[InTeam].Add(InUnit);
-
-            if (InTeam == BattleTeam.Friendly)
-            {
-                if (_instance.m_FogOfWar)
-                {
-                    _instance.m_FogOfWar.CheckPoint(InUnit.GetCell());
-                }
-            }
         }
 
         private static List<Renderer> GetAllRenderersOfObject(GameObject InObject)
