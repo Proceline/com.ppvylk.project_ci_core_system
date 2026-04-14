@@ -185,60 +185,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
         }
 
         /// <summary>
-        /// 扫描指定区域内的对象
-        /// </summary>
-        /// <typeparam name="T">要查找的组件类型，必须继承自Component</typeparam>
-        /// <param name="center">区域中心点</param>
-        /// <param name="radius">如果是圆形区域，则为半径；如果是矩形区域，则为半边长</param>
-        /// <param name="isCircle">true为圆形区域，false为矩形区域</param>
-        /// <param name="layerMask">要检测的层</param>
-        /// <param name="maxResults">最大返回结果数</param>
-        /// <returns>区域内的对象列表</returns>
-        public static List<T> ScanAreaForObjects<T>(
-            Vector3 center,
-            float radius,
-            bool isCircle = true,
-            LayerMask layerMask = default,
-            int maxResults = 10) where T : Component
-        {
-            List<T> foundObjects = new List<T>();
-            
-            if (isCircle)
-            {
-                // 圆形区域扫描
-                Collider[] colliders = Physics.OverlapSphere(center, radius, layerMask);
-                foreach (var collider in colliders)
-                {
-                    if (foundObjects.Count >= maxResults) break;
-
-                    T component = collider.GetComponent<T>();
-                    if (component != null)
-                    {
-                        foundObjects.Add(component);
-                    }
-                }
-            }
-            else
-            {
-                // 矩形区域扫描
-                Vector3 halfExtents = new Vector3(radius, radius, radius);
-                Collider[] colliders = Physics.OverlapBox(center, halfExtents, Quaternion.identity, layerMask);
-                foreach (var collider in colliders)
-                {
-                    if (foundObjects.Count >= maxResults) break;
-
-                    T component = collider.GetComponent<T>();
-                    if (component != null)
-                    {
-                        foundObjects.Add(component);
-                    }
-                }
-            }
-
-            return foundObjects;
-        }
-
-        /// <summary>
         /// 查找距离position最近的未被占用的LevelCellBase（通过OverlapSphere）
         /// </summary>
         /// <param name="position">目标点</param>
