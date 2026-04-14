@@ -121,8 +121,7 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
             BattleTeam InTeam,
             Action<T> afterSpawnHandler,
             float searchRadius,
-            LayerMask cellLayer,
-            CompassDir InStartDirection = CompassDir.S)
+            LayerMask cellLayer)
             where T : GridPawnUnit
         {
             if (originPawn == null || InGrid == null)
@@ -144,12 +143,6 @@ namespace ProjectCI.CoreSystem.Runtime.TacticRpgTool.Library
 
             T spawnedGridUnit = SetupBattleUnit<T>(originPawn, InGrid, InUnitData, InTeam, cell);
             afterSpawnHandler?.Invoke(spawnedGridUnit);
-
-            LevelCellBase dirCell = spawnedGridUnit.GetCell().GetAdjacentCell(InStartDirection);
-            if (dirCell)
-            {
-                spawnedGridUnit.LookAtCell(dirCell);
-            }
 
             TacticBattleManager.AddUnitToTeam(spawnedGridUnit, InTeam);
 
